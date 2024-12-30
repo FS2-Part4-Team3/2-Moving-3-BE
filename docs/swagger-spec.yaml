@@ -1,0 +1,255 @@
+openapi: 3.0.0
+paths:
+  /auth/signUp:
+    post:
+      operationId: AuthController_signUp
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      summary: 회원가입
+      tags: &ref_0
+        - Auth
+  /auth/signIn:
+    post:
+      operationId: AuthController_signIn
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      summary: 로그인
+      tags: *ref_0
+  /auth/me:
+    get:
+      operationId: AuthController_getMe
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      summary: 로그인 유저 정보 조회
+      tags: *ref_0
+  /auth/refresh:
+    post:
+      operationId: AuthController_refreshToken
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      summary: 토큰 재발급
+      tags: *ref_0
+  /users/watch:
+    post:
+      operationId: UserController_watch
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      summary: 기사 찜하기
+      tags: &ref_1
+        - User
+  /users/share:
+    post:
+      operationId: UserController_share
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      summary: 기사 정보 공유하기
+      tags: *ref_1
+  /drivers:
+    get:
+      operationId: DriverController_getDrivers
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      summary: 기사 목록 조회
+      tags: &ref_2
+        - Driver
+  /drivers/{id}:
+    get:
+      operationId: DriverController_getDriver
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      summary: 기사 상세 조회
+      tags: *ref_2
+  /moves:
+    get:
+      operationId: MoveController_getMoveInfos
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      summary: 이사 정보 목록 조회
+      tags: &ref_3
+        - Move
+    post:
+      operationId: MoveController_postMoveInfo
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      summary: 이사 정보 생성
+      tags: *ref_3
+  /moves/{id}:
+    get:
+      operationId: MoveController_getMoveInfo
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      summary: 이사 정보 상세 조회
+      tags: *ref_3
+    patch:
+      operationId: MoveController_patchMoveInfo
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      summary: 이사 정보 수정
+      tags: *ref_3
+  /moves/{moveId}/confirm/{estimationId}:
+    post:
+      operationId: MoveController_confirmEstimation
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      summary: 이사 견적 확정
+      tags: *ref_3
+  /requests:
+    get:
+      operationId: RequestController_getRequests
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      summary: 요청 목록 조회(유저 기준)
+      tags: &ref_4
+        - Request
+    post:
+      operationId: RequestController_postRequest
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      summary: 요청 생성
+      tags: *ref_4
+  /requests/driver/{id}:
+    get:
+      operationId: RequestController_getRequestsForDriver
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      summary: 요청 목록 조회(기사 기준)
+      tags: *ref_4
+  /requests/{id}:
+    get:
+      operationId: RequestController_getRequest
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      summary: 요청 상세 조회
+      tags: *ref_4
+    delete:
+      operationId: RequestController_deleteRequest
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      summary: 요청 취소(유저)
+      tags: *ref_4
+  /reviews/{driverId}:
+    get:
+      operationId: ReviewController_getReviews
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      summary: 기사 리뷰 조회
+      tags: &ref_5
+        - Review
+    post:
+      operationId: ReviewController_postReview
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      summary: 리뷰 생성
+      tags: *ref_5
+  /reviews/{reviewId}:
+    post:
+      operationId: ReviewController_patchReview
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      summary: 리뷰 수정
+      tags: *ref_5
+    delete:
+      operationId: ReviewController_deleteReview
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      summary: 리뷰 삭제
+      tags: *ref_5
+  /Estimations:
+    get:
+      operationId: EstimationController_getEstimations
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      summary: 견적 목록 조회
+      tags: &ref_6
+        - Estimation
+  /Estimations/{id}:
+    get:
+      operationId: EstimationController_getEstimation
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      summary: 견적 상세 조회
+      tags: *ref_6
+    post:
+      operationId: EstimationController_patchEstimation
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      summary: 견적 수정
+      tags: *ref_6
+    delete:
+      operationId: EstimationController_deleteEstimation
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      summary: 견적 삭제
+      tags: *ref_6
+  /Estimations/{moveInfoId}:
+    post:
+      operationId: EstimationController_postEstimation
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      summary: 견적 생성
+      tags: *ref_6
+info:
+  title: Moving
+  description: 3팀 무빙 api
+  version: '1.0'
+  contact: {}
+tags: []
+servers:
+  - url: http://localhost:3000/
+    description: Local environment
+components:
+  schemas: {}

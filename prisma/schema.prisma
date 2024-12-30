@@ -1,0 +1,243 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  email        String  @unique
+  name         String
+  phoneNumber  String
+  image        String?
+  password     String
+  salt         String
+  refreshToken String?
+
+  serviceTypes ServiceType[]
+  areas        Area[]
+
+  reviews           Review[]
+  userNotifications UserNotification[]
+  moveInfos         MoveInfo[]
+}
+
+model Driver {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  email          String        @unique
+  name           String
+  nickname       String
+  image          String?
+  password       String
+  salt           String
+  refreshToken   String?
+  phoneNumber    String
+  introduce      String
+  description    String
+  serviceType    ServiceType[]
+  availableAreas Area[]
+
+  applyCount    Int
+  favoriteCount Int
+  score         Float
+
+  reviews             Review[]
+  requests            Request[]
+  driverNotifications DriverNotification[]
+  estimations         Estimation[]
+}
+
+model MoveInfo {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  type        ServiceType
+  date        DateTime
+  fromAddress String
+  toAddress   String
+  progress    Progress
+
+  confirmedEstimation   Estimation? @relation(fields: [confirmedEstimationId], references: [id], name: "confirmedEstimation")
+  confirmedEstimationId String?     @unique
+
+  owner       User         @relation(fields: [ownerId], references: [id])
+  ownerId     String
+  estimations Estimation[] @relation(name: "MoveInfoEstimation")
+  requests    Request[]
+
+  @@index([createdAt])
+}
+
+model Request {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  moveInfo   MoveInfo @relation(fields: [moveInfoId], references: [id])
+  moveInfoId String
+  status     Status
+
+  driver              Driver               @relation(fields: [driverId], references: [id])
+  driverId            String
+  driverNotifications DriverNotification[]
+
+  @@index([createdAt])
+}
+
+model Estimation {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  price   Int?
+  comment String
+
+  moveInfo   MoveInfo @relation(fields: [moveInfoId], references: [id], name: "MoveInfoEstimation")
+  moveInfoId String
+  driver     Driver   @relation(fields: [driverId], references: [id])
+  driverId   String
+
+  confirmedFor        MoveInfo?            @relation(name: "confirmedEstimation")
+  confirmedForId      String?              @unique
+  questions           Question[]
+  userNotifications   UserNotification[]
+  driverNotifications DriverNotification[]
+
+  @@index([createdAt])
+}
+
+model Question {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  content String
+
+  estimation   Estimation @relation(fields: [estimationId], references: [id])
+  estimationId String
+
+  @@index([createdAt])
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  comment String
+  score   Int
+
+  driver   Driver @relation(fields: [driverId], references: [id])
+  driverId String
+  owner    User   @relation(fields: [ownerId], references: [id])
+  ownerId  String
+
+  @@index([createdAt])
+}
+
+model UserNotification {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  type    NotificationType
+  message String
+  isRead  Boolean
+
+  user         User        @relation(fields: [userId], references: [id])
+  userId       String
+  estimation   Estimation? @relation(fields: [estimationId], references: [id])
+  estimationId String?
+  date         DateTime?
+
+  @@index([createdAt])
+}
+
+model DriverNotification {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  type    NotificationType
+  message String
+  isRead  Boolean
+
+  driver       Driver      @relation(fields: [driverId], references: [id])
+  driverId     String
+  request      Request?    @relation(fields: [requestId], references: [id])
+  requestId    String?
+  estimation   Estimation? @relation(fields: [estimationId], references: [id])
+  estimationId String?
+  date         DateTime?
+
+  @@index([createdAt])
+}
+
+/**
+ * ******************************************************* enum *********************************************
+ */
+
+enum ServiceType {
+  SMALL
+  HOME
+  OFFICE
+}
+
+enum Area {
+  SEOUL
+  GYEONGGI
+  INCHEON
+  GAGNWON
+  CHUNGBUK
+  CHUNGNAM
+  SEJONG
+  DAEJEON
+  JEONBUK
+  JEONNAM
+  GWANGJU
+  GYEONGBUK
+  GYEONGNAM
+  DAEGU
+  ULSAN
+  BUSAN
+  JEJU
+}
+
+enum Status {
+  PENDING
+  EXPIRED
+  APPLY
+  REJECTED
+  CANCELED
+}
+
+enum Progress {
+  PENDING
+  OPEN
+  EXPIRED
+  CONFIRMED
+  CANCELED
+  COMPLETE
+}
+
+enum NotificationType {
+  REQUEST
+  ESTIMATION
+  DATE
+}
