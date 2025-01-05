@@ -1,0 +1,19 @@
+name: Test PR Trigger
+on:
+  pull_request:
+    types: [opened]
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  test-job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print Context
+        run: |
+          echo "Event triggered by: ${{ github.actor }}"
+          echo "Repository: ${{ github.repository }}"
+          echo "Event name: ${{ github.event_name }}"
+          echo "PR number: ${{ github.event.pull_request.number }}"
