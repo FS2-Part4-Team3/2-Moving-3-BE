@@ -1,0 +1,29 @@
+name: Assign Issue Creator as Assignee
+
+on:
+  issues:
+    types:
+      - opened
+
+jobs:
+  assign-creator:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Assign issue creator as assignee
+        run: |
+          curl -X POST \
+            -H "Authorization: token ${{ secrets.GH_TOKEN }}" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/assignees \
+            -d '{"assignees":["${{ github.event.issue.user.login }}"]}'
+
+      - name: Debug API Response
+        run: |
+          curl -s -o response.json -w "%{http_code}" -X POST \
+            -H "Authorization: token ${{ secrets.GH_TOKEN }}" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/assignees \
+            -d '{"assignees":["${{ github.event.issue.user.login }}"]}'
+          echo "Response:"
+          cat response.json

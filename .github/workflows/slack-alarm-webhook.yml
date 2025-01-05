@@ -1,0 +1,239 @@
+name: Slack Alarm Webhook
+
+on:
+  pull_request:
+    types: [synchronize]
+  pull_request_review:
+    types: [submitted]
+  pull_request_review_comment:
+    types: [created]
+  repository_dispatch:
+    types: [pr_review_request]
+jobs:
+  mention_notification:
+    name: Mention Notification
+    runs-on: ubuntu-latest
+    if: >
+      github.event_name == 'pull_request_review' &&
+      (github.event.review.state == 'APPROVED' || github.event.review.state == 'CHANGES_REQUESTED') ||
+      github.event_name == 'pull_request' ||
+      github.event_name == 'repository_dispatch' ||
+      (github.event_name == 'pull_request_review_comment' && github.event.action == 'created')
+    steps:
+      - name: Debug Event
+        run: |
+          echo "Event name: ${{ github.event_name }}"
+          echo "Event action: ${{ github.event.action }}"
+          echo "Triggered by: ${{ github.actor }}"
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Cache npm packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-yaml-${{ hashFiles('**/js-yaml/**') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-yaml-
+
+      - name: Install yaml package
+        run: npm install yaml
+
+      - name: Read Slack mapping
+        id: slack-mapping
+        run: |
+          MAPPING=$(cat .github/mention-to-slack.yml)
+          echo "mapping<<EOF" >> $GITHUB_OUTPUT
+          echo "$MAPPING" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Download previous notification history
+        continue-on-error: true
+        uses: actions/download-artifact@v3
+        with:
+          name: notification-history
+          path: ./history
+
+      - uses: actions/github-script@v6
+        with:
+          script: |
+            const yaml = require('yaml');
+            const fs = require('fs');
+
+            let notificationHistory = {};
+            try {
+              if (fs.existsSync('./history/notifications.json')) {
+                notificationHistory = JSON.parse(fs.readFileSync('./history/notifications.json', 'utf8'));
+              }
+            } catch (error) {
+              console.log('No previous notification history found');
+            }
+
+            const prNumber = context.payload.pull_request?.number || context.payload.client_payload?.pr_url;
+            const eventType = context.eventName;
+            const eventKey = `${eventType}-${prNumber}`;
+            const currentTime = Date.now();
+
+            if (notificationHistory[eventKey] && 
+                (currentTime - notificationHistory[eventKey]) < 180000) {
+              console.log(`Skipping notification for ${eventKey} - Last notification was sent less than 3 minutes ago`);
+              return;
+            }
+
+            let alarmType = '';
+            let headerText = '';
+
+            if (context.eventName === 'repository_dispatch') {
+              alarmType = '🎯 새로운 PR 리뷰 요청';
+              headerText = '리뷰어가 선정되었습니다';
+            } else if (context.eventName === 'pull_request' && context.payload.action === 'synchronize') {
+              alarmType = '🔄 PR 업데이트';
+              headerText = '새로운 커밋이 푸시되었습니다';
+            } else if (context.eventName === 'pull_request_review') {
+              alarmType = '✍️ 새로운 리뷰';
+              headerText = '새로운 리뷰가 등록되었습니다';
+            }
+
+            const mappingFile = fs.readFileSync('.github/mention-to-slack.yml', 'utf8');
+            const mapping = yaml.parse(mappingFile);
+
+            let prAuthor, prTitle, prUrl, reviewers;
+
+            if (context.eventName === 'repository_dispatch') {
+              prAuthor = context.payload.client_payload.pr_author;
+              prTitle = context.payload.client_payload.pr_title;
+              prUrl = context.payload.client_payload.pr_url;
+              reviewers = context.payload.client_payload.reviewers.reviewers;
+            } else {
+              prAuthor = context.payload.pull_request.user.login;
+              prTitle = context.payload.pull_request.title;
+              prUrl = context.payload.pull_request.html_url;
+              
+              const [requestedReviewers, completedReviews] = await Promise.all([
+                github.rest.pulls.listRequestedReviewers({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: context.payload.pull_request.number
+                }),
+                github.rest.pulls.listReviews({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: context.payload.pull_request.number
+                })
+              ]);
+
+              const allReviewers = new Set([
+                ...requestedReviewers.data.users.map(user => user.login),
+                ...completedReviews.data
+                  .map(review => review.user.login)
+                  .filter(reviewer => reviewer !== prAuthor)
+              ]);
+              
+              reviewers = Array.from(allReviewers);
+            }
+
+            const authorSlackId = mapping[prAuthor] || prAuthor;
+            const formattedAuthor = authorSlackId.startsWith('<@') ? authorSlackId : `<@${authorSlackId}>`;
+
+            const slackReviewers = reviewers
+              .map(reviewer => mapping[reviewer] || reviewer)
+              .map(id => id.startsWith('<@') ? id : `<@${id}>`)
+              .join(', ');
+
+            if (context.eventName === 'pull_request_review_comment') {
+              const currentUser = context.payload.comment.user.login;
+              const prAuthor = context.payload.pull_request.user.login;
+              
+              // 현재 코멘트가 대화 스레드의 일부인지 확인
+              const isReplyInThread = context.payload.comment.in_reply_to_id !== null;
+              
+              // PR 작성자의 댓글이거나 대화 스레드의 일부인 경우 알림 스킵
+              if (currentUser === prAuthor || isReplyInThread) {
+                console.log('Skipping notification - Comment is from PR author or is part of a thread');
+                return;
+              }
+            }
+
+            const message = {
+              blocks: [
+                {
+                  type: "header",
+                  text: {
+                    type: "plain_text",
+                    text: alarmType,
+                    emoji: true
+                  }
+                },
+                {
+                  type: "section",
+                  text: {
+                    type: "mrkdwn",
+                    text: `*${headerText}*`
+                  }
+                },
+                {
+                  type: "section",
+                  fields: [
+                    {
+                      type: "mrkdwn",
+                      text: `*제목:*\n${prTitle}`
+                    },
+                    {
+                      type: "mrkdwn",
+                      text: `*작성자:*\n${formattedAuthor}`
+                    }
+                  ]
+                },
+                {
+                  type: "section",
+                  fields: [
+                    {
+                      type: "mrkdwn",
+                      text: `*리뷰어:*\n${slackReviewers}`
+                    }
+                  ]
+                },
+                {
+                  type: "section",
+                  text: {
+                    type: "mrkdwn",
+                    text: `*PR 링크:*\n${prUrl}`
+                  }
+                }
+              ]
+            };
+
+            await fetch(process.env.SLACK_WEBHOOK_URL, {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify(message)
+            });
+
+            notificationHistory[eventKey] = currentTime;
+
+            for (const key in notificationHistory) {
+              if (currentTime - notificationHistory[key] > 180000) {
+                delete notificationHistory[key];
+              }
+            }
+
+            if (!fs.existsSync('./history')) {
+              fs.mkdirSync('./history');
+            }
+            fs.writeFileSync('./history/notifications.json', JSON.stringify(notificationHistory));
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+
+      - name: Upload notification history
+        uses: actions/upload-artifact@v3
+        with:
+          name: notification-history
+          path: ./history/notifications.json
+          retention-days: 1
