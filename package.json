@@ -18,6 +18,7 @@
     "#estimations/*": "./dist/estimations/*",
     "#move/*": "./dist/move/*",
     "#notifications/*": "./dist/notifications/*",
+    "#questions/*": "./dist/questions/*",
     "#requests/*": "./dist/requests/*",
     "#reviews/*": "./dist/reviews/*",
     "#users/*": "./dist/users/*"
