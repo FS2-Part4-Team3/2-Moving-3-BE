@@ -2,7 +2,7 @@ import { IEstimationController } from '#estimations/interfaces/estimation.contro
 import { Controller, Delete, Get, Post } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 
-@Controller('Estimations')
+@Controller('estimations')
 export class EstimationController implements IEstimationController {
   constructor() {}
 

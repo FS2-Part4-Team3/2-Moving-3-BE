@@ -30,12 +30,13 @@
       "#estimations/*": ["./src/estimations/*"],
       "#move/*": ["./src/move/*"],
       "#notifications/*": ["./src/notifications/*"],
+      "#questions/*": ["./src/questions/*"],
       "#requests/*": ["./src/requests/*"],
       "#reviews/*": ["./src/reviews/*"],
       "#users/*": ["./src/users/*"],
       "#prisma/*": ["./prisma/*"]
     }
   },
-  "include": ["src/**/*", "types/**/*.d.ts"],
+  "include": ["src/**/*", "types/**/*.d.ts", "src/questions/question/.types.ts"],
   "exclude": ["node_modules", "dist", "prettier.config.mjs", "eslint.config.js"]
 }
