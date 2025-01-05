@@ -1,0 +1,103 @@
+name: Assign Random Reviewers and PR Author
+on:
+  pull_request:
+    types: [opened]
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  assign_reviewers_and_author:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get repository collaborators and assign reviewers
+        id: get-members
+        run: |
+          # Get repository collaborators
+          collaborators=$(curl -s \
+            -H "Authorization: token ${{ secrets.GH_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/${{ github.repository }}/collaborators?affiliation=direct" | jq -r '.[].login')
+
+          echo "All collaborators: $collaborators"
+
+          # Convert collaborators to array and remove PR author
+          PR_AUTHOR="${{ github.event.pull_request.user.login }}"
+          filtered_members=()
+          for member in $collaborators; do
+            if [ "$member" != "$PR_AUTHOR" ]; then
+              filtered_members+=("$member")
+            fi
+          done
+
+          echo "Filtered members (excluding PR author): ${filtered_members[*]}"
+
+          # Randomly select 2 reviewers
+          if [ ${#filtered_members[@]} -lt 2 ]; then
+            echo "Not enough collaborators to assign reviewers (excluding PR author)"
+            echo "Number of available reviewers: ${#filtered_members[@]}"
+            exit 1
+          fi
+
+          # Shuffle and select 2 reviewers
+          selected_reviewers=($(printf "%s\n" "${filtered_members[@]}" | shuf -n 2))
+
+          # Create proper JSON payload for reviewers
+          json_payload=$(jq -n --arg r1 "${selected_reviewers[0]}" --arg r2 "${selected_reviewers[1]}" \
+            '{reviewers: [$r1, $r2]}')
+
+          echo "Selected reviewers: ${selected_reviewers[*]}"
+          echo "json_string<<EOF" >> $GITHUB_OUTPUT
+          echo "$json_payload" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Assign reviewers to PR
+        if: success()
+        run: |
+          curl -X POST \
+            "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/requested_reviewers" \
+            -H "Authorization: token ${{ secrets.GH_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            -d '${{ steps.get-members.outputs.json_string }}'
+
+      - name: Assign PR author as assignee
+        if: success()
+        run: |
+          # Create JSON payload for assignee
+          assignee_payload=$(jq -n --arg author "${{ github.event.pull_request.user.login }}" \
+            '{assignees: [$author]}')
+
+          # Assign PR author as assignee
+          curl -X POST \
+            "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/assignees" \
+            -H "Authorization: token ${{ secrets.GH_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            -d "$assignee_payload"
+
+  trigger-next:
+    runs-on: ubuntu-latest
+    needs: assign_reviewers_and_author
+    steps:
+      - name: Trigger Slack Alarm
+        run: |
+          # 리뷰어 정보 가져오기
+          reviewers=$(curl -s \
+            -H "Authorization: token ${{ secrets.GH_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/requested_reviewers" | jq -c '{reviewers: [.users[].login]}')
+
+          curl -X POST \
+          -H "Content-Type: application/json" \
+          -d '{
+            "event_type": "pr_review_request",
+            "client_payload": {
+              "pr_title": "${{ github.event.pull_request.title }}",
+              "pr_url": "${{ github.event.pull_request.html_url }}",
+              "pr_author": "${{ github.event.pull_request.user.login }}",
+              "reviewers": '"$reviewers"'
+            }
+          }' \
+          -H "Authorization: token ${{ secrets.GH_TOKEN }}" \
+          -H "Accept: application/vnd.github.v3+json" \
+          https://api.github.com/repos/${{ github.repository }}/dispatches
