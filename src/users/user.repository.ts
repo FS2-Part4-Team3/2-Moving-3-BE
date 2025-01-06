@@ -13,7 +13,11 @@ export class UserRepository implements IUserRepository {
 
   async findMany(options: FindOptions) {}
 
-  async findById(id: string) {}
+  async findById(id: string) {
+    const user = await this.user.findUnique({ where: id });
+
+    return user;
+  }
 
   async findByEmail(email: string) {}
 
