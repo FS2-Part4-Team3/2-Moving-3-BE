@@ -9,3 +9,9 @@ export interface UserToken {
 
 export interface SignInDTO extends Pick<User, 'email' | 'password'> {}
 export interface FilteredUserOutputDTO extends Omit<UserInputDTO, 'password' | 'salt' | 'refreshToken'>, ModelBase {}
+
+export interface FilteredUserUserWithToken {
+  user: FilteredUserOutputDTO;
+  accessToken?: string;
+  refreshToken?: string;
+}

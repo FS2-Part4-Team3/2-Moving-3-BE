@@ -1,4 +1,5 @@
 import { AuthService } from '#auth/auth.service.js';
+import { SignInDTO } from '#auth/auth.types.js';
 import { AccessTokenGuard } from '#auth/guards/access-token.guard.js';
 import { HashPasswordGuard } from '#auth/guards/hash-password.guard.js';
 import { IAuthController } from '#auth/interfaces/auth.controller.interface.js';
@@ -14,14 +15,18 @@ export class AuthController implements IAuthController {
   @UseGuards(HashPasswordGuard)
   @ApiOperation({ summary: '회원가입' })
   async signUp(@Body() body: UserInputDTO) {
-    const user = await this.authService.createUser(body);
+    const userWithToken = await this.authService.createUser(body);
 
-    return user;
+    return userWithToken;
   }
 
   @Post('signIn')
   @ApiOperation({ summary: '로그인' })
-  async signIn() {}
+  async signIn(@Body() body: SignInDTO) {
+    const userWithToken = await this.authService.signIn(body);
+
+    return userWithToken;
+  }
 
   @Get('me')
   @UseGuards(AccessTokenGuard)
