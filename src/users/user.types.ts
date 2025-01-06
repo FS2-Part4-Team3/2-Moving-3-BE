@@ -7,3 +7,4 @@ interface UserBase extends PrismaUserBase {}
 export interface User extends UserBase, ModelBase {}
 
 export interface UserInputDTO extends Omit<User, keyof ModelBase> {}
+export interface UserCreateDTO extends UserInputDTO {}

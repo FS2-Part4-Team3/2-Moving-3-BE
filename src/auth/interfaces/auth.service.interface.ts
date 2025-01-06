@@ -3,7 +3,7 @@ import { User, UserInputDTO } from '#users/user.types.js';
 
 export interface IAuthService {
   getMe: () => Promise<User>;
-  createUser: (body: UserInputDTO) => void;
+  createUser: (data: UserInputDTO) => Promise<User>;
   signIn: (body: SignInDTO) => void;
   getNewToken: () => void;
 }

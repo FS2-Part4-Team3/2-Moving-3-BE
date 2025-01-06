@@ -22,7 +22,12 @@ export class AuthService implements IAuthService {
     return user;
   }
 
-  async createUser(body: UserInputDTO) {}
+  async createUser(body: UserInputDTO) {
+    const data = body;
+    const user = await this.userRepository.create(data);
+
+    return user;
+  }
 
   async signIn(body: SignInDTO) {}
 
