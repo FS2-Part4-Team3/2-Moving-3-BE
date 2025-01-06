@@ -42,7 +42,11 @@ export class QuestionRepository implements IQuestionRepository {
     return question;
   }
 
-  async update(id: string, data: Partial<QuestionCreateDTO>) {}
+  async update(id: string, data: Partial<QuestionCreateDTO>) {
+    const question = await this.question.update({ where: { id }, data });
+
+    return question;
+  }
 
   async delete(id: string) {}
 }

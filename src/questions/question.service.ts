@@ -28,4 +28,10 @@ export class QuestionService implements IQuestionService {
 
     return question;
   }
+
+  async updateQuestion(id: string, data: Partial<QuestionInputDTO>) {
+    const question = await this.questionRepository.update(id, data);
+
+    return question;
+  }
 }
