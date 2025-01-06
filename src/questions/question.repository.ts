@@ -48,5 +48,9 @@ export class QuestionRepository implements IQuestionRepository {
     return question;
   }
 
-  async delete(id: string) {}
+  async delete(id: string) {
+    const question = await this.question.delete({ where: { id } });
+
+    return question;
+  }
 }

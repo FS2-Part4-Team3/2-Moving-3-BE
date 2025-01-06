@@ -34,4 +34,10 @@ export class QuestionService implements IQuestionService {
 
     return question;
   }
+
+  async deleteQuestion(id: string) {
+    const question = await this.questionRepository.delete(id);
+
+    return question;
+  }
 }

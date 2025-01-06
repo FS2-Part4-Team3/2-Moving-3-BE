@@ -26,5 +26,9 @@ export class QuestionController implements IQuestionController {
 
   @Delete(':id')
   @ApiOperation({ summary: '문의 삭제' })
-  async deleteQuestion() {}
+  async deleteQuestion(@Param('id') id: string) {
+    const question = await this.questionService.deleteQuestion(id);
+
+    return question;
+  }
 }
