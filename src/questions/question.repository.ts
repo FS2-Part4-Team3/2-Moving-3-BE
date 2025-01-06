@@ -11,6 +11,12 @@ export class QuestionRepository implements IQuestionRepository {
     this.question = prisma.question;
   }
 
+  async count(estimationId: string) {
+    const count = await this.question.count({ where: { estimationId } });
+
+    return count;
+  }
+
   async findMany(estimationId: string, options: FindOptions) {
     const { page, pageSize } = options;
 
@@ -24,7 +30,11 @@ export class QuestionRepository implements IQuestionRepository {
     return questions;
   }
 
-  async findById(id: string) {}
+  async findById(id: string) {
+    const question = await this.question.findUnique({ where: { id } });
+
+    return question;
+  }
 
   async create(data: QuestionInputDTO) {}
 
