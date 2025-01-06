@@ -37,6 +37,6 @@
       "#prisma/*": ["./prisma/*"]
     }
   },
-  "include": ["src/**/*", "types/**/*.d.ts", "src/questions/question/.types.ts"],
+  "include": ["src/**/*", "types/**/*.d.ts", "prisma/**/*"],
   "exclude": ["node_modules", "dist", "prettier.config.mjs", "eslint.config.js"]
 }

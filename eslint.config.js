@@ -5,11 +5,20 @@ import pluginPrettier from 'eslint-plugin-prettier';
 import tseslint from 'typescript-eslint';
 
 export default [
-  pluginJs.configs.recommended,
-  ...tseslint.configs.recommended,
+  {
+    env: {
+      node: true,
+    },
+  },
   prettierConfig,
   {
+    files: ['**/*.js'],
+    ...pluginJs.configs.recommended,
+  },
+  {
     files: ['**/*.ts', '**/*.tsx'],
+    ...pluginJs.configs.recommended,
+    ...tseslint.configs.recommended,
     languageOptions: {
       parser: tseslint.parser,
       parserOptions: {

@@ -18,14 +18,13 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  email        String  @unique
+  email        String        @unique
   name         String
   phoneNumber  String
   image        String?
   password     String
   salt         String
   refreshToken String?
-
   serviceTypes ServiceType[]
   areas        Area[]
 
@@ -49,7 +48,7 @@ model Driver {
   phoneNumber    String
   introduce      String
   description    String
-  serviceType    ServiceType[]
+  serviceTypes   ServiceType[]
   availableAreas Area[]
 
   applyCount    Int
