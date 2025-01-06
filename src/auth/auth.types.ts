@@ -12,6 +12,6 @@ export interface FilteredUserOutputDTO extends Omit<UserInputDTO, 'password' | '
 
 export interface FilteredUserUserWithToken {
   user: FilteredUserOutputDTO;
-  accessToken?: string;
+  accessToken: string;
   refreshToken?: string;
 }

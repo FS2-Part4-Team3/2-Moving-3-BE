@@ -2,10 +2,12 @@ import { AuthService } from '#auth/auth.service.js';
 import { SignInDTO } from '#auth/auth.types.js';
 import { AccessTokenGuard } from '#auth/guards/access-token.guard.js';
 import { HashPasswordGuard } from '#auth/guards/hash-password.guard.js';
+import { RefreshTokenGuard } from '#auth/guards/refresh-token.guard.js';
 import { IAuthController } from '#auth/interfaces/auth.controller.interface.js';
 import { UserInputDTO } from '#users/user.types.js';
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Res, UseGuards } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
+import { Response } from 'express';
 
 @Controller('auth')
 export class AuthController implements IAuthController {
@@ -14,18 +16,20 @@ export class AuthController implements IAuthController {
   @Post('signUp')
   @UseGuards(HashPasswordGuard)
   @ApiOperation({ summary: '회원가입' })
-  async signUp(@Body() body: UserInputDTO) {
-    const userWithToken = await this.authService.createUser(body);
+  async signUp(@Body() body: UserInputDTO, @Res({ passthrough: true }) response: Response) {
+    const { user, accessToken, refreshToken } = await this.authService.createUser(body);
+    response.cookie('refreshToken', refreshToken);
 
-    return userWithToken;
+    return { user, accessToken };
   }
 
   @Post('signIn')
   @ApiOperation({ summary: '로그인' })
-  async signIn(@Body() body: SignInDTO) {
-    const userWithToken = await this.authService.signIn(body);
+  async signIn(@Body() body: SignInDTO, @Res({ passthrough: true }) response: Response) {
+    const { user, accessToken, refreshToken } = await this.authService.signIn(body);
+    response.cookie('refreshToken', refreshToken);
 
-    return userWithToken;
+    return { user, accessToken };
   }
 
   @Get('me')
@@ -38,6 +42,12 @@ export class AuthController implements IAuthController {
   }
 
   @Post('refresh')
+  @UseGuards(RefreshTokenGuard)
   @ApiOperation({ summary: '토큰 재발급' })
-  async refreshToken() {}
+  async refreshToken(@Res({ passthrough: true }) response: Response) {
+    const { user, accessToken, refreshToken } = await this.authService.getNewToken();
+    response.cookie('refreshToken', refreshToken);
+
+    return { user, accessToken };
+  }
 }

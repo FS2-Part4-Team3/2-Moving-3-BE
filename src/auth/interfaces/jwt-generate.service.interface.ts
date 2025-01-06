@@ -1,4 +1,4 @@
 export interface IJwtGenerateService {
-  generateAccessToken: (payload: any) => string;
-  generateRefreshToken: (payload: any) => string;
+  generateAccessToken: (payload: { userId: string }) => string;
+  generateRefreshToken: (payload: { userId: string }) => Promise<string>;
 }

@@ -35,7 +35,7 @@ export class UserRepository implements IUserRepository {
   }
 
   async findById(id: string) {
-    const user = await this.user.findUnique({ where: id });
+    const user = await this.user.findUnique({ where: { id } });
 
     return user;
   }
@@ -52,5 +52,9 @@ export class UserRepository implements IUserRepository {
     return user;
   }
 
-  async update(id: string, data: Partial<UserCreateDTO>) {}
+  async update(id: string, data: Partial<UserCreateDTO>) {
+    const user = await this.user.update({ where: { id }, data });
+
+    return user;
+  }
 }

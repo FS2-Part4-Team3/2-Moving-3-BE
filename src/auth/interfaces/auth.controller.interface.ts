@@ -3,8 +3,8 @@ import { User, UserInputDTO } from '#users/user.types.js';
 import { Response } from 'express';
 
 export interface IAuthController {
-  signUp: (body: UserInputDTO) => Promise<FilteredUserUserWithToken>;
-  signIn: (body: SignInDTO, res: Response) => void;
+  signUp: (body: UserInputDTO, res: Response) => Promise<FilteredUserUserWithToken>;
+  signIn: (body: SignInDTO, res: Response) => Promise<FilteredUserUserWithToken>;
   getMe: () => Promise<User>;
-  refreshToken: () => void;
+  refreshToken: (res: Response) => void;
 }
