@@ -11,7 +11,18 @@ export class QuestionRepository implements IQuestionRepository {
     this.question = prisma.question;
   }
 
-  async findMany(options: FindOptions) {}
+  async findMany(estimationId: string, options: FindOptions) {
+    const { page, pageSize } = options;
+
+    const questions = await this.question.findMany({
+      where: { estimationId },
+      orderBy: { createdAt: 'desc' },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    });
+
+    return questions;
+  }
 
   async findById(id: string) {}
 
