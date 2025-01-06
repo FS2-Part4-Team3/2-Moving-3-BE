@@ -1,6 +1,6 @@
 import { PrismaService } from '#global/prisma.service.js';
 import { IQuestionRepository } from '#questions/interfaces/question.repository.interface.js';
-import { QuestionInputDTO } from '#questions/question.types.js';
+import { QuestionCreateDTO } from '#questions/question.types.js';
 import { FindOptions } from '#types/options.type.js';
 import { Injectable } from '@nestjs/common';
 
@@ -36,9 +36,13 @@ export class QuestionRepository implements IQuestionRepository {
     return question;
   }
 
-  async create(data: QuestionInputDTO) {}
+  async create(data: QuestionCreateDTO) {
+    const question = await this.question.create({ data });
 
-  async update(id: string, data: Partial<QuestionInputDTO>) {}
+    return question;
+  }
+
+  async update(id: string, data: Partial<QuestionCreateDTO>) {}
 
   async delete(id: string) {}
 }

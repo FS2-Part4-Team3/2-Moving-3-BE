@@ -1,7 +1,8 @@
 import { IEstimationController } from '#estimations/interfaces/estimation.controller.interface.js';
 import { QuestionService } from '#questions/question.service.js';
+import { QuestionInputDTO } from '#questions/question.types.js';
 import { GetQueries } from '#types/queries.type.js';
-import { Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 
 @Controller('estimations')
@@ -37,5 +38,13 @@ export class EstimationController implements IEstimationController {
     const questions = await this.questionService.findQuestions(id, options);
 
     return questions;
+  }
+
+  @Post(':id/questions')
+  @ApiOperation({ summary: '문의 생성' })
+  async postQuestion(@Param('id') id: string, @Body() body: QuestionInputDTO) {
+    const question = await this.questionService.createQuestion(id, body);
+
+    return question;
   }
 }

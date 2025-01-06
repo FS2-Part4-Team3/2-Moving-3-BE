@@ -15,10 +15,6 @@ export class QuestionController implements IQuestionController {
     return question;
   }
 
-  @Post(':moveInfoId')
-  @ApiOperation({ summary: '문의 생성' })
-  async postQuestion() {}
-
   @Post(':id')
   @ApiOperation({ summary: '문의 수정' })
   async patchQuestion() {}
