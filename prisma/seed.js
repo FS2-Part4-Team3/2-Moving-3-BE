@@ -1,4 +1,4 @@
-import { fakerKO as faker } from '@faker-js/faker';
+import { fakerKO as faker, faker as fakerEN } from '@faker-js/faker';
 import { Area, NotificationType, PrismaClient, Progress, ServiceType, Status } from '@prisma/client';
 
 if (!process.env.DATABASE_URL) {
@@ -75,8 +75,8 @@ async function main() {
       password: faker.string.hexadecimal({ prefix: '', casing: 'lower', length: 128 }),
       salt: faker.string.hexadecimal({ prefix: '', casing: 'lower', length: 32 }),
       phoneNumber: faker.phone.number(),
-      introduce: faker.lorem.sentence(),
-      description: faker.lorem.paragraph(),
+      introduce: fakerEN.lorem.sentence(),
+      description: fakerEN.lorem.paragraph(),
       serviceTypes: driverServiceTypes,
       availableAreas: driverAreas,
       applyCount: faker.number.int({ min: 1, max: 100 }),
@@ -111,7 +111,7 @@ async function main() {
   const estimations = Array.from({ length: 50 }).map(() => ({
     id: faker.string.uuid(),
     price: faker.number.int({ min: 10000, max: 1000000, multipleOf: 1000 }),
-    comment: faker.lorem.sentence(),
+    comment: fakerEN.lorem.sentence(),
     moveInfoId: moveInfos[faker.number.int({ min: 0, max: 49 })].id,
     driverId: drivers[faker.number.int({ min: 0, max: 19 })].id,
   }));
@@ -120,7 +120,7 @@ async function main() {
   // Generate mock data for Question
   const questions = Array.from({ length: 50 }).map(() => ({
     id: faker.string.uuid(),
-    content: faker.lorem.sentence(),
+    content: fakerEN.lorem.sentence(),
     estimationId: estimations[faker.number.int({ min: 0, max: 49 })].id,
   }));
   await prisma.question.createMany({ data: questions });
@@ -128,7 +128,7 @@ async function main() {
   // Generate mock data for Review
   const reviews = Array.from({ length: 50 }).map(() => ({
     id: faker.string.uuid(),
-    comment: faker.lorem.sentence(),
+    comment: fakerEN.lorem.sentence(),
     score: faker.number.int({ min: 1, max: 5 }),
     driverId: drivers[faker.number.int({ min: 0, max: 19 })].id,
     ownerId: users[faker.number.int({ min: 0, max: 19 })].id,
@@ -139,7 +139,7 @@ async function main() {
   const userNotifications = Array.from({ length: 20 }).map(() => ({
     id: faker.string.uuid(),
     type: notificationTypes[faker.number.int({ min: 0, max: 2 })],
-    message: faker.lorem.sentence(),
+    message: fakerEN.lorem.sentence(),
     isRead: faker.datatype.boolean(),
     userId: users[faker.number.int({ min: 0, max: 19 })].id,
   }));
@@ -149,7 +149,7 @@ async function main() {
   const driverNotifications = Array.from({ length: 20 }).map(() => ({
     id: faker.string.uuid(),
     type: notificationTypes[faker.number.int({ min: 0, max: 2 })],
-    message: faker.lorem.sentence(),
+    message: fakerEN.lorem.sentence(),
     isRead: faker.datatype.boolean(),
     driverId: drivers[faker.number.int({ min: 0, max: 19 })].id,
   }));

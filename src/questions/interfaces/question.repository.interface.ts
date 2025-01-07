@@ -1,10 +1,10 @@
 import { FindOptions } from '#types/options.type.js';
-import { QuestionInputDTO } from 'src/questions/question.types.js';
+import { Question, QuestionCreateDTO } from 'src/questions/question.types.js';
 
 export interface IQuestionRepository {
-  findMany: (options: FindOptions) => void;
-  findById: (id: string) => void;
-  create: (data: QuestionInputDTO) => void;
-  update: (id: string, data: Partial<QuestionInputDTO>) => void;
-  delete: (id: string) => void;
+  findMany: (estimationId: string, options: FindOptions) => Promise<Question[]>;
+  findById: (id: string) => Promise<Question> | null;
+  create: (data: QuestionCreateDTO) => Promise<Question>;
+  update: (id: string, data: Partial<QuestionCreateDTO>) => Promise<Question>;
+  delete: (id: string) => Promise<Question>;
 }

@@ -1,7 +1,43 @@
 import { IQuestionService } from '#questions/interfaces/question.service.interface.js';
+import { QuestionNotFoundException } from '#questions/question.exception.js';
+import { QuestionRepository } from '#questions/question.repository.js';
+import { QuestionInputDTO } from '#questions/question.types.js';
+import { FindOptions } from '#types/options.type.js';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class QuestionService implements IQuestionService {
-  constructor() {}
+  constructor(private readonly questionRepository: QuestionRepository) {}
+
+  async findQuestions(estimationId: string, options: FindOptions) {
+    const list = await this.questionRepository.findMany(estimationId, options);
+    const totalCount = await this.questionRepository.count(estimationId);
+
+    return { totalCount, list };
+  }
+
+  async findQuestion(id: string) {
+    const question = await this.questionRepository.findById(id);
+    if (!question) throw new QuestionNotFoundException();
+
+    return question;
+  }
+
+  async createQuestion(estimationId: string, data: QuestionInputDTO) {
+    const question = await this.questionRepository.create({ ...data, estimationId });
+
+    return question;
+  }
+
+  async updateQuestion(id: string, data: Partial<QuestionInputDTO>) {
+    const question = await this.questionRepository.update(id, data);
+
+    return question;
+  }
+
+  async deleteQuestion(id: string) {
+    const question = await this.questionRepository.delete(id);
+
+    return question;
+  }
 }
