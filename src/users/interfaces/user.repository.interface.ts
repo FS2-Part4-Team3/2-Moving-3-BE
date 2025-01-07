@@ -7,5 +7,5 @@ export interface IUserRepository {
   findById: (id: string) => Promise<User> | null;
   findByEmail: (email: string) => Promise<User> | null;
   create: (data: UserCreateDTO) => Promise<User>;
-  update: (id: string, data: UserUpdateDTO) => void;
+  update: (id: string, data: UserUpdateDTO) => Promise<User>;
 }

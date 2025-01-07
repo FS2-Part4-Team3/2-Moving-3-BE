@@ -1,6 +1,6 @@
 import { ModelBase } from '#types/common.types.js';
 import { PersonalInfo } from '#types/personal.type.js';
-import { OmitType } from '@nestjs/swagger';
+import { OmitType, PartialType } from '@nestjs/swagger';
 import { $Enums, User as PrismaUser } from '@prisma/client';
 import { ArrayNotEmpty, IsIn } from 'class-validator';
 
@@ -19,7 +19,9 @@ export class UserEntity extends PersonalInfo implements User {
   serviceTypes: $Enums.ServiceType[];
 }
 
-export class UserInputDTO extends OmitType(UserEntity, ['refreshToken']) {}
+export class UserPostDTO extends OmitType(UserEntity, ['refreshToken']) {}
+export class UserPatchDTO extends PartialType(UserPostDTO) {}
+
 export interface UserCreateDTO extends Omit<Omit<User, keyof ModelBase>, 'refreshToken'> {}
 export interface UserUpdateDTO extends Partial<UserCreateDTO> {
   refreshToken?: string;

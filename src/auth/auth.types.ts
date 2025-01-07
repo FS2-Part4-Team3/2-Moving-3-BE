@@ -1,5 +1,5 @@
 import { ModelBase } from '#types/common.types.js';
-import { User, UserInputDTO } from '#users/user.types.js';
+import { User, UserPostDTO } from '#users/user.types.js';
 
 export interface UserToken {
   userId: string;
@@ -8,7 +8,7 @@ export interface UserToken {
 }
 
 export interface SignInDTO extends Pick<User, 'email' | 'password'> {}
-export interface FilteredUserOutputDTO extends Omit<UserInputDTO, 'password' | 'salt' | 'refreshToken'>, ModelBase {}
+export interface FilteredUserOutputDTO extends Omit<UserPostDTO, 'password' | 'salt' | 'refreshToken'>, ModelBase {}
 
 export interface FilteredUserUserWithToken {
   user: FilteredUserOutputDTO;
