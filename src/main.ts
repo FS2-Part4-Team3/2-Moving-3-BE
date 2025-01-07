@@ -1,6 +1,7 @@
 import { port } from '#configs/common.config.js';
 import { HttpExceptionFilter } from '#exceptions/exception.filter.js';
 import { AppModule } from '#global/app.module.js';
+import { ForbiddenFieldsPipe } from '#global/pipes/forbidden-field.validation.pipe.js';
 import { SwaggerService } from '#swagger/swagger.service.js';
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
@@ -12,6 +13,7 @@ async function bootstrap() {
   app.use(cookieParser());
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ForbiddenFieldsPipe());
 
   const swaggerService = app.get(SwaggerService);
   swaggerService.setupSwagger(app);
