@@ -1,10 +1,10 @@
-import { SignInDTO } from '#auth/auth.types.js';
-import { UserInputDTO } from '#users/user.types.js';
+import { FilteredUserUserWithToken, SignInDTO } from '#auth/auth.types.js';
+import { User, UserInputDTO } from '#users/user.types.js';
 import { Response } from 'express';
 
 export interface IAuthController {
-  signUp: (body: UserInputDTO) => void;
-  signIn: (body: SignInDTO, res: Response) => void;
-  getMe: () => void;
-  refreshToken: () => void;
+  signUp: (body: UserInputDTO, res: Response) => Promise<FilteredUserUserWithToken>;
+  signIn: (body: SignInDTO, res: Response) => Promise<FilteredUserUserWithToken>;
+  getMe: () => Promise<User>;
+  refreshToken: (res: Response) => void;
 }

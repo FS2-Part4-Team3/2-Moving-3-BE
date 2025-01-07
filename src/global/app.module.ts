@@ -12,6 +12,7 @@ import { MoveModule } from '#move/move.module.js';
 import { RequestModule } from '#requests/request.module.js';
 import { ReviewModule } from '#reviews/review.module.js';
 import { SwaggerModule } from '#swagger/swagger.module.js';
+import { UserModule } from '#users/user.module.js';
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_INTERCEPTOR } from '@nestjs/core';
@@ -24,6 +25,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
     RequestModule,
     ReviewModule,
     EstimationModule,
+    UserModule,
     SwaggerModule,
     StorageModule,
     ConfigModule.forRoot({ isGlobal: true, load: [jwtConfig, postgresConfig] }),

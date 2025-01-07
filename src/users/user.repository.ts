@@ -1,7 +1,7 @@
 import { PrismaService } from '#global/prisma.service.js';
 import { FindOptions } from '#types/options.type.js';
 import { IUserRepository } from '#users/interfaces/user.repository.interface.js';
-import { UserInputDTO } from '#users/user.types.js';
+import { UserCreateDTO } from '#users/user.types.js';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
@@ -11,15 +11,50 @@ export class UserRepository implements IUserRepository {
     this.user = prisma.user;
   }
 
-  async findMany(options: FindOptions) {}
+  async count() {
+    const count = await this.user.count();
 
-  async findById(id: string) {}
+    return count;
+  }
 
-  async findByEmail(email: string) {}
+  async findMany(options: FindOptions) {
+    const { page, pageSize, orderBy } = options;
+    // prettier-ignore
+    const sort = (
+      orderBy === 'oldest' ? {createdAt: 'asc'} :
+      orderBy === 'latest' ? {createdAt: 'desc'} : {createdAt: 'desc'}
+    )
 
-  async findBySignInForm(body: UserInputDTO) {}
+    const users = await this.user.findMany({
+      orderBy: sort,
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    });
 
-  async create(data: UserInputDTO) {}
+    return users;
+  }
 
-  async update(id: string, data: UserInputDTO) {}
+  async findById(id: string) {
+    const user = await this.user.findUnique({ where: { id } });
+
+    return user;
+  }
+
+  async findByEmail(email: string) {
+    const user = await this.user.findUnique({ where: { email } });
+
+    return user;
+  }
+
+  async create(data: UserCreateDTO) {
+    const user = await this.user.create({ data });
+
+    return user;
+  }
+
+  async update(id: string, data: Partial<UserCreateDTO>) {
+    const user = await this.user.update({ where: { id }, data });
+
+    return user;
+  }
 }
