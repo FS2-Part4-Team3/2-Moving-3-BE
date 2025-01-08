@@ -1,14 +1,20 @@
 import { IMoveController } from '#move/interfaces/move.controller.interface.js';
-import { Controller, Get, Patch, Post } from '@nestjs/common';
+import { FindOptions, RequestFilter } from '#types/options.type.js';
+import { Controller, Get, Patch, Post, Query } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
+import { MoveService } from './move.service.js';
 
 @Controller('moves')
 export class MoveController implements IMoveController {
-  constructor() {}
+  constructor(private readonly moveService: MoveService) {}
 
   @Get()
   @ApiOperation({ summary: '이사 정보 목록 조회' })
-  async getMoveInfos() {}
+  async getMoveInfos(@Query('driverId') driverId?: string, @Query() options?: FindOptions & RequestFilter) {
+    const request = await this.moveService.getMoveInfos(driverId, options);
+
+    return request;
+  }
 
   @Get(':id')
   @ApiOperation({ summary: '이사 정보 상세 조회' })
