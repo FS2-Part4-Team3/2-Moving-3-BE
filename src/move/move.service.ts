@@ -5,10 +5,10 @@ import { MoveRepository } from './move.repository.js';
 
 @Injectable()
 export class MoveService implements IMoveService {
-  constructor(private readonly movetRepository: MoveRepository) {}
+  constructor(private readonly moveRepository: MoveRepository) {}
 
   async getMoveInfos(driverId?: string, options?: FindOptions & RequestFilter) {
-    const { list, totalCount } = await this.movetRepository.findMany(options, driverId);
+    const { list, totalCount } = await this.moveRepository.findMany(options, driverId);
 
     return { totalCount, list };
   }

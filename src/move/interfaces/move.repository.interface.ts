@@ -1,8 +1,8 @@
-import { MoveInfoInputDTO } from '#move/move.types.js';
+import { MoveInfo, MoveInfoInputDTO } from '#move/move.types.js';
 import { FindOptions, RequestFilter } from '#types/options.type.js';
 
 export interface IMoveRepository {
-  findMany: (options?: FindOptions & RequestFilter, driverId?: string) => Promise<{ totalCount: number; list: Request[] }>;
+  findMany: (options?: FindOptions & RequestFilter, driverId?: string) => Promise<{ totalCount: number; list: MoveInfo[] }>;
   findById: (id: string) => void;
   create: (data: MoveInfoInputDTO) => void;
   update: (id: string, data: Partial<MoveInfoInputDTO>) => void;

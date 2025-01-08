@@ -1,6 +1,6 @@
-import { Request } from '#requests/request.types.js';
+import { MoveInfo } from '#move/move.types.js';
 import { FindOptions, RequestFilter } from '#types/options.type.js';
 
 export interface IMoveService {
-  getMoveInfos: (driverId?: string, options?: FindOptions & RequestFilter) => Promise<{ totalCount: number; list: Request[] }>;
+  getMoveInfos: (driverId?: string, options?: FindOptions & RequestFilter) => Promise<{ totalCount: number; list: MoveInfo[] }>;
 }
