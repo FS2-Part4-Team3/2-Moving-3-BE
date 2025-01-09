@@ -1,6 +1,7 @@
 import { DriverNotFoundException } from '#drivers/driver.exception.js';
 import { DriverRepository } from '#drivers/driver.repository.js';
 import { IDriverService } from '#drivers/interfaces/driver.service.interface.js';
+import filterSensitiveData from '#utils/filterSensitiveData.js';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
@@ -13,6 +14,6 @@ export class DriverService implements IDriverService {
       throw new DriverNotFoundException();
     }
 
-    return driver;
+    return filterSensitiveData(driver);
   }
 }

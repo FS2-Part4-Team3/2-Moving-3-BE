@@ -1,3 +1,5 @@
+import { Driver } from '#drivers/driver.types.js';
+import { User } from '#users/user.types.js';
 import { IsEmail, IsHexadecimal, IsJWT, IsNotEmpty, IsOptional, IsString, IsUrl, Length, Matches } from 'class-validator';
 
 export class PersonalInfo {
@@ -27,3 +29,5 @@ export class PersonalInfo {
   @IsJWT({ message: 'refreshToken은 JWT 형식이어야 합니다.' })
   refreshToken: string;
 }
+
+export type FilteredPersonalInfo<T> = T extends User | Driver ? Omit<T, 'password' | 'salt' | 'refreshToken'> : never;
