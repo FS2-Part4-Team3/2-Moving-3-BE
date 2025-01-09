@@ -1,7 +1,7 @@
 import { DriverInputDTO } from '#drivers/driver.types.js';
 import { IDriverRepository } from '#drivers/interfaces/driver.repository.interface.js';
 import { PrismaService } from '#global/prisma.service.js';
-import { FindOptions } from '#types/options.type.js';
+import { FindOptions, SortOrder } from '#types/options.type.js';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
@@ -21,8 +21,8 @@ export class DriverRepository implements IDriverRepository {
     const { page, pageSize, orderBy } = options;
     // prettier-ignore
     const sort = (
-      orderBy === 'oldest' ? {createdAt: 'asc'} :
-      orderBy === 'latest' ? {createdAt: 'desc'} : {createdAt: 'desc'}
+      orderBy === SortOrder.Oldest ? {createdAt: 'asc'} :
+      orderBy === SortOrder.Latest ? {createdAt: 'desc'} : {createdAt: 'desc'}
     )
 
     const drivers = await this.driver.findMany({

@@ -1,5 +1,5 @@
 import { PrismaService } from '#global/prisma.service.js';
-import { FindOptions } from '#types/options.type.js';
+import { FindOptions, SortOrder } from '#types/options.type.js';
 import { IUserRepository } from '#users/interfaces/user.repository.interface.js';
 import { UserCreateDTO, UserUpdateDTO } from '#users/user.types.js';
 import { Injectable } from '@nestjs/common';
@@ -21,8 +21,8 @@ export class UserRepository implements IUserRepository {
     const { page, pageSize, orderBy } = options;
     // prettier-ignore
     const sort = (
-      orderBy === 'oldest' ? {createdAt: 'asc'} :
-      orderBy === 'latest' ? {createdAt: 'desc'} : {createdAt: 'desc'}
+      orderBy === SortOrder.Oldest ? {createdAt: 'asc'} :
+      orderBy === SortOrder.Latest ? {createdAt: 'desc'} : {createdAt: 'desc'}
     )
 
     const users = await this.user.findMany({
