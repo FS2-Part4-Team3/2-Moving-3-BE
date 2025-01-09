@@ -1,6 +1,5 @@
 import { IStorage } from '#types/common.types.js';
-import logger from '#utils/logger.js';
-import stringifyJson from '#utils/stringifyJson.js';
+import loggingError from '#utils/loggingError.js';
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
@@ -27,13 +26,11 @@ export class RefreshTokenGuard implements CanActivate {
 
     try {
       const payload = await this.jwtService.verifyAsync(token, { secret: jwtSecret });
-      console.log('🚀 ~ RefreshTokenGuard ~ canActivate ~ payload:', payload);
       const storage = this.als.getStore();
-      storage.refreshToken = token;
       Object.assign(storage, payload);
+      storage.refreshToken = token;
     } catch (err) {
-      logger.error(`${err instanceof Error ? err : `Error: ` + stringifyJson(err)}`);
-      if (err instanceof Error) logger.error(`${err.stack}`);
+      loggingError(err);
       throw new UnauthorizedException();
     }
 

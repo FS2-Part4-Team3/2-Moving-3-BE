@@ -1,5 +1,6 @@
-import { InternalServerErrorException, UnauthorizedException } from '#exceptions/http.exception.js';
+import { UnauthorizedException } from '#exceptions/http.exception.js';
 import { IStorage } from '#types/common.types.js';
+import loggingError from '#utils/loggingError.js';
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
@@ -24,10 +25,11 @@ export class AccessTokenGuard implements CanActivate {
     try {
       const payload = await this.jwtService.verifyAsync(token, { secret: jwtSecret });
       const storage = this.als.getStore();
-      storage.accessToken = token;
       Object.assign(storage, payload);
-    } catch {
-      throw new InternalServerErrorException();
+      storage.accessToken = token;
+    } catch (err) {
+      loggingError(err);
+      throw new UnauthorizedException();
     }
 
     return true;
