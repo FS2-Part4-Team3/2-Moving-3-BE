@@ -1,5 +1,5 @@
 import { IRequestController } from '#requests/interfaces/request.controller.interface.js';
-import { Controller, Delete, Get, Post } from '@nestjs/common';
+import { Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 import { RequestService } from './request.service.js';
 
@@ -17,7 +17,11 @@ export class RequestController implements IRequestController {
 
   @Get(':id')
   @ApiOperation({ summary: '요청 상세 조회' })
-  async getRequest() {}
+  async getRequest(@Param('id') id: string) {
+    const request = await this.requestService.getRequest(id);
+
+    return request;
+  }
 
   @Post()
   @ApiOperation({ summary: '요청 생성' })
