@@ -31,6 +31,7 @@ model User {
   reviews           Review[]
   userNotifications UserNotification[]
   moveInfos         MoveInfo[]
+  likeDrivers       Driver[]
 }
 
 model Driver {
@@ -51,14 +52,15 @@ model Driver {
   serviceTypes   ServiceType[]
   availableAreas Area[]
 
-  applyCount    Int
-  favoriteCount Int
-  score         Float
+  applyCount Int   @default(0)
+  likeCount  Int   @default(0)
+  score      Float
 
   reviews             Review[]
   requests            Request[]
   driverNotifications DriverNotification[]
   estimations         Estimation[]
+  likedUsers          User[]
 }
 
 model MoveInfo {
