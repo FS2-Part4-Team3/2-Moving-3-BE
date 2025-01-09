@@ -4,6 +4,7 @@ import { postgresConfig } from '#configs/postgres.config.js';
 import { DriverModule } from '#drivers/driver.module.js';
 import { EstimationModule } from '#estimations/estimation.module.js';
 import { AppController } from '#global/app.controller.js';
+import { DBModule } from '#global/db.module.js';
 import { DevController } from '#global/dev.controller.js';
 import { LogInterceptor } from '#global/interceptors/log.interceptor.js';
 import { AlsMiddleware } from '#global/middlewares/als.middleware.js';
@@ -20,6 +21,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 
 @Module({
   imports: [
+    DBModule,
     AuthModule,
     DriverModule,
     MoveModule,
