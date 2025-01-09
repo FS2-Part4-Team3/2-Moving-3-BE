@@ -3,6 +3,7 @@ import { IMoveRepository } from '#move/interfaces/move.repository.interface.js';
 import { MoveInfoInputDTO } from '#move/move.types.js';
 import { FindOptions } from '#types/options.type.js';
 import { Injectable } from '@nestjs/common';
+import { Progress } from '@prisma/client';
 
 @Injectable()
 export class MoveRepository implements IMoveRepository {
@@ -13,7 +14,11 @@ export class MoveRepository implements IMoveRepository {
 
   async findMany(options: FindOptions) {}
 
-  async findById(id: string) {}
+  async findById(userId: string) {
+    const moveInfo = await this.moveInfo.findMany({ where: { ownerId: userId, progress: Progress.OPEN } });
+
+    return moveInfo;
+  }
 
   async create(data: MoveInfoInputDTO) {}
 
