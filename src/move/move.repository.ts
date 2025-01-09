@@ -44,22 +44,22 @@ export class MoveRepository implements IMoveRepository {
         }),
     };
 
-    const [list, totalCount] = await this.prisma.$transaction([
-      this.moveInfo.findMany({
-        where: whereCondition,
-        skip: (page - 1) * pageSize,
-        take: pageSize,
-        orderBy:
-          orderBy === SortOrder.MoveDate
-            ? { scheduledTime: SortOrder.Recent ? 'desc' : 'asc' }
-            : { createdAt: SortOrder.Recent ? 'desc' : 'asc' },
-        include: {
-          owner: true,
-          requests: true,
-        },
-      }),
-      this.moveInfo.count({ where: whereCondition }),
-    ]);
+    const list = await this.moveInfo.findMany({
+      where: whereCondition,
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+      orderBy:
+        orderBy === SortOrder.MoveDate
+          ? { scheduledTime: SortOrder.Recent ? 'desc' : 'asc' }
+          : { createdAt: SortOrder.Recent ? 'desc' : 'asc' },
+      include: {
+        owner: true,
+        requests: true,
+      },
+    });
+
+    const totalCount = await this.moveInfo.count({ where: whereCondition });
+    console.log('totalCount', totalCount);
 
     return { totalCount, list };
   }
