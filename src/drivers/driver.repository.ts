@@ -24,4 +24,36 @@ export class DriverRepository implements IDriverRepository {
   async update(id: string, data: Partial<DriverInputDTO>) {}
 
   async delete(id: string) {}
+
+  async like(driverId: string, userId: string) {
+    const driver = await this.driver.update({
+      where: { id: driverId },
+      data: {
+        likeCount: { increment: 1 },
+        likeUsers: {
+          connect: {
+            id: userId,
+          },
+        },
+      },
+    });
+
+    return driver;
+  }
+
+  async unlike(driverId: string, userId: string) {
+    const driver = await this.driver.update({
+      where: { id: driverId },
+      data: {
+        likeCount: { decrement: 1 },
+        likeUsers: {
+          disconnect: {
+            id: userId,
+          },
+        },
+      },
+    });
+
+    return driver;
+  }
 }
