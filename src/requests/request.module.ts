@@ -3,10 +3,11 @@ import { RequestController } from '#requests/request.controller.js';
 import { RequestRepository } from '#requests/request.repository.js';
 import { RequestService } from '#requests/request.service.js';
 import { Module } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [DBModule],
   controllers: [RequestController],
-  providers: [RequestService, RequestRepository],
+  providers: [RequestService, RequestRepository, JwtService],
 })
 export class RequestModule {}
