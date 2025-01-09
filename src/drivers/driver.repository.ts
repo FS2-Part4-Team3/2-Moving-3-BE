@@ -13,7 +13,11 @@ export class DriverRepository implements IDriverRepository {
 
   async findMany(options: FindOptions) {}
 
-  async findById(id: string) {}
+  async findById(id: string) {
+    const driver = await this.driver.findUnique({ where: { id } });
+
+    return driver;
+  }
 
   async create(data: DriverInputDTO) {}
 
