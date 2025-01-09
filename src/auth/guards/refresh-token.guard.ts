@@ -1,14 +1,18 @@
+import { AuthInvalidRefreshTokenException, AuthInvalidTokenException } from '#auth/auth.exception.js';
+import { InternalServerErrorException } from '#exceptions/http.exception.js';
 import { IStorage } from '#types/common.types.js';
+import { UserRepository } from '#users/user.repository.js';
 import loggingError from '#utils/loggingError.js';
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
+import { JsonWebTokenError, JwtService } from '@nestjs/jwt';
 import { AsyncLocalStorage } from 'async_hooks';
 
 @Injectable()
 export class RefreshTokenGuard implements CanActivate {
   constructor(
     private readonly jwtService: JwtService,
+    private readonly userRepository: UserRepository,
     private readonly als: AsyncLocalStorage<IStorage>,
     private readonly configService: ConfigService,
   ) {}
@@ -26,12 +30,25 @@ export class RefreshTokenGuard implements CanActivate {
 
     try {
       const payload = await this.jwtService.verifyAsync(token, { secret: jwtSecret });
+      if (!payload.userId) {
+        throw new AuthInvalidRefreshTokenException();
+      }
+      const user = await this.userRepository.findById(payload.userId);
+      if (!user) {
+        throw new AuthInvalidRefreshTokenException();
+      }
+
       const storage = this.als.getStore();
       Object.assign(storage, payload);
       storage.refreshToken = token;
+      storage.user = user;
     } catch (err) {
       loggingError(err);
-      throw new UnauthorizedException();
+      if (err instanceof JsonWebTokenError) {
+        throw new AuthInvalidTokenException();
+      }
+
+      throw new InternalServerErrorException();
     }
 
     return true;

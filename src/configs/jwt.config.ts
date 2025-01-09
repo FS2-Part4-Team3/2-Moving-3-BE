@@ -5,7 +5,7 @@ const jwtConfig = () => {
 
   return {
     jwtSecret: process.env.JWT_SECRET,
-    accessExpireTime: process.env.ACCESS_EXPIRE_TIME || '99w', //'1h',
+    accessExpireTime: process.env.ACCESS_EXPIRE_TIME || '1h',
     refreshExpireTime: process.env.REFRESH_EXPIRE_TIME || '2w',
   };
 };

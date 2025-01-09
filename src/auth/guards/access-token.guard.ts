@@ -1,9 +1,11 @@
-import { UnauthorizedException } from '#exceptions/http.exception.js';
+import { AuthInvalidAccessTokenException, AuthInvalidTokenException } from '#auth/auth.exception.js';
+import { InternalServerErrorException, UnauthorizedException } from '#exceptions/http.exception.js';
 import { IStorage } from '#types/common.types.js';
+import { UserRepository } from '#users/user.repository.js';
 import loggingError from '#utils/loggingError.js';
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
+import { JsonWebTokenError, JwtService } from '@nestjs/jwt';
 import { AsyncLocalStorage } from 'async_hooks';
 import { Request } from 'express';
 
@@ -11,6 +13,7 @@ import { Request } from 'express';
 export class AccessTokenGuard implements CanActivate {
   constructor(
     private readonly jwtService: JwtService,
+    private readonly userRepository: UserRepository,
     private readonly als: AsyncLocalStorage<IStorage>,
     private readonly configService: ConfigService,
   ) {}
@@ -24,12 +27,25 @@ export class AccessTokenGuard implements CanActivate {
 
     try {
       const payload = await this.jwtService.verifyAsync(token, { secret: jwtSecret });
+      if (!payload.userId) {
+        throw new AuthInvalidAccessTokenException();
+      }
+      const user = await this.userRepository.findById(payload.userId);
+      if (!user) {
+        throw new AuthInvalidAccessTokenException();
+      }
+
       const storage = this.als.getStore();
       Object.assign(storage, payload);
       storage.accessToken = token;
+      storage.user = user;
     } catch (err) {
       loggingError(err);
-      throw new UnauthorizedException();
+      if (err instanceof JsonWebTokenError) {
+        throw new AuthInvalidTokenException();
+      }
+
+      throw new InternalServerErrorException();
     }
 
     return true;
