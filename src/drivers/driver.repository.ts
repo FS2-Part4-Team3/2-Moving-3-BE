@@ -30,7 +30,7 @@ export class DriverRepository implements IDriverRepository {
       where: { id: driverId },
       data: {
         likeCount: { increment: 1 },
-        likeUsers: {
+        likedUsers: {
           connect: {
             id: userId,
           },
@@ -46,7 +46,7 @@ export class DriverRepository implements IDriverRepository {
       where: { id: driverId },
       data: {
         likeCount: { decrement: 1 },
-        likeUsers: {
+        likedUsers: {
           disconnect: {
             id: userId,
           },
