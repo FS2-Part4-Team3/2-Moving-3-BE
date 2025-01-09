@@ -56,4 +56,15 @@ export class DriverRepository implements IDriverRepository {
 
     return driver;
   }
+
+  async isLiked(driverId: string, userId: string) {
+    const driver = await this.driver.findUnique({
+      where: {
+        id: driverId,
+        likedUsers: { some: { id: userId } },
+      },
+    });
+
+    return !!driver;
+  }
 }

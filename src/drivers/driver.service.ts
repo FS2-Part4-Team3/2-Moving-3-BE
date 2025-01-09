@@ -1,4 +1,4 @@
-import { DriverNotFoundException } from '#drivers/driver.exception.js';
+import { DriverIsLikedException, DriverIsUnLikedException, DriverNotFoundException } from '#drivers/driver.exception.js';
 import { DriverRepository } from '#drivers/driver.repository.js';
 import { IDriverService } from '#drivers/interfaces/driver.service.interface.js';
 import { IStorage } from '#types/common.types.js';
@@ -28,6 +28,9 @@ export class DriverService implements IDriverService {
 
     const { userId } = this.als.getStore();
 
+    const isLiked = await this.driverRepository.isLiked(driverId, userId);
+    if (isLiked) throw new DriverIsLikedException();
+
     const driver = await this.driverRepository.like(driverId, userId);
 
     return filterSensitiveData(driver);
@@ -38,6 +41,9 @@ export class DriverService implements IDriverService {
     if (!target) throw new DriverNotFoundException();
 
     const { userId } = this.als.getStore();
+
+    const isLiked = await this.driverRepository.isLiked(driverId, userId);
+    if (!isLiked) throw new DriverIsUnLikedException();
 
     const driver = await this.driverRepository.unlike(driverId, userId);
 

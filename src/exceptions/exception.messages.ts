@@ -11,6 +11,8 @@ enum ExceptionMessages {
   INVALID_TOKEN = '토큰이 잘못되었습니다.',
 
   DRIVER_NOT_FOUND = '찾을 수 없는 기사입니다.',
+  ALREADY_LIKED = '이미 찜해둔 기사입니다.',
+  ALREADY_UNLIKED = '이미 찜 해제된 기사입니다.',
 
   QUESTION_NOT_FOUND = '찾을 수 없는 문의입니다.',
 
