@@ -4,10 +4,12 @@ export interface OffsetPaginationOptions {
 }
 
 export enum SortOrder {
+  Latest = 'Latest',
+  Oldest = 'Oldest',
   Recent = 'Recent',
 }
 
 export interface FindOptions extends OffsetPaginationOptions {
-  orderBy: string;
+  orderBy: SortOrder;
   keyword: string;
 }
