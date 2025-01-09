@@ -11,7 +11,28 @@ export class DriverRepository implements IDriverRepository {
     this.driver = prisma.driver;
   }
 
-  async findMany(options: FindOptions) {}
+  async count() {
+    const count = await this.driver.count();
+
+    return count;
+  }
+
+  async findMany(options: FindOptions) {
+    const { page, pageSize, orderBy } = options;
+    // prettier-ignore
+    const sort = (
+      orderBy === 'oldest' ? {createdAt: 'asc'} :
+      orderBy === 'latest' ? {createdAt: 'desc'} : {createdAt: 'desc'}
+    )
+
+    const drivers = await this.driver.findMany({
+      orderBy: sort,
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    });
+
+    return drivers;
+  }
 
   async findById(id: string) {}
 
