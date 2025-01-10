@@ -1,3 +1,4 @@
+import { SignUpDTO } from '#auth/auth.types.js';
 import { DriverInputDTO } from '#drivers/driver.types.js';
 import { IDriverRepository } from '#drivers/interfaces/driver.repository.interface.js';
 import { PrismaService } from '#global/prisma.service.js';
@@ -41,12 +42,16 @@ export class DriverRepository implements IDriverRepository {
   }
 
   async findByEmail(email: string) {
-    const user = await this.driver.findUnique({ where: { email } });
+    const driver = await this.driver.findUnique({ where: { email } });
 
-    return user;
+    return driver;
   }
 
-  async create(data: DriverInputDTO) {}
+  async create(data: SignUpDTO) {
+    const driver = await this.driver.create({ data });
+
+    return driver;
+  }
 
   async update(id: string, data: Partial<DriverInputDTO>) {}
 
