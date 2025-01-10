@@ -1,6 +1,7 @@
 import { IStorage } from '#types/common.types.js';
 import isEmpty from '#utils/isEmpty.js';
 import logger from '#utils/logger.js';
+import loggingError from '#utils/loggingError.js';
 import stringifyJson from '#utils/stringifyJson.js';
 import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
 import { AsyncLocalStorage } from 'async_hooks';
@@ -67,8 +68,7 @@ export class LogInterceptor implements NestInterceptor {
   logError(error: any) {
     if (isEmpty(error)) return;
 
-    logger.error(`${error instanceof Error ? error : `Error: ` + stringifyJson(error)}`);
-    if (error instanceof Error) logger.error(`${error.stack}`);
+    loggingError(error);
   }
 
   logBase(target: any, messageType: MessageType, logType: LogType, filters: string[]) {

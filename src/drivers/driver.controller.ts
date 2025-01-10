@@ -2,7 +2,7 @@ import { DriverService } from '#drivers/driver.service.js';
 import { IDriverController } from '#drivers/interfaces/driver.controller.interface.js';
 import { SortOrder } from '#types/options.type.js';
 import { GetQueries } from '#types/queries.type.js';
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 
 @Controller('drivers')
@@ -22,5 +22,9 @@ export class DriverController implements IDriverController {
 
   @Get(':id')
   @ApiOperation({ summary: '기사 상세 조회' })
-  async getDriver() {}
+  async getDriver(@Param('id') id: string) {
+    const driver = await this.driverService.findDriver(id);
+
+    return driver;
+  }
 }
