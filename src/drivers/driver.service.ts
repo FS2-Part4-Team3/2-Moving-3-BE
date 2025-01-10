@@ -1,3 +1,4 @@
+import { DriverNotFoundException } from '#drivers/driver.exception.js';
 import { DriverRepository } from '#drivers/driver.repository.js';
 import { IDriverService } from '#drivers/interfaces/driver.service.interface.js';
 import { FindOptions } from '#types/options.type.js';
@@ -14,5 +15,14 @@ export class DriverService implements IDriverService {
     const list = drivers.map(driver => filterSensitiveData(driver));
 
     return { totalCount, list };
+  }
+
+  async findDriver(id: string) {
+    const driver = await this.driverRepository.findById(id);
+    if (!driver) {
+      throw new DriverNotFoundException();
+    }
+
+    return filterSensitiveData(driver);
   }
 }

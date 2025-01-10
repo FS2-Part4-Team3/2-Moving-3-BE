@@ -29,7 +29,7 @@ export class AuthService implements IAuthService {
     const user = await this.userRepository.findById(userId);
     if (!user) throw new AuthInvalidAccessTokenException();
 
-    return user;
+    return filterSensitiveData(user);
   }
 
   async createUser(body: UserPostDTO) {
