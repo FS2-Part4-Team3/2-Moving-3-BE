@@ -24,8 +24,8 @@ export class DevController {
     return users;
   }
 
-  @Get('login')
-  async login() {
+  @Get('login/user')
+  async userLogin() {
     const [user] = await this.prismaService.user.findMany({
       orderBy: { createdAt: 'desc' },
       take: 1,
@@ -34,6 +34,18 @@ export class DevController {
     const accessToken = await this.jwtGenerateService.generateAccessToken({ id: user.id, type: UserType.User });
 
     return { user, accessToken };
+  }
+
+  @Get('login/driver')
+  async driverLogin() {
+    const [driver] = await this.prismaService.driver.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: 1,
+    });
+
+    const accessToken = await this.jwtGenerateService.generateAccessToken({ id: driver.id, type: UserType.Driver });
+
+    return { driver, accessToken };
   }
 
   @Get('parse-token')
