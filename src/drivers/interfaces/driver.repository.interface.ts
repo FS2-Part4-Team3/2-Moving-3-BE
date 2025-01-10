@@ -8,4 +8,6 @@ export interface IDriverRepository {
   create: (data: DriverInputDTO) => void;
   update: (id: string, data: Partial<DriverInputDTO>) => void;
   delete: (id: string) => void;
+  like: (driverId: string, userId: string) => Promise<Driver>;
+  unlike: (driverId: string, userId: string) => Promise<Driver>;
 }
