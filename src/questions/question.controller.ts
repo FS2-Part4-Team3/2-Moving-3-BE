@@ -1,28 +1,34 @@
 import { IQuestionController } from '#questions/interfaces/question.controller.interface.js';
-import { Controller, Delete, Get, Post } from '@nestjs/common';
+import { QuestionService } from '#questions/question.service.js';
+import { QuestionInputDTO } from '#questions/question.types.js';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 
 @Controller('questions')
 export class QuestionController implements IQuestionController {
-  constructor() {}
-
-  @Get()
-  @ApiOperation({ summary: '문의 목록 조회' })
-  async getQuestions() {}
+  constructor(private readonly questionService: QuestionService) {}
 
   @Get(':id')
   @ApiOperation({ summary: '문의 상세 조회' })
-  async getQuestion() {}
+  async getQuestion(@Param('id') id: string) {
+    const question = await this.questionService.findQuestion(id);
 
-  @Post(':moveInfoId')
-  @ApiOperation({ summary: '문의 생성' })
-  async postQuestion() {}
+    return question;
+  }
 
   @Post(':id')
   @ApiOperation({ summary: '문의 수정' })
-  async patchQuestion() {}
+  async patchQuestion(@Param('id') id: string, @Body() body: Partial<QuestionInputDTO>) {
+    const question = await this.questionService.updateQuestion(id, body);
+
+    return question;
+  }
 
   @Delete(':id')
   @ApiOperation({ summary: '문의 삭제' })
-  async deleteQuestion() {}
+  async deleteQuestion(@Param('id') id: string) {
+    const question = await this.questionService.deleteQuestion(id);
+
+    return question;
+  }
 }

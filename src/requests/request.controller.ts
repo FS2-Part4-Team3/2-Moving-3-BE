@@ -1,5 +1,6 @@
+import { AccessTokenGuard } from '#auth/guards/access-token.guard.js';
 import { IRequestController } from '#requests/interfaces/request.controller.interface.js';
-import { Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 import { RequestService } from './request.service.js';
 
@@ -23,9 +24,14 @@ export class RequestController implements IRequestController {
     return request;
   }
 
-  @Post()
+  @Post(':id')
+  @UseGuards(AccessTokenGuard)
   @ApiOperation({ summary: '요청 생성' })
-  async postRequest() {}
+  async postRequest(@Param('id') driverId: string) {
+    const request = await this.requestService.postRequest(driverId);
+
+    return request;
+  }
 
   @Delete(':id')
   @ApiOperation({ summary: '요청 취소(유저)' })

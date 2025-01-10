@@ -1,11 +1,11 @@
 import { FindOptions } from '#types/options.type.js';
-import { UserInputDTO } from '#users/user.types.js';
+import { User, UserCreateDTO, UserUpdateDTO } from '#users/user.types.js';
 
 export interface IUserRepository {
-  findMany: (option: FindOptions) => void;
-  findById: (id: string) => void;
-  findByEmail: (email: string) => void;
-  findBySignInForm: (body: UserInputDTO) => void;
-  create: (data: UserInputDTO) => void;
-  update: (id: string, data: UserInputDTO) => void;
+  count: () => Promise<number>;
+  findMany: (option: FindOptions) => Promise<User[]>;
+  findById: (id: string) => Promise<User> | null;
+  findByEmail: (email: string) => Promise<User> | null;
+  create: (data: UserCreateDTO) => Promise<User>;
+  update: (id: string, data: UserUpdateDTO) => Promise<User>;
 }

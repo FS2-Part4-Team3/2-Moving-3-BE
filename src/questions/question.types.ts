@@ -6,4 +6,5 @@ interface QuestionBase extends PrismaQuestionBase {}
 
 export interface Question extends QuestionBase, ModelBase {}
 
-export interface QuestionInputDTO extends Omit<Question, keyof ModelBase> {}
+export interface QuestionCreateDTO extends Omit<Question, keyof ModelBase> {}
+export interface QuestionInputDTO extends Omit<QuestionCreateDTO, 'estimationId'> {}

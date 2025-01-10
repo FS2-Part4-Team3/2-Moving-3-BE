@@ -8,5 +8,6 @@ import { Module } from '@nestjs/common';
   imports: [DBModule],
   controllers: [QuestionController],
   providers: [QuestionService, QuestionRepository],
+  exports: [QuestionService],
 })
 export class QuestionModule {}
