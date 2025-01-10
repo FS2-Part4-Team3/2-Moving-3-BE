@@ -2,7 +2,7 @@ import { Driver } from '#drivers/driver.types.js';
 import { User } from '#users/user.types.js';
 import { IsEmail, IsHexadecimal, IsJWT, IsNotEmpty, IsOptional, IsString, IsUrl, Length, Matches } from 'class-validator';
 
-export class PersonalInfo {
+export class SignUpDTO {
   @IsEmail({}, { message: '이메일 형식 입력이 필요합니다.' })
   email: string;
 
@@ -20,7 +20,9 @@ export class PersonalInfo {
 
   @Matches(/(010)-\d{3,4}-\d{4}/, { message: '010으로 시작하는 휴대전화 번호를 입력해주세요.' })
   phoneNumber: string;
+}
 
+export class PersonalInfo extends SignUpDTO {
   @IsOptional()
   @IsUrl({}, { message: '올바른 이미지 주소를 입력해주세요.' })
   image: string;
