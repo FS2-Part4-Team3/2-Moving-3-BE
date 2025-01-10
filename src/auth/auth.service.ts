@@ -23,12 +23,14 @@ export class AuthService implements IAuthService {
   ) {}
 
   async getMe() {
-    const { user } = this.als.getStore();
+    const storage = this.als.getStore();
 
-    return filterSensitiveData(user);
+    const person = storage.type === UserType.User ? storage.user : storage.driver;
+
+    return filterSensitiveData(person);
   }
 
-  async createUser(body: SignUpDTO) {
+  async createPerson(body: SignUpDTO, type: UserType) {
     const data = body;
     const userExist = await this.userRepository.findByEmail(data.email);
     if (userExist) throw new AuthUserAlreadyExistException();
@@ -40,7 +42,7 @@ export class AuthService implements IAuthService {
     return { user: filterSensitiveData(user), accessToken, refreshToken };
   }
 
-  async signIn(body: SignInDTO) {
+  async signIn(body: SignInDTO, type: UserType) {
     const { email, password } = body;
     const user = await this.userRepository.findByEmail(email);
     const hashed = hashingPassword(password, user.salt);

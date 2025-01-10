@@ -3,11 +3,12 @@ import { DriverRepository } from '#drivers/driver.repository.js';
 import { DriverService } from '#drivers/driver.service.js';
 import { DBModule } from '#global/db.module.js';
 import { GuardModule } from '#guards/guard.module.js';
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 
 @Module({
-  imports: [DBModule, GuardModule],
+  imports: [DBModule, forwardRef(() => GuardModule)],
   controllers: [DriverController],
   providers: [DriverService, DriverRepository],
+  exports: [DriverRepository],
 })
 export class DriverModule {}

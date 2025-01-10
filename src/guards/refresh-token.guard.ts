@@ -1,7 +1,7 @@
-import { AuthInvalidRefreshTokenException, AuthInvalidTokenException } from '#auth/auth.exception.js';
+import { AuthInvalidAccessTokenException, AuthInvalidTokenException } from '#auth/auth.exception.js';
 import { InternalServerErrorException } from '#exceptions/http.exception.js';
 import { GuardService } from '#guards/guard.service.js';
-import { IStorage } from '#types/common.types.js';
+import { IStorage, UserType } from '#types/common.types.js';
 import loggingError from '#utils/loggingError.js';
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -30,18 +30,30 @@ export class RefreshTokenGuard implements CanActivate {
 
     try {
       const payload = await this.jwtService.verifyAsync(token, { secret: jwtSecret });
-      if (!payload.userId) {
-        throw new AuthInvalidRefreshTokenException();
+      if (!payload.id || !payload.type) {
+        throw new AuthInvalidAccessTokenException();
       }
-      const user = await this.guardService.validateUser(payload.userId);
-      if (!user) {
-        throw new AuthInvalidRefreshTokenException();
+      const person = await this.guardService.validatePerson(payload.id, payload.type);
+      if (!person) {
+        throw new AuthInvalidAccessTokenException();
       }
 
       const storage = this.als.getStore();
-      Object.assign(storage, payload);
       storage.refreshToken = token;
-      storage.user = user;
+      storage.type = payload.type;
+
+      switch (payload.type) {
+        case UserType.User:
+          storage.userId = payload.id;
+          storage.user = person;
+          break;
+        case UserType.Driver:
+          storage.driverId = payload.id;
+          storage.driver = person;
+          break;
+        default:
+          throw new AuthInvalidTokenException();
+      }
     } catch (err) {
       loggingError(err);
       if (err instanceof JsonWebTokenError) {
