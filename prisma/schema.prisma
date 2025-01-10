@@ -52,9 +52,8 @@ model Driver {
   serviceTypes   ServiceType[]
   availableAreas Area[]
 
-  applyCount Int   @default(0)
-  likeCount  Int   @default(0)
-  score      Float
+  applyCount Int @default(0)
+  likeCount  Int @default(0)
 
   reviews             Review[]
   requests            Request[]
