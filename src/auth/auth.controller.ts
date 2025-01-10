@@ -66,9 +66,10 @@ export class AuthController implements IAuthController {
   @UseGuards(RefreshTokenGuard)
   @ApiOperation({ summary: '토큰 재발급' })
   async refreshToken(@Res({ passthrough: true }) response: Response) {
-    const { user, accessToken, refreshToken } = await this.authService.getNewToken();
+    const { person, accessToken, refreshToken, type } = await this.authService.getNewToken();
     response.cookie('refreshToken', refreshToken);
 
-    return { user, accessToken };
+    const result = type === UserType.User ? { user: person, accessToken } : { driver: person, accessToken };
+    return result;
   }
 }

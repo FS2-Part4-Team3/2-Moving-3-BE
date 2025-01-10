@@ -7,5 +7,5 @@ export interface IAuthController {
   signUp: (body: SignUpDTO, userType: 'user' | 'driver', res: Response) => Promise<FilteredPersonWithToken>;
   signIn: (body: SignInDTO, userType: 'user' | 'driver', res: Response) => Promise<FilteredPersonWithToken>;
   getMe: () => Promise<FilteredPersonalInfo<User>>;
-  refreshToken: (res: Response) => void;
+  refreshToken: (res: Response) => Promise<FilteredPersonWithToken>;
 }

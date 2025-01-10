@@ -60,17 +60,19 @@ export class AuthService implements IAuthService {
   }
 
   async getNewToken() {
-    const { user, userId, refreshToken, exp } = this.als.getStore();
-    if (user.refreshToken !== refreshToken) throw new AuthInvalidRefreshTokenException();
+    const storage = this.als.getStore();
+    const { type, refreshToken, exp } = storage;
+    const person = type === UserType.User ? storage.user : storage.driver;
+    if (person.refreshToken !== refreshToken) throw new AuthInvalidRefreshTokenException();
 
-    const accessToken = this.jwtGenerateService.generateAccessToken({ id: userId, type: UserType.User });
+    const accessToken = this.jwtGenerateService.generateAccessToken({ id: person.id, type });
 
-    const result = { user: filterSensitiveData(user), accessToken, refreshToken };
+    const result = { person: filterSensitiveData(person), accessToken, refreshToken, type };
     // NOTE 리프레시 토큰의 남은 시간이 2시간 이내일경우
     const timeRemaining = compareExp(exp);
     if (timeRemaining < 3600 * 2) {
       // NOTE 새 리프레시 토큰을 발급하고 이를 업데이트
-      const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: userId, type: UserType.User });
+      const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: person.id, type });
       result.refreshToken = refreshToken;
     }
 
