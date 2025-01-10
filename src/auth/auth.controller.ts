@@ -1,10 +1,9 @@
 import { AuthService } from '#auth/auth.service.js';
-import { SignInDTO } from '#auth/auth.types.js';
+import { SignInDTO, SignUpDTO } from '#auth/auth.types.js';
 import { IAuthController } from '#auth/interfaces/auth.controller.interface.js';
 import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { HashPasswordGuard } from '#guards/hash-password.guard.js';
 import { RefreshTokenGuard } from '#guards/refresh-token.guard.js';
-import { SignUpDTO } from '#types/personal.type.js';
 import { Body, Controller, Get, Post, Res, UseGuards } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 import { Response } from 'express';

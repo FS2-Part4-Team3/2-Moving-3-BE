@@ -3,11 +3,10 @@ import {
   AuthUserAlreadyExistException,
   AuthWrongCredentialException,
 } from '#auth/auth.exception.js';
-import { SignInDTO } from '#auth/auth.types.js';
+import { SignInDTO, SignUpDTO } from '#auth/auth.types.js';
 import { IAuthService } from '#auth/interfaces/auth.service.interface.js';
 import { JwtGenerateService } from '#auth/jwt-generate.service.js';
-import { IStorage } from '#types/common.types.js';
-import { SignUpDTO } from '#types/personal.type.js';
+import { IStorage, UserType } from '#types/common.types.js';
 import { UserRepository } from '#users/user.repository.js';
 import compareExp from '#utils/compareExp.js';
 import filterSensitiveData from '#utils/filterSensitiveData.js';
@@ -35,8 +34,8 @@ export class AuthService implements IAuthService {
     if (userExist) throw new AuthUserAlreadyExistException();
 
     const user = await this.userRepository.create(data);
-    const accessToken = await this.jwtGenerateService.generateAccessToken({ userId: user.id });
-    const refreshToken = await this.jwtGenerateService.generateRefreshToken({ userId: user.id });
+    const accessToken = await this.jwtGenerateService.generateAccessToken({ id: user.id, type: UserType.User });
+    const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: user.id, type: UserType.User });
 
     return { user: filterSensitiveData(user), accessToken, refreshToken };
   }
@@ -48,8 +47,8 @@ export class AuthService implements IAuthService {
     if (!user) throw new AuthWrongCredentialException();
     if (user.password !== hashed) throw new AuthWrongCredentialException();
 
-    const accessToken = await this.jwtGenerateService.generateAccessToken({ userId: user.id });
-    const refreshToken = await this.jwtGenerateService.generateRefreshToken({ userId: user.id });
+    const accessToken = await this.jwtGenerateService.generateAccessToken({ id: user.id, type: UserType.User });
+    const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: user.id, type: UserType.User });
 
     return { user: filterSensitiveData(user), accessToken, refreshToken };
   }
@@ -58,14 +57,14 @@ export class AuthService implements IAuthService {
     const { user, userId, refreshToken, exp } = this.als.getStore();
     if (user.refreshToken !== refreshToken) throw new AuthInvalidRefreshTokenException();
 
-    const accessToken = this.jwtGenerateService.generateAccessToken({ userId });
+    const accessToken = this.jwtGenerateService.generateAccessToken({ id: userId, type: UserType.User });
 
     const result = { user: filterSensitiveData(user), accessToken, refreshToken };
     // NOTE 리프레시 토큰의 남은 시간이 2시간 이내일경우
     const timeRemaining = compareExp(exp);
     if (timeRemaining < 3600 * 2) {
       // NOTE 새 리프레시 토큰을 발급하고 이를 업데이트
-      const refreshToken = await this.jwtGenerateService.generateRefreshToken({ userId });
+      const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: userId, type: UserType.User });
       result.refreshToken = refreshToken;
     }
 

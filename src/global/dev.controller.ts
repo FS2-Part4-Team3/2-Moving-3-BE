@@ -1,7 +1,7 @@
 import { JwtGenerateService } from '#auth/jwt-generate.service.js';
 import { PrismaService } from '#global/prisma.service.js';
 import { AccessTokenGuard } from '#guards/access-token.guard.js';
-import { IStorage } from '#types/common.types.js';
+import { IStorage, UserType } from '#types/common.types.js';
 import { UserService } from '#users/user.service.js';
 import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { AsyncLocalStorage } from 'async_hooks';
@@ -31,7 +31,7 @@ export class DevController {
       take: 1,
     });
 
-    const accessToken = await this.jwtGenerateService.generateAccessToken({ userId: user.id });
+    const accessToken = await this.jwtGenerateService.generateAccessToken({ id: user.id, type: UserType.User });
 
     return { user, accessToken };
   }

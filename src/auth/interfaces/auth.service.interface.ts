@@ -1,5 +1,5 @@
-import { FilteredUserWithToken, SignInDTO } from '#auth/auth.types.js';
-import { FilteredPersonalInfo, SignUpDTO } from '#types/personal.type.js';
+import { FilteredUserWithToken, SignInDTO, SignUpDTO } from '#auth/auth.types.js';
+import { FilteredPersonalInfo } from '#types/personal.type.js';
 import { User } from '#users/user.types.js';
 
 export interface IAuthService {

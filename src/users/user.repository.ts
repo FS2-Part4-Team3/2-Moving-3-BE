@@ -1,6 +1,6 @@
+import { SignUpDTO } from '#auth/auth.types.js';
 import { PrismaService } from '#global/prisma.service.js';
 import { FindOptions, SortOrder } from '#types/options.type.js';
-import { SignUpDTO } from '#types/personal.type.js';
 import { IUserRepository } from '#users/interfaces/user.repository.interface.js';
 import { UserUpdateDTO } from '#users/user.types.js';
 import { Injectable } from '@nestjs/common';

@@ -1,5 +1,5 @@
+import { SignUpDTO } from '#auth/auth.types.js';
 import { FindOptions } from '#types/options.type.js';
-import { SignUpDTO } from '#types/personal.type.js';
 import { User, UserUpdateDTO } from '#users/user.types.js';
 
 export interface IUserRepository {
