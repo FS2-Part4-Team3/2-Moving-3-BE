@@ -40,6 +40,12 @@ export class DriverRepository implements IDriverRepository {
     return driver;
   }
 
+  async findByEmail(email: string) {
+    const user = await this.driver.findUnique({ where: { email } });
+
+    return user;
+  }
+
   async create(data: DriverInputDTO) {}
 
   async update(id: string, data: Partial<DriverInputDTO>) {}
