@@ -27,10 +27,10 @@ export class AuthController implements IAuthController {
     }
     const type = userType === 'user' ? UserType.User : UserType.Driver;
 
-    const { user, accessToken, refreshToken } = await this.authService.createPerson(body, type);
+    const { person, accessToken, refreshToken } = await this.authService.createPerson(body, type);
     response.cookie('refreshToken', refreshToken);
 
-    return { user, accessToken };
+    return { person, accessToken };
   }
 
   @Post('signIn/:userType')
@@ -45,10 +45,10 @@ export class AuthController implements IAuthController {
     }
     const type = userType === 'user' ? UserType.User : UserType.Driver;
 
-    const { user, accessToken, refreshToken } = await this.authService.signIn(body, type);
+    const { person, accessToken, refreshToken } = await this.authService.signIn(body, type);
     response.cookie('refreshToken', refreshToken);
 
-    return { user, accessToken };
+    return { person, accessToken };
   }
 
   @Get('me')

@@ -1,3 +1,4 @@
+import { Driver } from '#drivers/driver.types.js';
 import { UserType } from '#types/common.types.js';
 import { FilteredPersonalInfo } from '#types/personal.type.js';
 import { User } from '#users/user.types.js';
@@ -30,8 +31,8 @@ export class SignUpDTO {
   phoneNumber: string;
 }
 
-export interface FilteredUserWithToken {
-  user: FilteredPersonalInfo<User>;
+export interface FilteredPersonWithToken {
+  person: FilteredPersonalInfo<User> | FilteredPersonalInfo<Driver>;
   accessToken: string;
   refreshToken?: string;
 }

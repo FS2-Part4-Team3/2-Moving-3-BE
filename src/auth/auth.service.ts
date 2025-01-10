@@ -39,7 +39,7 @@ export class AuthService implements IAuthService {
     const accessToken = await this.jwtGenerateService.generateAccessToken({ id: user.id, type: UserType.User });
     const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: user.id, type: UserType.User });
 
-    return { user: filterSensitiveData(user), accessToken, refreshToken };
+    return { person: filterSensitiveData(user), accessToken, refreshToken };
   }
 
   async signIn(body: SignInDTO, type: UserType) {
@@ -52,7 +52,7 @@ export class AuthService implements IAuthService {
     const accessToken = await this.jwtGenerateService.generateAccessToken({ id: user.id, type: UserType.User });
     const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: user.id, type: UserType.User });
 
-    return { user: filterSensitiveData(user), accessToken, refreshToken };
+    return { person: filterSensitiveData(user), accessToken, refreshToken };
   }
 
   async getNewToken() {
