@@ -18,6 +18,7 @@ enum ExceptionMessages {
 
   ID_FORMAT = 'ID 형식이 올바르지 않습니다.',
   UN_CATCHED_EXCEPTION = '오류가 발생했습니다.',
+  MOVEINFO_NOT_FOUND = '이사 정보가 없습니다.',
 }
 
 export default ExceptionMessages;
