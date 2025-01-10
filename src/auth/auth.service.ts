@@ -7,8 +7,8 @@ import { SignInDTO } from '#auth/auth.types.js';
 import { IAuthService } from '#auth/interfaces/auth.service.interface.js';
 import { JwtGenerateService } from '#auth/jwt-generate.service.js';
 import { IStorage } from '#types/common.types.js';
+import { SignUpDTO } from '#types/personal.type.js';
 import { UserRepository } from '#users/user.repository.js';
-import { UserPostDTO } from '#users/user.types.js';
 import compareExp from '#utils/compareExp.js';
 import filterSensitiveData from '#utils/filterSensitiveData.js';
 import hashingPassword from '#utils/hashingPassword.js';
@@ -29,7 +29,7 @@ export class AuthService implements IAuthService {
     return filterSensitiveData(user);
   }
 
-  async createUser(body: UserPostDTO) {
+  async createUser(body: SignUpDTO) {
     const data = body;
     const userExist = await this.userRepository.findByEmail(data.email);
     if (userExist) throw new AuthUserAlreadyExistException();

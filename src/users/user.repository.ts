@@ -1,7 +1,8 @@
 import { PrismaService } from '#global/prisma.service.js';
 import { FindOptions, SortOrder } from '#types/options.type.js';
+import { SignUpDTO } from '#types/personal.type.js';
 import { IUserRepository } from '#users/interfaces/user.repository.interface.js';
-import { UserCreateDTO, UserUpdateDTO } from '#users/user.types.js';
+import { UserUpdateDTO } from '#users/user.types.js';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
@@ -46,7 +47,7 @@ export class UserRepository implements IUserRepository {
     return user;
   }
 
-  async create(data: UserCreateDTO) {
+  async create(data: SignUpDTO) {
     const user = await this.user.create({ data });
 
     return user;

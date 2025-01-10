@@ -4,7 +4,7 @@ import { IAuthController } from '#auth/interfaces/auth.controller.interface.js';
 import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { HashPasswordGuard } from '#guards/hash-password.guard.js';
 import { RefreshTokenGuard } from '#guards/refresh-token.guard.js';
-import { UserPostDTO } from '#users/user.types.js';
+import { SignUpDTO } from '#types/personal.type.js';
 import { Body, Controller, Get, Post, Res, UseGuards } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 import { Response } from 'express';
@@ -16,7 +16,7 @@ export class AuthController implements IAuthController {
   @Post('signUp')
   @UseGuards(HashPasswordGuard)
   @ApiOperation({ summary: '회원가입' })
-  async signUp(@Body() body: UserPostDTO, @Res({ passthrough: true }) response: Response) {
+  async signUp(@Body() body: SignUpDTO, @Res({ passthrough: true }) response: Response) {
     const { user, accessToken, refreshToken } = await this.authService.createUser(body);
     response.cookie('refreshToken', refreshToken);
 
