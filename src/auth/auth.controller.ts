@@ -1,9 +1,9 @@
 import { AuthService } from '#auth/auth.service.js';
 import { SignInDTO } from '#auth/auth.types.js';
-import { AccessTokenGuard } from '#auth/guards/access-token.guard.js';
-import { HashPasswordGuard } from '#auth/guards/hash-password.guard.js';
-import { RefreshTokenGuard } from '#auth/guards/refresh-token.guard.js';
 import { IAuthController } from '#auth/interfaces/auth.controller.interface.js';
+import { AccessTokenGuard } from '#guards/access-token.guard.js';
+import { HashPasswordGuard } from '#guards/hash-password.guard.js';
+import { RefreshTokenGuard } from '#guards/refresh-token.guard.js';
 import { UserPostDTO } from '#users/user.types.js';
 import { Body, Controller, Get, Post, Res, UseGuards } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';

@@ -1,4 +1,4 @@
-import { AccessTokenGuard } from '#auth/guards/access-token.guard.js';
+import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { IRequestController } from '#requests/interfaces/request.controller.interface.js';
 import { Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';

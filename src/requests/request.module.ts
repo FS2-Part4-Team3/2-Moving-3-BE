@@ -1,5 +1,5 @@
-import { GuardModule } from '#auth/guard.module.js';
 import { DBModule } from '#global/db.module.js';
+import { GuardModule } from '#guards/guard.module.js';
 import { MoveModule } from '#move/move.module.js';
 import { RequestController } from '#requests/request.controller.js';
 import { RequestRepository } from '#requests/request.repository.js';

@@ -1,4 +1,4 @@
-import { AccessTokenGuard } from '#auth/guards/access-token.guard.js';
+import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { IMoveController } from '#move/interfaces/move.controller.interface.js';
 import { Controller, Get, Patch, Post, UseGuards } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';

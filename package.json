@@ -12,6 +12,7 @@
     "#exceptions/*": "./dist/exceptions/*",
     "#global/*": "./dist/global/*",
     "#utils/*": "./dist/utils/*",
+    "#guards/*": "./dist/guards/*",
     "#swagger/*": "./dist/swagger/*",
     "#auth/*": "./dist/auth/*",
     "#drivers/*": "./dist/drivers/*",
