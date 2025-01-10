@@ -1,7 +1,7 @@
 import { AuthInvalidAccessTokenException, AuthInvalidTokenException } from '#auth/auth.exception.js';
+import { GuardService } from '#auth/guard.service.js';
 import { InternalServerErrorException, UnauthorizedException } from '#exceptions/http.exception.js';
 import { IStorage } from '#types/common.types.js';
-import { UserRepository } from '#users/user.repository.js';
 import loggingError from '#utils/loggingError.js';
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -13,7 +13,7 @@ import { Request } from 'express';
 export class AccessTokenGuard implements CanActivate {
   constructor(
     private readonly jwtService: JwtService,
-    private readonly userRepository: UserRepository,
+    private readonly guardService: GuardService,
     private readonly als: AsyncLocalStorage<IStorage>,
     private readonly configService: ConfigService,
   ) {}
@@ -30,7 +30,7 @@ export class AccessTokenGuard implements CanActivate {
       if (!payload.userId) {
         throw new AuthInvalidAccessTokenException();
       }
-      const user = await this.userRepository.findById(payload.userId);
+      const user = await this.guardService.validateUser(payload.userId);
       if (!user) {
         throw new AuthInvalidAccessTokenException();
       }

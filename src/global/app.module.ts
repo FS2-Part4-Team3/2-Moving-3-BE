@@ -1,4 +1,5 @@
 import { AuthModule } from '#auth/auth.module.js';
+import { GuardModule } from '#auth/guard.module.js';
 import jwtConfig from '#configs/jwt.config.js';
 import { postgresConfig } from '#configs/postgres.config.js';
 import { DriverModule } from '#drivers/driver.module.js';
@@ -23,6 +24,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
   imports: [
     DBModule,
     AuthModule,
+    GuardModule,
     DriverModule,
     MoveModule,
     QuestionModule,

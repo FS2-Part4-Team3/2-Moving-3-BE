@@ -1,7 +1,7 @@
 import { AuthInvalidRefreshTokenException, AuthInvalidTokenException } from '#auth/auth.exception.js';
+import { GuardService } from '#auth/guard.service.js';
 import { InternalServerErrorException } from '#exceptions/http.exception.js';
 import { IStorage } from '#types/common.types.js';
-import { UserRepository } from '#users/user.repository.js';
 import loggingError from '#utils/loggingError.js';
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -12,7 +12,7 @@ import { AsyncLocalStorage } from 'async_hooks';
 export class RefreshTokenGuard implements CanActivate {
   constructor(
     private readonly jwtService: JwtService,
-    private readonly userRepository: UserRepository,
+    private readonly guardService: GuardService,
     private readonly als: AsyncLocalStorage<IStorage>,
     private readonly configService: ConfigService,
   ) {}
@@ -33,7 +33,7 @@ export class RefreshTokenGuard implements CanActivate {
       if (!payload.userId) {
         throw new AuthInvalidRefreshTokenException();
       }
-      const user = await this.userRepository.findById(payload.userId);
+      const user = await this.guardService.validateUser(payload.userId);
       if (!user) {
         throw new AuthInvalidRefreshTokenException();
       }
