@@ -1,5 +1,6 @@
 import { ModelBase } from '#types/common.types.js';
 import { PersonalInfo } from '#types/personal.type.js';
+import { OmitType, PartialType } from '@nestjs/swagger';
 import { $Enums, Driver as PrismaDriver } from '@prisma/client';
 import { ArrayNotEmpty, IsIn, IsString } from 'class-validator';
 
@@ -27,4 +28,5 @@ export class DriverEntity extends PersonalInfo implements Omit<Driver, 'applyCou
   serviceTypes: $Enums.ServiceType[];
 }
 
-export interface DriverInputDTO extends Omit<Driver, keyof ModelBase> {}
+export class DriverPatchDTO extends PartialType(OmitType(DriverEntity, ['refreshToken'])) {}
+export interface DriverUpdateDTO extends Partial<Omit<Driver, keyof ModelBase>> {}

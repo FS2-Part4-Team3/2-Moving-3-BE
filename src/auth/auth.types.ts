@@ -31,8 +31,11 @@ export class SignUpDTO {
   phoneNumber: string;
 }
 
-export interface FilteredPersonWithToken {
-  person: FilteredPersonalInfo<User> | FilteredPersonalInfo<Driver>;
+export type FilteredPersonWithToken = {
   accessToken: string;
   refreshToken?: string;
-}
+} & (
+  | { person: FilteredPersonalInfo<User> | FilteredPersonalInfo<Driver> }
+  | { user: FilteredPersonalInfo<User> }
+  | { driver: FilteredPersonalInfo<Driver> }
+);

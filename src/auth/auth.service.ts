@@ -6,6 +6,7 @@ import {
 import { SignInDTO, SignUpDTO } from '#auth/auth.types.js';
 import { IAuthService } from '#auth/interfaces/auth.service.interface.js';
 import { JwtGenerateService } from '#auth/jwt-generate.service.js';
+import { DriverRepository } from '#drivers/driver.repository.js';
 import { IStorage, UserType } from '#types/common.types.js';
 import { UserRepository } from '#users/user.repository.js';
 import compareExp from '#utils/compareExp.js';
@@ -18,6 +19,7 @@ import { AsyncLocalStorage } from 'async_hooks';
 export class AuthService implements IAuthService {
   constructor(
     private readonly userRepository: UserRepository,
+    private readonly driverRepository: DriverRepository,
     private readonly jwtGenerateService: JwtGenerateService,
     private readonly als: AsyncLocalStorage<IStorage>,
   ) {}
@@ -32,14 +34,16 @@ export class AuthService implements IAuthService {
 
   async createPerson(body: SignUpDTO, type: UserType) {
     const data = body;
-    const userExist = await this.userRepository.findByEmail(data.email);
-    if (userExist) throw new AuthUserAlreadyExistException();
+    const repo = type === UserType.User ? this.userRepository : this.driverRepository;
 
-    const user = await this.userRepository.create(data);
-    const accessToken = await this.jwtGenerateService.generateAccessToken({ id: user.id, type: UserType.User });
-    const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: user.id, type: UserType.User });
+    const targetExist = await repo.findByEmail(data.email);
+    if (targetExist) throw new AuthUserAlreadyExistException();
 
-    return { person: filterSensitiveData(user), accessToken, refreshToken };
+    const person = await repo.create(data);
+    const accessToken = await this.jwtGenerateService.generateAccessToken({ id: person.id, type });
+    const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: person.id, type });
+
+    return { person: filterSensitiveData(person), accessToken, refreshToken };
   }
 
   async signIn(body: SignInDTO, type: UserType) {
@@ -49,8 +53,8 @@ export class AuthService implements IAuthService {
     if (!user) throw new AuthWrongCredentialException();
     if (user.password !== hashed) throw new AuthWrongCredentialException();
 
-    const accessToken = await this.jwtGenerateService.generateAccessToken({ id: user.id, type: UserType.User });
-    const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: user.id, type: UserType.User });
+    const accessToken = await this.jwtGenerateService.generateAccessToken({ id: user.id, type });
+    const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: user.id, type });
 
     return { person: filterSensitiveData(user), accessToken, refreshToken };
   }

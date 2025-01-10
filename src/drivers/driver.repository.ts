@@ -1,5 +1,5 @@
 import { SignUpDTO } from '#auth/auth.types.js';
-import { DriverInputDTO } from '#drivers/driver.types.js';
+import { DriverUpdateDTO } from '#drivers/driver.types.js';
 import { IDriverRepository } from '#drivers/interfaces/driver.repository.interface.js';
 import { PrismaService } from '#global/prisma.service.js';
 import { FindOptions, SortOrder } from '#types/options.type.js';
@@ -53,7 +53,11 @@ export class DriverRepository implements IDriverRepository {
     return driver;
   }
 
-  async update(id: string, data: Partial<DriverInputDTO>) {}
+  async update(id: string, data: DriverUpdateDTO) {
+    const driver = await this.driver.update({ where: { id }, data });
+
+    return driver;
+  }
 
   async delete(id: string) {}
 
