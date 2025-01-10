@@ -18,7 +18,11 @@ export class RequestController implements IRequestController {
 
   @Get(':id')
   @ApiOperation({ summary: '요청 상세 조회' })
-  async getRequest() {}
+  async getRequest(@Param('id') id: string) {
+    const request = await this.requestService.getRequest(id);
+
+    return request;
+  }
 
   @Post(':id')
   @UseGuards(AccessTokenGuard)

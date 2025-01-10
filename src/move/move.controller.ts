@@ -1,6 +1,7 @@
 import { AccessTokenGuard } from '#auth/guards/access-token.guard.js';
 import { IMoveController } from '#move/interfaces/move.controller.interface.js';
-import { Controller, Get, Patch, Post, UseGuards } from '@nestjs/common';
+import { FindOptions, RequestFilter } from '#types/options.type.js';
+import { Controller, Get, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 import { MoveService } from './move.service.js';
 
@@ -10,7 +11,11 @@ export class MoveController implements IMoveController {
 
   @Get()
   @ApiOperation({ summary: '이사 정보 목록 조회' })
-  async getMoveInfos() {}
+  async getMoveInfos(@Query('driverId') driverId?: string, @Query() options?: FindOptions & RequestFilter) {
+    const request = await this.moveService.getMoveInfos(driverId, options);
+
+    return request;
+  }
 
   @Get('detail')
   @UseGuards(AccessTokenGuard)

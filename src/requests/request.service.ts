@@ -1,5 +1,5 @@
 import { IRequestService } from '#requests/interfaces/request.service.interface.js';
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { RequestRepository } from './request.repository.js';
 import { AsyncLocalStorage } from 'async_hooks';
 import { IStorage } from '#types/common.types.js';
@@ -14,6 +14,12 @@ export class RequestService implements IRequestService {
     private readonly requestRepository: RequestRepository,
     private readonly als: AsyncLocalStorage<IStorage>,
   ) {}
+
+  async getRequest(id: string) {
+    const request = await this.requestRepository.findById(id);
+
+    return request;
+  }
 
   async postRequest(driverId: string) {
     const { userId } = this.als.getStore();
