@@ -1,4 +1,4 @@
-import { AccessTokenGuard } from '#auth/guards/access-token.guard.js';
+import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { IMoveController } from '#move/interfaces/move.controller.interface.js';
 import { FindOptions, RequestFilter } from '#types/options.type.js';
 import { Controller, Get, Patch, Post, Query, UseGuards } from '@nestjs/common';

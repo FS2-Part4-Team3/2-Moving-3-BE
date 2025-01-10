@@ -24,6 +24,7 @@
       "#exceptions/*": ["./src/exceptions/*"],
       "#global/*": ["./src/global/*"],
       "#utils/*": ["./src/utils/*"],
+      "#guards/*": ["./src/guards/*"],
       "#swagger/*": ["./src/swagger/*"],
       "#auth/*": ["./src/auth/*"],
       "#drivers/*": ["./src/drivers/*"],

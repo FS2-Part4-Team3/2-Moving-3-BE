@@ -1,6 +1,6 @@
-import { AccessTokenGuard } from '#auth/guards/access-token.guard.js';
 import { JwtGenerateService } from '#auth/jwt-generate.service.js';
 import { PrismaService } from '#global/prisma.service.js';
+import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { IStorage } from '#types/common.types.js';
 import { UserService } from '#users/user.service.js';
 import { Controller, Get, Query, UseGuards } from '@nestjs/common';

@@ -1,5 +1,4 @@
 import {
-  AuthInvalidAccessTokenException,
   AuthInvalidRefreshTokenException,
   AuthUserAlreadyExistException,
   AuthWrongCredentialException,
@@ -25,9 +24,7 @@ export class AuthService implements IAuthService {
   ) {}
 
   async getMe() {
-    const { userId } = this.als.getStore();
-    const user = await this.userRepository.findById(userId);
-    if (!user) throw new AuthInvalidAccessTokenException();
+    const { user } = this.als.getStore();
 
     return filterSensitiveData(user);
   }
@@ -58,9 +55,7 @@ export class AuthService implements IAuthService {
   }
 
   async getNewToken() {
-    const { userId, refreshToken, exp } = this.als.getStore();
-    const user = await this.userRepository.findById(userId);
-    if (!user) throw new AuthInvalidRefreshTokenException();
+    const { user, userId, refreshToken, exp } = this.als.getStore();
     if (user.refreshToken !== refreshToken) throw new AuthInvalidRefreshTokenException();
 
     const accessToken = this.jwtGenerateService.generateAccessToken({ userId });

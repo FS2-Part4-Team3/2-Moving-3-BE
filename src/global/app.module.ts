@@ -9,6 +9,7 @@ import { DevController } from '#global/dev.controller.js';
 import { LogInterceptor } from '#global/interceptors/log.interceptor.js';
 import { AlsMiddleware } from '#global/middlewares/als.middleware.js';
 import { StorageModule } from '#global/storage.module.js';
+import { GuardModule } from '#guards/guard.module.js';
 import { MoveModule } from '#move/move.module.js';
 import { QuestionModule } from '#questions/question.module.js';
 import { RequestModule } from '#requests/request.module.js';
@@ -23,6 +24,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
   imports: [
     DBModule,
     AuthModule,
+    GuardModule,
     DriverModule,
     MoveModule,
     QuestionModule,

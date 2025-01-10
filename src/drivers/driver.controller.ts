@@ -1,6 +1,6 @@
-import { AccessTokenGuard } from '#auth/guards/access-token.guard.js';
 import { DriverService } from '#drivers/driver.service.js';
 import { IDriverController } from '#drivers/interfaces/driver.controller.interface.js';
+import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { SortOrder } from '#types/options.type.js';
 import { GetQueries } from '#types/queries.type.js';
 import { Controller, Delete, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
