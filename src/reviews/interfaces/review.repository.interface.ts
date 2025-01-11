@@ -5,6 +5,6 @@ export interface IReviewRepository {
   findMany: (options: FindOptions) => void;
   findById: (id: string) => void;
   create: (data: ReviewInputDTO) => Promise<Review>;
-  update: (id: string, data: Partial<ReviewInputDTO>) => void;
+  update: (id: string, data: Partial<ReviewInputDTO>) => Promise<Review>;
   delete: (id: string) => void;
 }

@@ -22,9 +22,14 @@ export class ReviewController implements IReviewController {
     return review;
   }
 
-  @Post(':reviewId')
+  @Post('patch/:reviewId')
+  @UseGuards(AccessTokenGuard)
   @ApiOperation({ summary: '리뷰 수정' })
-  async patchReview() {}
+  async patchReview(@Param('reviewId') reviewId: string, @Body() body: Partial<ReviewInputDTO>) {
+    const review = await this.reviewService.patchReview(reviewId, body);
+
+    return review;
+  }
 
   @Delete(':reviewId')
   @ApiOperation({ summary: '리뷰 삭제' })

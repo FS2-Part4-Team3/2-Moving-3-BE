@@ -22,4 +22,10 @@ export class ReviewService implements IReviewService {
 
     return review;
   }
+
+  async patchReview(reviewId: string, body: Partial<ReviewInputDTO>) {
+    const review = await this.reviewRepository.update(reviewId, body);
+
+    return review;
+  }
 }

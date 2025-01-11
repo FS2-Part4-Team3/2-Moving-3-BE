@@ -21,7 +21,11 @@ export class ReviewRepository implements IReviewRepository {
     return review;
   }
 
-  async update(id: string, data: Partial<ReviewInputDTO>) {}
+  async update(id: string, data: Partial<ReviewInputDTO>) {
+    const review = await this.review.update({ where: { id }, data });
+
+    return review;
+  }
 
   async delete(id: string) {}
 }
