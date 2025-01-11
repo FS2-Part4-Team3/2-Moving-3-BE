@@ -1,4 +1,7 @@
+import { TokenPayload } from '#auth/auth.types.js';
 import { IJwtGenerateService } from '#auth/interfaces/jwt-generate.service.interface.js';
+import { DriverRepository } from '#drivers/driver.repository.js';
+import { UserType } from '#types/common.types.js';
 import { UserRepository } from '#users/user.repository.js';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -8,11 +11,12 @@ import { JwtService } from '@nestjs/jwt';
 export class JwtGenerateService implements IJwtGenerateService {
   constructor(
     private readonly userRepository: UserRepository,
+    private readonly driverRepository: DriverRepository,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
   ) {}
 
-  generateAccessToken(payload: { userId: string }) {
+  generateAccessToken(payload: TokenPayload) {
     const jwtSecret = this.configService.get('jwtSecret');
     const accessExpireTime = this.configService.get('accessExpireTime');
 
@@ -23,7 +27,7 @@ export class JwtGenerateService implements IJwtGenerateService {
     return accessToken;
   }
 
-  async generateRefreshToken(payload: { userId: string }) {
+  async generateRefreshToken(payload: TokenPayload) {
     const jwtSecret = this.configService.get('jwtSecret');
     const refreshExpireTime = this.configService.get('refreshExpireTime');
 
@@ -31,7 +35,8 @@ export class JwtGenerateService implements IJwtGenerateService {
       secret: jwtSecret,
       expiresIn: refreshExpireTime,
     });
-    await this.userRepository.update(payload.userId, { refreshToken });
+    const repo = payload.type === UserType.User ? this.userRepository : this.driverRepository;
+    await repo.update(payload.id, { refreshToken });
     return refreshToken;
   }
 }

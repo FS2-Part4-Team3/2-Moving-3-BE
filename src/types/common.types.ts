@@ -7,3 +7,8 @@ export interface ModelBase {
   createdAt?: Date;
   updatedAt?: Date;
 }
+
+export enum UserType {
+  User = 'User',
+  Driver = 'Driver',
+}
