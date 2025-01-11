@@ -27,5 +27,9 @@ export class ReviewRepository implements IReviewRepository {
     return review;
   }
 
-  async delete(id: string) {}
+  async delete(id: string) {
+    const review = await this.review.delete({ where: { id } });
+
+    return review;
+  }
 }

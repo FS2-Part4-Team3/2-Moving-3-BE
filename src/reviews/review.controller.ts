@@ -32,6 +32,11 @@ export class ReviewController implements IReviewController {
   }
 
   @Delete(':reviewId')
+  @UseGuards(AccessTokenGuard)
   @ApiOperation({ summary: '리뷰 삭제' })
-  async deleteReview() {}
+  async deleteReview(@Param('reviewId') reviewId: string) {
+    const review = await this.reviewService.deleteReview(reviewId);
+
+    return review;
+  }
 }

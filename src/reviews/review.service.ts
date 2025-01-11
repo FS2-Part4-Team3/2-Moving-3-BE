@@ -28,4 +28,10 @@ export class ReviewService implements IReviewService {
 
     return review;
   }
+
+  async deleteReview(reviewId: string) {
+    const review = await this.reviewRepository.delete(reviewId);
+
+    return review;
+  }
 }
