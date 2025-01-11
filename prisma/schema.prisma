@@ -41,20 +41,19 @@ model Driver {
 
   email          String        @unique
   name           String
-  nickname       String
+  nickname       String?
   image          String?
   password       String
   salt           String
   refreshToken   String?
   phoneNumber    String
-  introduce      String
-  description    String
+  introduce      String?
+  description    String?
   serviceTypes   ServiceType[]
   availableAreas Area[]
 
-  applyCount Int   @default(0)
-  likeCount  Int   @default(0)
-  score      Float
+  applyCount Int @default(0)
+  likeCount  Int @default(0)
 
   reviews             Review[]
   requests            Request[]

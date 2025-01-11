@@ -11,18 +11,13 @@ export interface User extends UserBase, ModelBase {}
 
 export class UserEntity extends PersonalInfo implements User {
   @ArrayNotEmpty({ message: '하나 이상의 지역을 선택해주세요' })
-  @IsIn(Object.values($Enums.Area), { each: true })
+  @IsIn(Object.values($Enums.Area), { each: true, message: '올바른 지역을 선택해주세요.' })
   areas: $Enums.Area[];
 
   @ArrayNotEmpty({ message: '하나 이상의 타입을 선택해주세요' })
-  @IsIn(Object.values($Enums.ServiceType), { each: true })
+  @IsIn(Object.values($Enums.ServiceType), { each: true, message: '올바른 지역을 선택해주세요.' })
   serviceTypes: $Enums.ServiceType[];
 }
 
-export class UserPostDTO extends OmitType(UserEntity, ['refreshToken']) {}
-export class UserPatchDTO extends PartialType(UserPostDTO) {}
-
-export interface UserCreateDTO extends Omit<Omit<User, keyof ModelBase>, 'refreshToken'> {}
-export interface UserUpdateDTO extends Partial<UserCreateDTO> {
-  refreshToken?: string;
-}
+export class UserPatchDTO extends PartialType(OmitType(UserEntity, ['refreshToken'])) {}
+export interface UserUpdateDTO extends Partial<Omit<User, keyof ModelBase>> {}
