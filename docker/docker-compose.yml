@@ -1,4 +1,5 @@
 name: fs2-part4-team3-be
+version: '3.8'
 
 services:
   postgres:
