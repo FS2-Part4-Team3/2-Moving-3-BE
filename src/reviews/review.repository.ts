@@ -15,7 +15,11 @@ export class ReviewRepository implements IReviewRepository {
 
   async findById(id: string) {}
 
-  async create(data: ReviewInputDTO) {}
+  async create(data: ReviewInputDTO) {
+    const review = await this.review.create({ data });
+
+    return review;
+  }
 
   async update(id: string, data: Partial<ReviewInputDTO>) {}
 
