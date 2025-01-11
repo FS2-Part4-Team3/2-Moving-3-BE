@@ -1,5 +1,4 @@
-import { ReviewInputDTO } from '#reviews/review.types.js';
-import { Review } from '@prisma/client';
+import { Review, ReviewInputDTO } from '#reviews/review.types.js';
 
 export interface IReviewController {
   postReview: (driverId: string, body: ReviewInputDTO) => Promise<Review>;
