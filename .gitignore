@@ -1,6 +1,8 @@
 # manual
 .vscode
 http
+*.http
+ssh
 
 # compiled output
 /dist

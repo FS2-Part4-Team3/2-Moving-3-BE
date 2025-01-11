@@ -1,9 +1,10 @@
-import { SignInDTO } from '#auth/auth.types.js';
-import { UserInputDTO } from '#users/user.types.js';
+import { FilteredUserWithToken, SignInDTO } from '#auth/auth.types.js';
+import { FilteredPersonalInfo } from '#types/personal.type.js';
+import { User, UserPostDTO } from '#users/user.types.js';
 
 export interface IAuthService {
-  getMe: () => void;
-  createUser: (body: UserInputDTO) => void;
-  signIn: (body: SignInDTO) => void;
+  getMe: () => Promise<FilteredPersonalInfo<User>>;
+  createUser: (data: UserPostDTO) => Promise<FilteredUserWithToken>;
+  signIn: (body: SignInDTO) => Promise<FilteredUserWithToken>;
   getNewToken: () => void;
 }
