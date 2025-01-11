@@ -1,11 +1,12 @@
 FROM node:22 AS builder
 WORKDIR /app
 COPY package*.json ./
+COPY prisma ./prisma
 RUN npm install
 RUN ls
 RUN cat prisma/schema.prisma
 RUN npx prisma generate
-RUN npx prisma migrate production
+RUN npx prisma migrate deploy
 COPY . .
 RUN npm run build
 
