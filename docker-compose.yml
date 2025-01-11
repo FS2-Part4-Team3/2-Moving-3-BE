@@ -4,6 +4,7 @@ services:
   postgres:
     image: postgres:15
     container_name: moving-postgres
+    restart: always
     ports:
       - '5432:5432'
     environment:
@@ -18,6 +19,7 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: moving-nestjs
+    restart: always
     ports:
       - '3000:3000'
     depends_on:
@@ -28,11 +30,12 @@ services:
       DATABASE_USER: postgres
       DATABASE_PASSWORD: fs2_part4_team3_be
       DATABASE_NAME: moving_db
-      # DATABASE_URL: postgresql://postgres:fs2_part4_team3_be@postgres:5432/moving_db?schema=public
+      DATABASE_URL: postgresql://postgres:fs2_part4_team3_be@postgres:5432/moving_db?schema=public
 
   nginx:
     image: nginx:latest
     container_name: nginx-proxy
+    restart: always
     ports:
       - '80:80'
     volumes:
