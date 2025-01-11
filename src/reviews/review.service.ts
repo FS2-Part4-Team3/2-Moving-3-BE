@@ -4,6 +4,7 @@ import { ReviewRepository } from './review.repository.js';
 import { ReviewInputDTO } from './review.types.js';
 import { AsyncLocalStorage } from 'async_hooks';
 import { IStorage } from '#types/common.types.js';
+import { FindOptions } from '#types/options.type.js';
 
 @Injectable()
 export class ReviewService implements IReviewService {
@@ -11,6 +12,12 @@ export class ReviewService implements IReviewService {
     private readonly reviewRepository: ReviewRepository,
     private readonly als: AsyncLocalStorage<IStorage>,
   ) {}
+
+  async getDriverReviews(driverId: string, options: FindOptions) {
+    const { totalCount, list } = await this.reviewRepository.findManyDriverReviews(driverId, options);
+
+    return { totalCount, list };
+  }
 
   async postReview(driverId: string, body: ReviewInputDTO) {
     const { userId } = this.als.getStore();

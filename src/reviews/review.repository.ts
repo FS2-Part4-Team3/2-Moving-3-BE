@@ -1,7 +1,7 @@
 import { PrismaService } from '#global/prisma.service.js';
 import { IReviewRepository } from '#reviews/interfaces/review.repository.interface.js';
 import { ReviewInputDTO } from '#reviews/review.types.js';
-import { FindOptions } from '#types/options.type.js';
+import { FindOptions, SortOrder } from '#types/options.type.js';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
@@ -11,7 +11,31 @@ export class ReviewRepository implements IReviewRepository {
     this.review = prisma.review;
   }
 
-  async findMany(options: FindOptions) {}
+  async findManyDriverReviews(driverId: string, options: FindOptions) {
+    const { page, pageSize, orderBy } = options;
+
+    const sort = orderBy === SortOrder.Recent ? { createdAt: 'desc' } : { createdAt: 'asc' };
+
+    const list = await this.review.findMany({
+      where: { driverId },
+      orderBy: sort,
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+      include: {
+        owner: {
+          select: { name: true },
+        },
+      },
+    });
+
+    const totalCount = await this.review.count({
+      where: {
+        driverId,
+      },
+    });
+
+    return { totalCount, list };
+  }
 
   async findById(id: string) {}
 
