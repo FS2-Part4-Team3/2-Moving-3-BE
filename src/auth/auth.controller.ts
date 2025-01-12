@@ -1,15 +1,17 @@
 import { AuthService } from '#auth/auth.service.js';
-import { SignInDTO, SignUpDTO } from '#auth/auth.types.js';
+import { SignInDTO, SignUpDTO, SignUpDTOWithoutHash } from '#auth/auth.types.js';
 import { IAuthController } from '#auth/interfaces/auth.controller.interface.js';
 import { BadRequestException } from '#exceptions/http.exception.js';
+import { EnumValidationPipe } from '#global/pipes/enum.validation.pipe.js';
 import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { HashPasswordGuard } from '#guards/hash-password.guard.js';
 import { RefreshTokenGuard } from '#guards/refresh-token.guard.js';
 import { UserType } from '#types/common.types.js';
 import { Body, Controller, Get, Param, Post, Res, UseGuards } from '@nestjs/common';
-import { ApiOperation } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController implements IAuthController {
   constructor(private readonly authService: AuthService) {}
@@ -17,16 +19,13 @@ export class AuthController implements IAuthController {
   @Post('signUp/:userType')
   @UseGuards(HashPasswordGuard)
   @ApiOperation({ summary: '회원가입' })
+  @ApiBody({ type: SignUpDTOWithoutHash })
+  @ApiParam({ name: 'userType', enum: UserType })
   async signUp(
     @Body() body: SignUpDTO,
-    @Param('userType') userType: 'user' | 'driver',
+    @Param('userType', new EnumValidationPipe(UserType)) type: UserType,
     @Res({ passthrough: true }) response: Response,
   ) {
-    if (!['user', 'driver'].includes(userType)) {
-      throw new BadRequestException();
-    }
-    const type = userType === 'user' ? UserType.User : UserType.Driver;
-
     const { person, accessToken, refreshToken } = await this.authService.createPerson(body, type);
     response.cookie('refreshToken', refreshToken);
 
@@ -36,12 +35,8 @@ export class AuthController implements IAuthController {
 
   @Post('signIn/:userType')
   @ApiOperation({ summary: '로그인' })
-  async signIn(
-    @Body() body: SignInDTO,
-    @Param('userType') userType: 'user' | 'driver',
-    @Res({ passthrough: true }) response: Response,
-  ) {
-    if (!['user', 'driver'].includes(userType)) {
+  async signIn(@Body() body: SignInDTO, @Param('userType') userType: UserType, @Res({ passthrough: true }) response: Response) {
+    if (!Object.values(UserType).includes(userType)) {
       throw new BadRequestException();
     }
     const type = userType === 'user' ? UserType.User : UserType.Driver;

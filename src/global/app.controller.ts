@@ -5,7 +5,7 @@ import { ApiExcludeEndpoint } from '@nestjs/swagger';
 export class AppController {
   constructor() {}
 
-  @Get('hello')
+  @Get(['/', '/hello'])
   @ApiExcludeEndpoint()
   hello() {
     return 'Hello World!';

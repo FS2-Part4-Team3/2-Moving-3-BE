@@ -9,6 +9,6 @@ export interface ModelBase {
 }
 
 export enum UserType {
-  User = 'User',
-  Driver = 'Driver',
+  User = 'user',
+  Driver = 'driver',
 }
