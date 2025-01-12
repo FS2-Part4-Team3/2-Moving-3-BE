@@ -1,4 +1,4 @@
 docker compose down
-docker compose rm -f
-docker rmi moving-nestjs
+docker container prune
+docker image prune -a
 docker compose up --build -d
