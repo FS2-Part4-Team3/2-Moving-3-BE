@@ -3,7 +3,7 @@ import { UserType } from '#types/common.types.js';
 import { FilteredPersonalInfo } from '#types/personal.type.js';
 import { User } from '#users/user.types.js';
 import { ApiProperty, OmitType } from '@nestjs/swagger';
-import { IsEmail, IsHexadecimal, IsNotEmpty, IsString, Length, Matches } from 'class-validator';
+import { IsEmail, IsEnum, IsHexadecimal, IsNotEmpty, IsString, Length, Matches } from 'class-validator';
 
 export interface TokenPayload {
   id: string;
@@ -47,4 +47,9 @@ export type FilteredPersonWithToken = {
 export class SignUpDTOWithoutHash extends OmitType(SignUpDTO, ['password', 'salt']) {
   @ApiProperty({ description: '비밀번호' })
   password: string;
+}
+
+export class UserTypeParamDTO {
+  @IsEnum(UserType, { message: '사용자 형식은 user 혹은 driver 중 하나입니다.' })
+  type: UserType;
 }
