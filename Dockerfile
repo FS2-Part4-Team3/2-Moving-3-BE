@@ -11,5 +11,7 @@ COPY --from=build /app/prisma /app/prisma
 COPY --from=build /app/package*.json /app/
 RUN npm install --omit=dev
 RUN npx prisma generate
+RUN npx prisma migrate deploy
 EXPOSE 3000
-CMD ["node", "dist/main"]
+CMD ["nest", "start"]
+# CMD ["node", "dist/main"]
