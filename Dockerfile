@@ -10,8 +10,7 @@ COPY --from=build /app/dist /app/dist
 COPY --from=build /app/prisma /app/prisma
 COPY --from=build /app/package*.json /app/
 RUN npm install --omit=dev
-RUN npx prisma generate
-RUN npx prisma migrate deploy
 EXPOSE 3000
-CMD ["nest", "start"]
-# CMD ["node", "dist/main"]
+COPY docker-entrypoint.sh /app/
+RUN chmod +x /app/docker-entrypoint.sh
+CMD ["/app/docker-entrypoint.sh"]
