@@ -1,5 +1,5 @@
 import { AuthService } from '#auth/auth.service.js';
-import { SignInDTO, SignUpDTO } from '#auth/auth.types.js';
+import { SignInDTO, SignUpDTO, SignUpDTOWithoutHash } from '#auth/auth.types.js';
 import { IAuthController } from '#auth/interfaces/auth.controller.interface.js';
 import { BadRequestException } from '#exceptions/http.exception.js';
 import { AccessTokenGuard } from '#guards/access-token.guard.js';
@@ -7,7 +7,7 @@ import { HashPasswordGuard } from '#guards/hash-password.guard.js';
 import { RefreshTokenGuard } from '#guards/refresh-token.guard.js';
 import { UserType } from '#types/common.types.js';
 import { Body, Controller, Get, Param, Post, Res, UseGuards } from '@nestjs/common';
-import { ApiOperation } from '@nestjs/swagger';
+import { ApiBody, ApiOperation } from '@nestjs/swagger';
 import { Response } from 'express';
 
 @Controller('auth')
@@ -17,6 +17,7 @@ export class AuthController implements IAuthController {
   @Post('signUp/:userType')
   @UseGuards(HashPasswordGuard)
   @ApiOperation({ summary: '회원가입' })
+  @ApiBody({ type: SignUpDTOWithoutHash })
   async signUp(
     @Body() body: SignUpDTO,
     @Param('userType') userType: 'user' | 'driver',
