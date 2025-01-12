@@ -4,8 +4,10 @@ import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { IStorage } from '#types/common.types.js';
 import { UserService } from '#users/user.service.js';
 import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { ApiExcludeController } from '@nestjs/swagger';
 import { AsyncLocalStorage } from 'async_hooks';
 
+@ApiExcludeController()
 @Controller('dev')
 export class DevController {
   constructor(
