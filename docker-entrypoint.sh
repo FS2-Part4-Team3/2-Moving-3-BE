@@ -1,3 +1,3 @@
 npx prisma generate
 npx prisma migrate deploy
-npm start
+node dist/main
