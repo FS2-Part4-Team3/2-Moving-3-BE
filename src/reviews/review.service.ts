@@ -13,6 +13,12 @@ export class ReviewService implements IReviewService {
     private readonly als: AsyncLocalStorage<IStorage>,
   ) {}
 
+  async getMyReviews(userId: string, options: FindOptions) {
+    const { totalCount, list } = await this.reviewRepository.findManyMyReviews(userId, options);
+
+    return { totalCount, list };
+  }
+
   async getDriverReviews(driverId: string, options: FindOptions) {
     const { totalCount, list } = await this.reviewRepository.findManyDriverReviews(driverId, options);
 
