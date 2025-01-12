@@ -1,4 +1,6 @@
+import { TokenPayload } from '#auth/auth.types.js';
+
 export interface IJwtGenerateService {
-  generateAccessToken: (payload: { userId: string }) => string;
-  generateRefreshToken: (payload: { userId: string }) => Promise<string>;
+  generateAccessToken: (payload: TokenPayload) => string;
+  generateRefreshToken: (payload: TokenPayload) => Promise<string>;
 }
