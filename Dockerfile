@@ -2,7 +2,6 @@ FROM node:22 AS build
 WORKDIR /app
 COPY . .
 RUN npm install
-# RUN npx prisma generate
 RUN npm run build
 
 FROM node:22 AS deploy
