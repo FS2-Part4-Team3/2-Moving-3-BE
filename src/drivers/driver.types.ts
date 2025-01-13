@@ -9,9 +9,14 @@ interface DriverBase extends PrismaDriverBase {}
 
 export interface Driver extends DriverBase, ModelBase {}
 
+<<<<<<< HEAD
 export class DriverEntity extends PersonalInfo implements Omit<Driver, 'applyCount' | 'likeCount'> {
   @IsString({ message: '별명은 문자열 형식입니다.' })
   @IsNotEmpty({ message: '별명은 1글자 이상이어야 합니다.' })
+=======
+export class DriverEntity extends PersonalInfo {
+  @IsString()
+>>>>>>> dev
   nickname: string;
 
   @IsString({ message: '자기소개는 문자열 형식입니다.' })
