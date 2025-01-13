@@ -3,10 +3,11 @@ import {
   AuthUserAlreadyExistException,
   AuthWrongCredentialException,
 } from '#auth/auth.exception.js';
-import { SignInDTO, SignUpDTO } from '#auth/auth.types.js';
+import { GoogleAuthType, GoogleCreateDTO, SignInDTO, SignUpDTO } from '#auth/auth.types.js';
 import { IAuthService } from '#auth/interfaces/auth.service.interface.js';
 import { JwtGenerateService } from '#auth/jwt-generate.service.js';
 import { DriverRepository } from '#drivers/driver.repository.js';
+import { UnauthorizedException } from '#exceptions/http.exception.js';
 import { IStorage, UserType } from '#types/common.types.js';
 import { UserRepository } from '#users/user.repository.js';
 import compareExp from '#utils/compareExp.js';
@@ -41,7 +42,7 @@ export class AuthService implements IAuthService {
       throw new AuthUserAlreadyExistException();
     }
 
-    const person = await repo.create(data);
+    const person = await repo.createBySignUp(data);
     const accessToken = await this.jwtGenerateService.generateAccessToken({ id: person.id, type });
     const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: person.id, type });
 
@@ -85,5 +86,29 @@ export class AuthService implements IAuthService {
     }
 
     return result;
+  }
+
+  async googleAuth(redirectResult: GoogleAuthType) {
+    const { email, name, photo, provider, id } = redirectResult;
+    const target = await this.userRepository.findByEmail(email);
+
+    if (target) {
+      if (target.provider !== provider || target.providerId !== id) {
+        throw new UnauthorizedException();
+      }
+
+      const accessToken = await this.jwtGenerateService.generateAccessToken({ id: target.id, type: UserType.User });
+      const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: target.id, type: UserType.User });
+
+      return { person: filterSensitiveData(target), accessToken, refreshToken };
+    }
+
+    const data: GoogleCreateDTO = { email, name, image: photo, provider, providerId: id };
+    const user = await this.userRepository.createByGoogleCreateDTO(data);
+
+    const accessToken = await this.jwtGenerateService.generateAccessToken({ id: user.id, type: UserType.User });
+    const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: user.id, type: UserType.User });
+
+    return { person: filterSensitiveData(user), accessToken, refreshToken };
   }
 }

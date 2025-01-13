@@ -7,7 +7,7 @@ export interface IDriverRepository {
   findMany: (options: FindOptions) => Promise<Driver[]>;
   findById: (id: string) => Promise<Driver> | null;
   findByEmail: (email: string) => Promise<Driver> | null;
-  create: (data: SignUpDTO) => Promise<Driver>;
+  createBySignUp: (data: SignUpDTO) => Promise<Driver>;
   update: (id: string, data: DriverUpdateDTO) => Promise<Driver>;
   delete: (id: string) => void;
   like: (driverId: string, userId: string) => Promise<Driver>;

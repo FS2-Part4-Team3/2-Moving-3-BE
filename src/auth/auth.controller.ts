@@ -1,5 +1,5 @@
 import { AuthService } from '#auth/auth.service.js';
-import { SignInDTO, SignUpDTO, SignUpDTOWithoutHash } from '#auth/auth.types.js';
+import { GoogleAuthType, SignInDTO, SignUpDTO, SignUpDTOWithoutHash } from '#auth/auth.types.js';
 import { IAuthController } from '#auth/interfaces/auth.controller.interface.js';
 import { BadRequestException } from '#exceptions/http.exception.js';
 import { EnumValidationPipe } from '#global/pipes/enum.validation.pipe.js';
@@ -9,7 +9,7 @@ import { RefreshTokenGuard } from '#guards/refresh-token.guard.js';
 import { UserType } from '#types/common.types.js';
 import { Body, Controller, Get, Param, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiExcludeEndpoint, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 
 @ApiTags('auth')
@@ -75,9 +75,14 @@ export class AuthController implements IAuthController {
   async googleAuth() {}
 
   @Get('oauth2/redirect/google')
+  @ApiExcludeEndpoint()
   @UseGuards(AuthGuard('google'))
-  async googleAuthRedirect(@Req() req) {
-    const { user } = req;
-    return user;
+  async googleAuthRedirect(@Req() req, @Res({ passthrough: true }) response: Response) {
+    const redirectResult: GoogleAuthType = req.user;
+
+    const { person, accessToken, refreshToken } = await this.authService.googleAuth(redirectResult);
+    response.cookie('refreshToken', refreshToken);
+
+    return { user: person, accessToken };
   }
 }

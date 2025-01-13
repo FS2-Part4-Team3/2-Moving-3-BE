@@ -47,7 +47,7 @@ export class DriverRepository implements IDriverRepository {
     return driver;
   }
 
-  async create(data: SignUpDTO) {
+  async createBySignUp(data: SignUpDTO) {
     const driver = await this.driver.create({ data });
 
     return driver;

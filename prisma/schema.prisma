@@ -20,13 +20,16 @@ model User {
 
   email        String        @unique
   name         String
-  phoneNumber  String
+  phoneNumber  String?
   image        String?
-  password     String
-  salt         String
+  password     String?
+  salt         String?
   refreshToken String?
   serviceTypes ServiceType[]
   areas        Area[]
+
+  provider   String?
+  providerId String?
 
   reviews           Review[]
   userNotifications UserNotification[]
