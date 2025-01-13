@@ -7,9 +7,10 @@ import { IQuestionService } from '#questions/interfaces/question.service.interfa
 import { QuestionNotFoundException } from '#questions/question.exception.js';
 import { QuestionRepository } from '#questions/question.repository.js';
 import { QuestionCreateDTO, QuestionPatchDTO, QuestionPostDTO, QuestionUpdateDTO } from '#questions/question.types.js';
-import { ALS, UserType } from '#types/common.types.js';
+import { IStorage, UserType } from '#types/common.types.js';
 import { FindOptions } from '#types/options.type.js';
 import { Injectable } from '@nestjs/common';
+import { AsyncLocalStorage } from 'async_hooks';
 
 @Injectable()
 export class QuestionService implements IQuestionService {
@@ -17,7 +18,7 @@ export class QuestionService implements IQuestionService {
     private readonly questionRepository: QuestionRepository,
     private readonly moveRepository: MoveRepository,
     private readonly estimationRepository: EstimationRepository,
-    private readonly als: ALS,
+    private readonly als: AsyncLocalStorage<IStorage>,
   ) {}
 
   private async isAuthorizedPerson(target: Estimation) {

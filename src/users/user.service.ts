@@ -1,17 +1,18 @@
 import { DriverInvalidTypeException } from '#drivers/driver.exception.js';
-import { ALS, UserType } from '#types/common.types.js';
+import { IStorage, UserType } from '#types/common.types.js';
 import { FindOptions } from '#types/options.type.js';
 import { IUserService } from '#users/interfaces/user.service.interface.js';
 import { UserRepository } from '#users/user.repository.js';
 import { UserPatchDTO, UserUpdateDTO } from '#users/user.types.js';
 import filterSensitiveData from '#utils/filterSensitiveData.js';
 import { Injectable } from '@nestjs/common';
+import { AsyncLocalStorage } from 'async_hooks';
 
 @Injectable()
 export class UserService implements IUserService {
   constructor(
     private readonly userRepository: UserRepository,
-    private readonly als: ALS,
+    private readonly als: AsyncLocalStorage<IStorage>,
   ) {}
 
   async getUsers(options: FindOptions) {
