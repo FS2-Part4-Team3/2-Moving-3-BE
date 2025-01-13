@@ -9,7 +9,7 @@ interface DriverBase extends PrismaDriverBase {}
 
 export interface Driver extends DriverBase, ModelBase {}
 
-export class DriverEntity extends PersonalInfo implements Omit<Driver, 'applyCount' | 'likeCount'> {
+export class DriverEntity extends PersonalInfo {
   @IsString()
   nickname: string;
 
