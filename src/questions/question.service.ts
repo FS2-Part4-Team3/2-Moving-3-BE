@@ -61,7 +61,8 @@ export class QuestionService implements IQuestionService {
       throw new QuestionNotFoundException();
     }
 
-    if (!this.isAuthorizedPerson(question)) {
+    const estimation = await this.estimationRepository.findById(question.estimationId);
+    if (!this.isAuthorizedPerson(estimation)) {
       throw new ForbiddenException();
     }
 
