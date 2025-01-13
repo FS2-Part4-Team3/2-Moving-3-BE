@@ -1,2 +1,3 @@
 FROM nginx:alpine
-RUN apk add --no-cache certbot certbot-nginx
+COPY ./ssl/certs/nginx-selfsigned.crt /etc/ssl/certs/
+COPY ./ssl/private/nginx-selfsigned.key /etc/ssl/private/
