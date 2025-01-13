@@ -42,6 +42,7 @@ export class DriverService implements IDriverService {
     if (storage.type !== UserType.Driver) {
       throw new DriverInvalidTypeException();
     }
+
     const data: DriverUpdateDTO = body;
     const { driverId } = storage;
 
@@ -52,13 +53,16 @@ export class DriverService implements IDriverService {
 
   async likeDriver(driverId: string) {
     const target = await this.driverRepository.findById(driverId);
-    if (!target) throw new DriverNotFoundException();
+    if (!target) {
+      throw new DriverNotFoundException();
+    }
 
     const { userId } = this.als.getStore();
 
     const isLiked = await this.driverRepository.isLiked(driverId, userId);
-    if (isLiked) throw new DriverIsLikedException();
-
+    if (isLiked) {
+      throw new DriverIsLikedException();
+    }
     const driver = await this.driverRepository.like(driverId, userId);
 
     return filterSensitiveData(driver);
@@ -66,12 +70,16 @@ export class DriverService implements IDriverService {
 
   async unlikeDriver(driverId: string) {
     const target = await this.driverRepository.findById(driverId);
-    if (!target) throw new DriverNotFoundException();
+    if (!target) {
+      throw new DriverNotFoundException();
+    }
 
     const { userId } = this.als.getStore();
 
     const isLiked = await this.driverRepository.isLiked(driverId, userId);
-    if (!isLiked) throw new DriverIsUnLikedException();
+    if (!isLiked) {
+      throw new DriverIsUnLikedException();
+    }
 
     const driver = await this.driverRepository.unlike(driverId, userId);
 

@@ -50,7 +50,7 @@ export class DriverController implements IDriverController {
 
   @Delete(':id/like')
   @UseGuards(AccessTokenGuard)
-  @ApiOperation({ summary: '기사 찜하기' })
+  @ApiOperation({ summary: '기사 찜하기 해제' })
   async deleteLikeDriver(@Param('id') id: string) {
     const driver = await this.driverService.unlikeDriver(id);
 
