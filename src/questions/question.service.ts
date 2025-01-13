@@ -108,6 +108,19 @@ export class QuestionService implements IQuestionService {
   }
 
   async deleteQuestion(id: string) {
+    const target = await this.questionRepository.findById(id);
+    if (!target) {
+      throw new QuestionNotFoundException();
+    }
+
+    const { userId, driverId } = this.als.getStore();
+    if (userId && userId !== target.ownerId) {
+      throw new ForbiddenException();
+    }
+    if (driverId && driverId !== target.driverId) {
+      throw new ForbiddenException();
+    }
+
     const question = await this.questionRepository.delete(id);
 
     return question;
