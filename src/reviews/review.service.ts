@@ -13,14 +13,18 @@ export class ReviewService implements IReviewService {
     private readonly als: AsyncLocalStorage<IStorage>,
   ) {}
 
-  async getMyReviews(userId: string, options: FindOptions) {
-    const { totalCount, list } = await this.reviewRepository.findManyMyReviews(userId, options);
+  async getMyReviews(options: FindOptions) {
+    const { userId } = this.als.getStore();
+
+    const list = await this.reviewRepository.findManyMyReviews(userId, options);
+    const totalCount = await this.reviewRepository.totalCount(userId, 'user');
 
     return { totalCount, list };
   }
 
   async getDriverReviews(driverId: string, options: FindOptions) {
-    const { totalCount, list } = await this.reviewRepository.findManyDriverReviews(driverId, options);
+    const list = await this.reviewRepository.findManyDriverReviews(driverId, options);
+    const totalCount = await this.reviewRepository.totalCount(driverId, 'driver');
 
     return { totalCount, list };
   }

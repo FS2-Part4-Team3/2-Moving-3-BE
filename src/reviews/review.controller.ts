@@ -11,20 +11,19 @@ import { SortOrder } from '#types/options.type.js';
 export class ReviewController implements IReviewController {
   constructor(private readonly reviewService: ReviewService) {}
 
-  @Get('my/:userId')
+  @Get('my')
   @UseGuards(AccessTokenGuard)
   @ApiOperation({ summary: '내가 작성한 리뷰 조회' })
-  async getMyReviews(@Param('userId') userId: string, @Query() query: GetQueries) {
+  async getMyReviews(@Query() query: GetQueries) {
     const { page = 1, pageSize = 10, orderBy = SortOrder.Recent, keyword = '' } = query;
     const options = { page, pageSize, orderBy, keyword };
 
-    const { totalCount, list } = await this.reviewService.getMyReviews(userId, options);
+    const { totalCount, list } = await this.reviewService.getMyReviews(options);
 
     return { totalCount, list };
   }
 
   @Get(':driverId')
-  @UseGuards(AccessTokenGuard)
   @ApiOperation({ summary: '기사 리뷰 조회' })
   async getDriverReviews(@Param('driverId') driverId: string, @Query() query: GetQueries) {
     const { page = 1, pageSize = 10, orderBy = SortOrder.Recent, keyword = '' } = query;

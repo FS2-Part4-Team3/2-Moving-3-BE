@@ -11,13 +11,19 @@ export class ReviewRepository implements IReviewRepository {
     this.review = prisma.review;
   }
 
+  async totalCount(id: string, type: 'user' | 'driver') {
+    const whereCondition = type === 'user' ? { ownerId: id } : type === 'driver' ? { driverId: id } : {};
+    const totalCount = await this.review.count({ where: whereCondition });
+
+    return totalCount;
+  }
+
   async findManyMyReviews(userId: string, options: FindOptions) {
     console.log('findManyMyReviews called with:', userId, options);
     const { page, pageSize, orderBy } = options;
 
     const sort = orderBy === SortOrder.Recent ? { createdAt: 'desc' } : { createdAt: 'asc' };
 
-    // TODO
     const list = await this.review.findMany({
       where: { ownerId: userId },
       orderBy: sort,
@@ -44,13 +50,7 @@ export class ReviewRepository implements IReviewRepository {
       },
     });
 
-    const totalCount = await this.review.count({
-      where: {
-        ownerId: userId,
-      },
-    });
-
-    return { totalCount, list };
+    return list;
   }
 
   async findManyDriverReviews(driverId: string, options: FindOptions) {
@@ -70,13 +70,7 @@ export class ReviewRepository implements IReviewRepository {
       },
     });
 
-    const totalCount = await this.review.count({
-      where: {
-        driverId,
-      },
-    });
-
-    return { totalCount, list };
+    return list;
   }
 
   async findById(id: string) {}
