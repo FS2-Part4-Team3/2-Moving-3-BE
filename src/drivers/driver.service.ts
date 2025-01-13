@@ -1,7 +1,13 @@
-import { DriverIsLikedException, DriverIsUnLikedException, DriverNotFoundException } from '#drivers/driver.exception.js';
+import {
+  DriverInvalidTypeException,
+  DriverIsLikedException,
+  DriverIsUnLikedException,
+  DriverNotFoundException,
+} from '#drivers/driver.exception.js';
 import { DriverRepository } from '#drivers/driver.repository.js';
+import { DriverPatchDTO, DriverUpdateDTO } from '#drivers/driver.types.js';
 import { IDriverService } from '#drivers/interfaces/driver.service.interface.js';
-import { IStorage } from '#types/common.types.js';
+import { IStorage, UserType } from '#types/common.types.js';
 import { FindOptions } from '#types/options.type.js';
 import filterSensitiveData from '#utils/filterSensitiveData.js';
 import { Injectable } from '@nestjs/common';
@@ -29,6 +35,19 @@ export class DriverService implements IDriverService {
     }
 
     return filterSensitiveData(driver);
+  }
+
+  async updateDriver(body: DriverPatchDTO) {
+    const storage = this.als.getStore();
+    if (storage.type !== UserType.Driver) {
+      throw new DriverInvalidTypeException();
+    }
+    const data: DriverUpdateDTO = body;
+    const { driverId } = storage;
+
+    const driver = await this.driverRepository.update(driverId, data);
+
+    return driver;
   }
 
   async likeDriver(driverId: string) {
