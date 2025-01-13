@@ -4,6 +4,7 @@ import { FindOptions } from '#types/options.type.js';
 import { IUserService } from '#users/interfaces/user.service.interface.js';
 import { UserRepository } from '#users/user.repository.js';
 import { UserPatchDTO, UserUpdateDTO } from '#users/user.types.js';
+import filterSensitiveData from '#utils/filterSensitiveData.js';
 import { Injectable } from '@nestjs/common';
 import { AsyncLocalStorage } from 'async_hooks';
 
@@ -31,6 +32,6 @@ export class UserService implements IUserService {
 
     const user = await this.userRepository.update(userId, data);
 
-    return user;
+    return filterSensitiveData(user);
   }
 }
