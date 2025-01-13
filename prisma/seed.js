@@ -81,7 +81,6 @@ async function main() {
       availableAreas: driverAreas,
       applyCount: faker.number.int({ min: 1, max: 100 }),
       likeCount: faker.number.int({ min: 1, max: 50 }),
-      score: faker.number.float({ min: 0, max: 5 }),
     };
   });
   await prisma.driver.createMany({ data: drivers });
