@@ -1,8 +1,8 @@
 import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { IQuestionController } from '#questions/interfaces/question.controller.interface.js';
 import { QuestionService } from '#questions/question.service.js';
-import { QuestionPostDTO } from '#questions/question.types.js';
-import { Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { QuestionPatchDTO } from '#questions/question.types.js';
+import { Body, Controller, Delete, Get, Param, Patch, UseGuards } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 
 @Controller('questions')
@@ -18,9 +18,10 @@ export class QuestionController implements IQuestionController {
     return question;
   }
 
-  @Post(':id')
+  @Patch(':id')
+  @UseGuards(AccessTokenGuard)
   @ApiOperation({ summary: '문의 수정' })
-  async patchQuestion(@Param('id') id: string, @Body() body: Partial<QuestionPostDTO>) {
+  async patchQuestion(@Param('id') id: string, @Body() body: QuestionPatchDTO) {
     const question = await this.questionService.updateQuestion(id, body);
 
     return question;

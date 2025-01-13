@@ -6,7 +6,7 @@ import { MoveRepository } from '#move/move.repository.js';
 import { IQuestionService } from '#questions/interfaces/question.service.interface.js';
 import { QuestionNotFoundException } from '#questions/question.exception.js';
 import { QuestionRepository } from '#questions/question.repository.js';
-import { QuestionCreateDTO, QuestionPostDTO } from '#questions/question.types.js';
+import { QuestionCreateDTO, QuestionPatchDTO, QuestionPostDTO, QuestionUpdateDTO } from '#questions/question.types.js';
 import { IStorage, UserType } from '#types/common.types.js';
 import { FindOptions } from '#types/options.type.js';
 import { Injectable } from '@nestjs/common';
@@ -87,7 +87,21 @@ export class QuestionService implements IQuestionService {
     return question;
   }
 
-  async updateQuestion(id: string, data: Partial<QuestionPostDTO>) {
+  async updateQuestion(id: string, body: QuestionPatchDTO) {
+    const target = await this.questionRepository.findById(id);
+    if (!target) {
+      throw new QuestionNotFoundException();
+    }
+
+    const { userId, driverId } = this.als.getStore();
+    if (userId && userId !== target.ownerId) {
+      throw new ForbiddenException();
+    }
+    if (driverId && driverId !== target.driverId) {
+      throw new ForbiddenException();
+    }
+
+    const data: QuestionUpdateDTO = body;
     const question = await this.questionRepository.update(id, data);
 
     return question;
