@@ -14,7 +14,7 @@ export class RequestRepository implements IRequestRepository {
   async findMany(options: FindOptions) {}
 
   async findById(requestId: string) {
-    const request = await this.request.findUnique({ where: { requestId }, include: { moveInfo: { select: { id: true } } } });
+    const request = await this.request.findUnique({ where: { requestId }, include: { moveInfo: { select: { ownerId: true } } } });
 
     return request;
   }
