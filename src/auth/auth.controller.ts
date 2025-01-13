@@ -69,20 +69,37 @@ export class AuthController implements IAuthController {
     return result;
   }
 
-  @Get('google')
-  @UseGuards(AuthGuard('google'))
-  @ApiOperation({ summary: '구글 로그인' })
-  async googleAuth() {}
+  @Get('google/user')
+  @UseGuards(AuthGuard('google/user'))
+  @ApiOperation({ summary: '구글 유저 로그인' })
+  async googleUserAuth() {}
 
-  @Get('oauth2/redirect/google')
+  @Get('google/driver')
+  @UseGuards(AuthGuard('google/driver'))
+  @ApiOperation({ summary: '구글 기사 로그인' })
+  async googleDriverAuth() {}
+
+  @Get('oauth2/redirect/google/user')
   @ApiExcludeEndpoint()
-  @UseGuards(AuthGuard('google'))
-  async googleAuthRedirect(@Req() req, @Res({ passthrough: true }) response: Response) {
+  @UseGuards(AuthGuard('google/user'))
+  async googleUserAuthRedirect(@Req() req, @Res({ passthrough: true }) response: Response) {
     const redirectResult: GoogleAuthType = req.user;
 
-    const { person, accessToken, refreshToken } = await this.authService.googleAuth(redirectResult);
+    const { person, accessToken, refreshToken } = await this.authService.googleAuth(redirectResult, UserType.User);
     response.cookie('refreshToken', refreshToken);
 
     return { user: person, accessToken };
+  }
+
+  @Get('oauth2/redirect/google/driver')
+  @ApiExcludeEndpoint()
+  @UseGuards(AuthGuard('google/driver'))
+  async googleDriverAuthRedirect(@Req() req, @Res({ passthrough: true }) response: Response) {
+    const redirectResult: GoogleAuthType = req.user;
+
+    const { person, accessToken, refreshToken } = await this.authService.googleAuth(redirectResult, UserType.Driver);
+    response.cookie('refreshToken', refreshToken);
+
+    return { driver: person, accessToken };
   }
 }

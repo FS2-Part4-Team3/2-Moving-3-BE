@@ -2,14 +2,14 @@ import googleConfig from '#configs/google.config.js';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, VerifyCallback } from 'passport-google-oauth20';
 
-export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
+export class GoogleDriverStrategy extends PassportStrategy(Strategy, 'google/driver') {
   constructor() {
     const googleClientId = googleConfig.googleClientId;
     const googleClientSecret = googleConfig.googleClientSecret;
     super({
       clientID: googleClientId,
       clientSecret: googleClientSecret,
-      callbackURL: '/auth/oauth2/redirect/google',
+      callbackURL: '/auth/oauth2/redirect/google/driver',
       scope: ['email', 'profile'],
     });
   }

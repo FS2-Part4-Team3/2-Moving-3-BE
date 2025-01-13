@@ -9,6 +9,8 @@ export interface IAuthController {
   signIn: (body: SignInDTO, userType: UserType, res: Response) => Promise<FilteredPersonWithToken>;
   getMe: () => Promise<FilteredPersonalInfo<User>>;
   refreshToken: (res: Response) => Promise<FilteredPersonWithToken>;
-  googleAuth: () => void;
-  googleAuthRedirect: (req: any, res: Response) => Promise<FilteredPersonWithToken>;
+  googleUserAuth: () => void;
+  googleDriverAuth: () => void;
+  googleUserAuthRedirect: (req: any, res: Response) => Promise<FilteredPersonWithToken>;
+  googleDriverAuthRedirect: (req: any, res: Response) => Promise<FilteredPersonWithToken>;
 }

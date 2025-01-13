@@ -88,27 +88,28 @@ export class AuthService implements IAuthService {
     return result;
   }
 
-  async googleAuth(redirectResult: GoogleAuthType) {
+  async googleAuth(redirectResult: GoogleAuthType, type: UserType) {
     const { email, name, photo, provider, id } = redirectResult;
-    const target = await this.userRepository.findByEmail(email);
+    const repo = type === UserType.User ? this.userRepository : this.driverRepository;
+    const target = await repo.findByEmail(email);
 
     if (target) {
       if (target.provider !== provider || target.providerId !== id) {
         throw new UnauthorizedException();
       }
 
-      const accessToken = await this.jwtGenerateService.generateAccessToken({ id: target.id, type: UserType.User });
-      const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: target.id, type: UserType.User });
+      const accessToken = await this.jwtGenerateService.generateAccessToken({ id: target.id, type });
+      const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: target.id, type });
 
       return { person: filterSensitiveData(target), accessToken, refreshToken };
     }
 
     const data: GoogleCreateDTO = { email, name, image: photo, provider, providerId: id };
-    const user = await this.userRepository.createByGoogleCreateDTO(data);
+    const person = await repo.createByGoogleCreateDTO(data);
 
-    const accessToken = await this.jwtGenerateService.generateAccessToken({ id: user.id, type: UserType.User });
-    const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: user.id, type: UserType.User });
+    const accessToken = await this.jwtGenerateService.generateAccessToken({ id: person.id, type });
+    const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: person.id, type });
 
-    return { person: filterSensitiveData(user), accessToken, refreshToken };
+    return { person: filterSensitiveData(person), accessToken, refreshToken };
   }
 }
