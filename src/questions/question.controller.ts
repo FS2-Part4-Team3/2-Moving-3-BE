@@ -1,6 +1,6 @@
 import { IQuestionController } from '#questions/interfaces/question.controller.interface.js';
 import { QuestionService } from '#questions/question.service.js';
-import { QuestionInputDTO } from '#questions/question.types.js';
+import { QuestionPostDTO } from '#questions/question.types.js';
 import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 
@@ -18,7 +18,7 @@ export class QuestionController implements IQuestionController {
 
   @Post(':id')
   @ApiOperation({ summary: '문의 수정' })
-  async patchQuestion(@Param('id') id: string, @Body() body: Partial<QuestionInputDTO>) {
+  async patchQuestion(@Param('id') id: string, @Body() body: Partial<QuestionPostDTO>) {
     const question = await this.questionService.updateQuestion(id, body);
 
     return question;

@@ -45,6 +45,8 @@ export type FilteredPersonWithToken = {
 );
 
 export class SignUpDTOWithoutHash extends OmitType(SignUpDTO, ['password', 'salt']) {
+  @IsString({ message: '비밀번호는 문자열 형식입니다.' })
+  @IsNotEmpty({ message: '비밀번호는 1글자 이상이어야 합니다.' })
   @ApiProperty({ description: '비밀번호' })
   password: string;
 }
