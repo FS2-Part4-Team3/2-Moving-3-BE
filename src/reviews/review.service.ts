@@ -1,16 +1,15 @@
 import { IReviewService } from '#reviews/interfaces/review.service.interface.js';
+import { ALS } from '#types/common.types.js';
+import { FindOptions } from '#types/options.type.js';
 import { Injectable } from '@nestjs/common';
 import { ReviewRepository } from './review.repository.js';
 import { ReviewInputDTO } from './review.types.js';
-import { AsyncLocalStorage } from 'async_hooks';
-import { IStorage } from '#types/common.types.js';
-import { FindOptions } from '#types/options.type.js';
 
 @Injectable()
 export class ReviewService implements IReviewService {
   constructor(
     private readonly reviewRepository: ReviewRepository,
-    private readonly als: AsyncLocalStorage<IStorage>,
+    private readonly als: ALS,
   ) {}
 
   async getMyReviews(options: FindOptions) {

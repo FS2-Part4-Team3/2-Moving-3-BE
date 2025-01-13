@@ -7,13 +7,12 @@ import { SignInDTO, SignUpDTO } from '#auth/auth.types.js';
 import { IAuthService } from '#auth/interfaces/auth.service.interface.js';
 import { JwtGenerateService } from '#auth/jwt-generate.service.js';
 import { DriverRepository } from '#drivers/driver.repository.js';
-import { IStorage, UserType } from '#types/common.types.js';
+import { ALS, UserType } from '#types/common.types.js';
 import { UserRepository } from '#users/user.repository.js';
 import compareExp from '#utils/compareExp.js';
 import filterSensitiveData from '#utils/filterSensitiveData.js';
 import hashingPassword from '#utils/hashingPassword.js';
 import { Injectable } from '@nestjs/common';
-import { AsyncLocalStorage } from 'async_hooks';
 
 @Injectable()
 export class AuthService implements IAuthService {
@@ -21,7 +20,7 @@ export class AuthService implements IAuthService {
     private readonly userRepository: UserRepository,
     private readonly driverRepository: DriverRepository,
     private readonly jwtGenerateService: JwtGenerateService,
-    private readonly als: AsyncLocalStorage<IStorage>,
+    private readonly als: ALS,
   ) {}
 
   async getMe() {

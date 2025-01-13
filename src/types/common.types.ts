@@ -1,3 +1,5 @@
+import { AsyncLocalStorage } from 'async_hooks';
+
 export interface IStorage {
   [key: string]: any;
 }
@@ -12,3 +14,5 @@ export enum UserType {
   User = 'user',
   Driver = 'driver',
 }
+
+export type ALS = AsyncLocalStorage<IStorage>;

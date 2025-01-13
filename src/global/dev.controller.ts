@@ -1,11 +1,10 @@
 import { JwtGenerateService } from '#auth/jwt-generate.service.js';
 import { PrismaService } from '#global/prisma.service.js';
 import { AccessTokenGuard } from '#guards/access-token.guard.js';
-import { IStorage, UserType } from '#types/common.types.js';
+import { ALS, UserType } from '#types/common.types.js';
 import { UserService } from '#users/user.service.js';
 import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { ApiExcludeController } from '@nestjs/swagger';
-import { AsyncLocalStorage } from 'async_hooks';
 
 @ApiExcludeController()
 @Controller('dev')
@@ -14,7 +13,7 @@ export class DevController {
     private readonly userService: UserService,
     private readonly prismaService: PrismaService,
     private readonly jwtGenerateService: JwtGenerateService,
-    private readonly als: AsyncLocalStorage<IStorage>,
+    private readonly als: ALS,
   ) {}
 
   @Get('users')

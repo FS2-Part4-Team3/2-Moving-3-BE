@@ -1,9 +1,8 @@
 import { MoveRepository } from '#move/move.repository.js';
 import { IRequestService } from '#requests/interfaces/request.service.interface.js';
-import { IStorage } from '#types/common.types.js';
+import { ALS } from '#types/common.types.js';
 import { Injectable } from '@nestjs/common';
 import { Status } from '@prisma/client';
-import { AsyncLocalStorage } from 'async_hooks';
 import { MoveInfoNotFoundException } from './request.exception.js';
 import { RequestRepository } from './request.repository.js';
 
@@ -12,7 +11,7 @@ export class RequestService implements IRequestService {
   constructor(
     private readonly moveRepository: MoveRepository,
     private readonly requestRepository: RequestRepository,
-    private readonly als: AsyncLocalStorage<IStorage>,
+    private readonly als: ALS,
   ) {}
 
   async getRequest(id: string) {
