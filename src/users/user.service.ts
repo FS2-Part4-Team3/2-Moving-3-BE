@@ -1,13 +1,19 @@
+import { DriverInvalidTypeException } from '#drivers/driver.exception.js';
+import { IStorage, UserType } from '#types/common.types.js';
 import { FindOptions } from '#types/options.type.js';
 import { IUserService } from '#users/interfaces/user.service.interface.js';
-import { UserNotFoundException } from '#users/user.exception.js';
 import { UserRepository } from '#users/user.repository.js';
-import { UserPatchDTO } from '#users/user.types.js';
+import { UserPatchDTO, UserUpdateDTO } from '#users/user.types.js';
+import filterSensitiveData from '#utils/filterSensitiveData.js';
 import { Injectable } from '@nestjs/common';
+import { AsyncLocalStorage } from 'async_hooks';
 
 @Injectable()
 export class UserService implements IUserService {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly als: AsyncLocalStorage<IStorage>,
+  ) {}
 
   async getUsers(options: FindOptions) {
     const totalCount = await this.userRepository.count();
@@ -16,13 +22,16 @@ export class UserService implements IUserService {
     return { totalCount, list };
   }
 
-  async updateUser(id: string, body: UserPatchDTO) {
-    const target = await this.userRepository.findById(id);
-    if (!target) throw new UserNotFoundException();
+  async updateUser(body: UserPatchDTO) {
+    const storage = this.als.getStore();
+    if (storage.type !== UserType.User) {
+      throw new DriverInvalidTypeException();
+    }
+    const data: UserUpdateDTO = body;
+    const { userId } = storage;
 
-    const data = body;
-    const user = await this.userRepository.update(id, data);
+    const user = await this.userRepository.update(userId, data);
 
-    return user;
+    return filterSensitiveData(user);
   }
 }

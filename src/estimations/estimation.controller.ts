@@ -1,9 +1,10 @@
 import { IEstimationController } from '#estimations/interfaces/estimation.controller.interface.js';
+import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { QuestionService } from '#questions/question.service.js';
-import { QuestionInputDTO } from '#questions/question.types.js';
+import { QuestionPostDTO } from '#questions/question.types.js';
 import { SortOrder } from '#types/options.type.js';
 import { GetQueries } from '#types/queries.type.js';
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 
 @Controller('estimations')
@@ -31,6 +32,7 @@ export class EstimationController implements IEstimationController {
   async deleteEstimation() {}
 
   @Get(':id/questions')
+  @UseGuards(AccessTokenGuard)
   @ApiOperation({ summary: '문의 목록 조회' })
   async getQuestions(@Param('id') id: string, @Query() query: GetQueries) {
     const { page = 1, pageSize = 10 } = query;
@@ -42,9 +44,10 @@ export class EstimationController implements IEstimationController {
   }
 
   @Post(':id/questions')
+  @UseGuards(AccessTokenGuard)
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: '문의 생성' })
-  async postQuestion(@Param('id') id: string, @Body() body: QuestionInputDTO) {
+  async postQuestion(@Param('id') id: string, @Body() body: QuestionPostDTO) {
     const question = await this.questionService.createQuestion(id, body);
 
     return question;

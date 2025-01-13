@@ -37,7 +37,9 @@ export class AuthService implements IAuthService {
     const repo = type === UserType.User ? this.userRepository : this.driverRepository;
 
     const targetExist = await repo.findByEmail(data.email);
-    if (targetExist) throw new AuthUserAlreadyExistException();
+    if (targetExist) {
+      throw new AuthUserAlreadyExistException();
+    }
 
     const person = await repo.create(data);
     const accessToken = await this.jwtGenerateService.generateAccessToken({ id: person.id, type });
@@ -50,8 +52,12 @@ export class AuthService implements IAuthService {
     const { email, password } = body;
     const user = await this.userRepository.findByEmail(email);
     const hashed = hashingPassword(password, user.salt);
-    if (!user) throw new AuthWrongCredentialException();
-    if (user.password !== hashed) throw new AuthWrongCredentialException();
+    if (!user) {
+      throw new AuthWrongCredentialException();
+    }
+    if (user.password !== hashed) {
+      throw new AuthWrongCredentialException();
+    }
 
     const accessToken = await this.jwtGenerateService.generateAccessToken({ id: user.id, type });
     const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: user.id, type });
@@ -63,7 +69,9 @@ export class AuthService implements IAuthService {
     const storage = this.als.getStore();
     const { type, refreshToken, exp } = storage;
     const person = type === UserType.User ? storage.user : storage.driver;
-    if (person.refreshToken !== refreshToken) throw new AuthInvalidRefreshTokenException();
+    if (person.refreshToken !== refreshToken) {
+      throw new AuthInvalidRefreshTokenException();
+    }
 
     const accessToken = this.jwtGenerateService.generateAccessToken({ id: person.id, type });
 

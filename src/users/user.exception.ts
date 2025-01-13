@@ -1,8 +1,14 @@
 import ExceptionMessages from '#exceptions/exception.messages.js';
-import { NotFoundException } from '#exceptions/http.exception.js';
+import { BadRequestException, NotFoundException } from '#exceptions/http.exception.js';
 
 export class UserNotFoundException extends NotFoundException {
   constructor() {
     super(ExceptionMessages.USER_NOT_FOUND);
+  }
+}
+
+export class UserInvalidTypeException extends BadRequestException {
+  constructor() {
+    super(ExceptionMessages.INVALID_TOKEN);
   }
 }

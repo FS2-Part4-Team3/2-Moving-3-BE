@@ -1,9 +1,10 @@
 import { DriverService } from '#drivers/driver.service.js';
+import { DriverPatchDTO } from '#drivers/driver.types.js';
 import { IDriverController } from '#drivers/interfaces/driver.controller.interface.js';
 import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { SortOrder } from '#types/options.type.js';
 import { GetQueries } from '#types/queries.type.js';
-import { Controller, Delete, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 
 @Controller('drivers')
@@ -29,6 +30,15 @@ export class DriverController implements IDriverController {
     return driver;
   }
 
+  @Patch('update')
+  @UseGuards(AccessTokenGuard)
+  @ApiOperation({ summary: '기사 정보 수정' })
+  async patchUser(@Body() body: DriverPatchDTO) {
+    const user = await this.driverService.updateDriver(body);
+
+    return user;
+  }
+
   @Post(':id/like')
   @UseGuards(AccessTokenGuard)
   @ApiOperation({ summary: '기사 찜하기' })
@@ -40,7 +50,7 @@ export class DriverController implements IDriverController {
 
   @Delete(':id/like')
   @UseGuards(AccessTokenGuard)
-  @ApiOperation({ summary: '기사 찜하기' })
+  @ApiOperation({ summary: '기사 찜하기 해제' })
   async deleteLikeDriver(@Param('id') id: string) {
     const driver = await this.driverService.unlikeDriver(id);
 

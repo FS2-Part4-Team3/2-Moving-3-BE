@@ -1,6 +1,6 @@
 import { IMoveService } from '#move/interfaces/move.service.interface.js';
-import { FindOptions, RequestFilter } from '#types/options.type.js';
 import { IStorage } from '#types/common.types.js';
+import { FindOptions, RequestFilter } from '#types/options.type.js';
 import { Injectable } from '@nestjs/common';
 import { AsyncLocalStorage } from 'async_hooks';
 import { MoveRepository } from './move.repository.js';
@@ -20,7 +20,7 @@ export class MoveService implements IMoveService {
 
   async getMoveInfo() {
     const { userId } = this.als.getStore();
-    const moveInfo = await this.moveRepository.findById(userId);
+    const moveInfo = await this.moveRepository.findByUserId(userId);
 
     return moveInfo;
   }

@@ -38,6 +38,6 @@
       "#prisma/*": ["./prisma/*"]
     }
   },
-  "include": ["src/**/*", "types/**/*.d.ts", "prisma/**/*"],
+  "include": ["src/**/*", "types/**/*.d.ts", "prisma/**/*", "test/**/*"],
   "exclude": ["node_modules", "dist", "prettier.config.mjs", "eslint.config.js"]
 }

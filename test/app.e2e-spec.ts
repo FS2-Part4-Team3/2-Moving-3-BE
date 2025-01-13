@@ -1,11 +1,11 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { AppModule } from '#global/app.module.js';
 import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
-import { AppModule } from './../src/app.module';
+import { Test, TestingModule } from '@nestjs/testing';
+import request from 'supertest';
 
-describe('AppController (e2e)', () => {
-  let app: INestApplication;
+let app: INestApplication;
 
+function setup() {
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
@@ -14,8 +14,12 @@ describe('AppController (e2e)', () => {
     app = moduleFixture.createNestApplication();
     await app.init();
   });
+}
 
-  it('/ (GET)', () => {
+describe('AppController (e2e)', () => {
+  setup();
+
+  test('/ (GET)', () => {
     return request(app.getHttpServer()).get('/').expect(200).expect('Hello World!');
   });
 });
