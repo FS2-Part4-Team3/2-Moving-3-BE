@@ -17,6 +17,7 @@ export class RequestController implements IRequestController {
   async getRequestsForDriver() {}
 
   @Get(':requestId')
+  @UseGuards(AccessTokenGuard)
   @ApiOperation({ summary: '요청 상세 조회' })
   async getRequest(@Param('requestId') requestId: string) {
     const request = await this.requestService.getRequest(requestId);
@@ -33,7 +34,12 @@ export class RequestController implements IRequestController {
     return request;
   }
 
-  @Delete(':id')
+  @Delete(':requestId')
+  @UseGuards(AccessTokenGuard)
   @ApiOperation({ summary: '요청 취소(유저)' })
-  async deleteRequest() {}
+  async deleteRequest(@Param('requestId') requestId: string) {
+    const request = await this.requestService.deleteRequest(requestId);
+
+    return request;
+  }
 }

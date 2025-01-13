@@ -14,7 +14,7 @@ export class RequestRepository implements IRequestRepository {
   async findMany(options: FindOptions) {}
 
   async findById(requestId: string) {
-    const request = await this.request.findUnique({ where: { requestId } });
+    const request = await this.request.findUnique({ where: { requestId }, include: { moveInfo: { select: { id: true } } } });
 
     return request;
   }
@@ -27,5 +27,9 @@ export class RequestRepository implements IRequestRepository {
 
   async update(id: string, data: Partial<RequestInputDTO>) {}
 
-  async delete(id: string) {}
+  async delete(id: string) {
+    const request = await this.request.delete({ where: { id } });
+
+    return request;
+  }
 }

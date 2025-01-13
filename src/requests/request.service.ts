@@ -6,6 +6,7 @@ import { IStorage } from '#types/common.types.js';
 import { Status } from '@prisma/client';
 import { MoveRepository } from '#move/move.repository.js';
 import { MoveInfoNotFoundException } from './request.exception.js';
+import { ForbiddenException } from '#exceptions/http.exception.js';
 
 @Injectable()
 export class RequestService implements IRequestService {
@@ -33,6 +34,18 @@ export class RequestService implements IRequestService {
     const data = { moveInfoId: moveInfo[0].id, status: Status.PENDING, driverId: driverId };
 
     const request = await this.requestRepository.create(data);
+
+    return request;
+  }
+
+  async deleteRequest(requestId: string) {
+    const { userId } = this.als.getStore();
+    const requestInfo = await this.requestRepository.findById(requestId);
+    if (requestInfo.moveInfo.id !== userId) {
+      throw new ForbiddenException();
+    }
+
+    const request = await this.requestRepository.delete(requestId);
 
     return request;
   }

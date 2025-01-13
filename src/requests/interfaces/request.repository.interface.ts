@@ -6,5 +6,5 @@ export interface IRequestRepository {
   findById: (requestId: string) => Promise<Request>;
   create: (data: RequestInputDTO) => Promise<Request>;
   update: (id: string, data: Partial<RequestInputDTO>) => void;
-  delete: (id: string) => void;
+  delete: (id: string) => Promise<Request>;
 }
