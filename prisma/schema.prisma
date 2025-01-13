@@ -32,6 +32,7 @@ model User {
   userNotifications UserNotification[]
   moveInfos         MoveInfo[]
   likeDrivers       Driver[]
+  Question          Question[]
 }
 
 model Driver {
@@ -60,6 +61,7 @@ model Driver {
   driverNotifications DriverNotification[]
   estimations         Estimation[]
   likedUsers          User[]
+  Question            Question[]
 }
 
 model MoveInfo {
@@ -131,6 +133,10 @@ model Question {
 
   estimation   Estimation @relation(fields: [estimationId], references: [id])
   estimationId String
+  owner        User?      @relation(fields: [ownerId], references: [id])
+  ownerId      String?
+  driver       Driver?    @relation(fields: [driverId], references: [id])
+  driverId     String?
 
   @@index([createdAt])
 }

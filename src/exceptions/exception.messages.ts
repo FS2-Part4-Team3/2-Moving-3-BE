@@ -15,6 +15,8 @@ enum ExceptionMessages {
 
   MOVEINFO_NOT_FOUND = '이사 정보가 없습니다.',
 
+  ESTIMATION_NOT_FOUND = '찾을 수 없는 견적입니다.',
+
   QUESTION_NOT_FOUND = '찾을 수 없는 문의입니다.',
 
   ID_FORMAT = 'ID 형식이 올바르지 않습니다.',
