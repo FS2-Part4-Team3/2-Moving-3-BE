@@ -36,8 +36,10 @@ services:
 
   nginx:
     container_name: nginx-proxy
-    image: nginx:alpine
     restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile.nginx
     ports:
       - '80:80'
       - '443:443'
