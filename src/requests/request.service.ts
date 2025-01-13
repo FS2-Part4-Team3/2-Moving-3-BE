@@ -15,8 +15,8 @@ export class RequestService implements IRequestService {
     private readonly als: AsyncLocalStorage<IStorage>,
   ) {}
 
-  async getRequest(id: string) {
-    const request = await this.requestRepository.findById(id);
+  async getRequest(requestId: string) {
+    const request = await this.requestRepository.findById(requestId);
 
     return request;
   }

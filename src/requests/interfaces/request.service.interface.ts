@@ -1,6 +1,6 @@
 import { Request } from '#requests/request.types.js';
 
 export interface IRequestService {
-  getRequest: (id: string) => Promise<Request>;
+  getRequest: (requestId: string) => Promise<Request>;
   postRequest: (driverId: string) => Promise<Request>;
 }

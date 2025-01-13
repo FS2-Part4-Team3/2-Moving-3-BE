@@ -16,18 +16,18 @@ export class RequestController implements IRequestController {
   @ApiOperation({ summary: '요청 목록 조회(기사 기준)' })
   async getRequestsForDriver() {}
 
-  @Get(':id')
+  @Get(':requestId')
   @ApiOperation({ summary: '요청 상세 조회' })
-  async getRequest(@Param('id') id: string) {
-    const request = await this.requestService.getRequest(id);
+  async getRequest(@Param('requestId') requestId: string) {
+    const request = await this.requestService.getRequest(requestId);
 
     return request;
   }
 
-  @Post(':id')
+  @Post(':driverId')
   @UseGuards(AccessTokenGuard)
   @ApiOperation({ summary: '요청 생성' })
-  async postRequest(@Param('id') driverId: string) {
+  async postRequest(@Param('driverId') driverId: string) {
     const request = await this.requestService.postRequest(driverId);
 
     return request;

@@ -13,8 +13,8 @@ export class RequestRepository implements IRequestRepository {
   }
   async findMany(options: FindOptions) {}
 
-  async findById(id: string) {
-    const request = await this.request.findUnique({ where: { id } });
+  async findById(requestId: string) {
+    const request = await this.request.findUnique({ where: { requestId } });
 
     return request;
   }
