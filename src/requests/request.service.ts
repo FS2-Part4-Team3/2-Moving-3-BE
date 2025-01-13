@@ -27,6 +27,10 @@ export class RequestService implements IRequestService {
 
     const moveInfo = await this.moveRepository.findById(userId);
 
+    if (moveInfo.ownerId !== userId) {
+      throw new ForbiddenException();
+    }
+
     if (!moveInfo || moveInfo.length === 0) {
       throw new MoveInfoNotFoundException();
     }
