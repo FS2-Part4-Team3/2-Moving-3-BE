@@ -1,9 +1,10 @@
-import { ALS } from '#types/common.types.js';
+import { IStorage } from '#types/common.types.js';
 import isEmpty from '#utils/isEmpty.js';
 import logger from '#utils/logger.js';
 import loggingError from '#utils/loggingError.js';
 import stringifyJson from '#utils/stringifyJson.js';
 import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
+import { AsyncLocalStorage } from 'async_hooks';
 import { Observable, tap } from 'rxjs';
 
 enum MessageType {
@@ -19,7 +20,7 @@ enum LogType {
 
 @Injectable()
 export class LogInterceptor implements NestInterceptor {
-  constructor(private readonly als: ALS) {}
+  constructor(private readonly als: AsyncLocalStorage<IStorage>) {}
 
   intercept(context: ExecutionContext, next: CallHandler<any>): Observable<any> | Promise<Observable<any>> {
     const req = context.switchToHttp().getRequest();

@@ -7,16 +7,17 @@ import {
 import { DriverRepository } from '#drivers/driver.repository.js';
 import { DriverPatchDTO, DriverUpdateDTO } from '#drivers/driver.types.js';
 import { IDriverService } from '#drivers/interfaces/driver.service.interface.js';
-import { ALS, UserType } from '#types/common.types.js';
+import { IStorage, UserType } from '#types/common.types.js';
 import { FindOptions } from '#types/options.type.js';
 import filterSensitiveData from '#utils/filterSensitiveData.js';
 import { Injectable } from '@nestjs/common';
+import { AsyncLocalStorage } from 'async_hooks';
 
 @Injectable()
 export class DriverService implements IDriverService {
   constructor(
     private readonly driverRepository: DriverRepository,
-    private readonly als: ALS,
+    private readonly als: AsyncLocalStorage<IStorage>,
   ) {}
 
   async findDrivers(options: FindOptions) {
