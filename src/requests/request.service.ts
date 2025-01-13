@@ -1,11 +1,11 @@
-import { IRequestService } from '#requests/interfaces/request.service.interface.js';
-import { Injectable } from '@nestjs/common';
-import { RequestRepository } from './request.repository.js';
-import { AsyncLocalStorage } from 'async_hooks';
-import { IStorage } from '#types/common.types.js';
-import { Status } from '@prisma/client';
 import { MoveRepository } from '#move/move.repository.js';
+import { IRequestService } from '#requests/interfaces/request.service.interface.js';
+import { IStorage } from '#types/common.types.js';
+import { Injectable } from '@nestjs/common';
+import { Status } from '@prisma/client';
+import { AsyncLocalStorage } from 'async_hooks';
 import { MoveInfoNotFoundException } from './request.exception.js';
+import { RequestRepository } from './request.repository.js';
 
 @Injectable()
 export class RequestService implements IRequestService {
@@ -24,7 +24,7 @@ export class RequestService implements IRequestService {
   async postRequest(driverId: string) {
     const { userId } = this.als.getStore();
 
-    const moveInfo = await this.moveRepository.findById(userId);
+    const moveInfo = await this.moveRepository.findByUserId(userId);
 
     if (!moveInfo || moveInfo.length === 0) {
       throw new MoveInfoNotFoundException();

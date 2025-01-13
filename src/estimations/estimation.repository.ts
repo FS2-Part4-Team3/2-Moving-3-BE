@@ -13,7 +13,11 @@ export class EstimationRepository implements IEstimationRepository {
 
   async findMany(options: FindOptions) {}
 
-  async findById(id: string) {}
+  async findById(id: string) {
+    const estimation = await this.estimation.findUnique({ where: { id } });
+
+    return estimation;
+  }
 
   async create(data: EstimationInputDTO) {}
 
