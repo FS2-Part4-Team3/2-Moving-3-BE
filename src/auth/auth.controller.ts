@@ -7,7 +7,8 @@ import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { HashPasswordGuard } from '#guards/hash-password.guard.js';
 import { RefreshTokenGuard } from '#guards/refresh-token.guard.js';
 import { UserType } from '#types/common.types.js';
-import { Body, Controller, Get, Param, Post, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 
@@ -66,5 +67,17 @@ export class AuthController implements IAuthController {
 
     const result = type === UserType.User ? { user: person, accessToken } : { driver: person, accessToken };
     return result;
+  }
+
+  @Get('google')
+  @UseGuards(AuthGuard('google'))
+  @ApiOperation({ summary: '구글 로그인' })
+  async googleAuth() {}
+
+  @Get('oauth2/redirect/google')
+  @UseGuards(AuthGuard('google'))
+  async googleAuthRedirect(@Req() req) {
+    const { user } = req;
+    return user;
   }
 }
