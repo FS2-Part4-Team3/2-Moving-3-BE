@@ -46,8 +46,8 @@ services:
       - '443:443'
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
-      - ./ssl/certs:/etc/ssl/certs
-      - ./ssl/private:/etc/ssl/private
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
     depends_on:
       - nestjs
     command: '/bin/sh -c ''while :; do sleep 3d & wait $${!}; nginx -s reload; done & nginx -g "daemon off;"'''
