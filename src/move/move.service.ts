@@ -5,12 +5,10 @@ import { Injectable } from '@nestjs/common';
 import { AsyncLocalStorage } from 'async_hooks';
 import { MoveRepository } from './move.repository.js';
 import { GetQueries } from '#types/queries.type.js';
-import { DriverRepository } from '#drivers/driver.repository.js';
 
 @Injectable()
 export class MoveService implements IMoveService {
   constructor(
-    private readonly driverRepository: DriverRepository,
     private readonly moveRepository: MoveRepository,
     private readonly als: AsyncLocalStorage<IStorage>,
   ) {}
