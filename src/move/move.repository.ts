@@ -15,7 +15,7 @@ export class MoveRepository implements IMoveRepository {
   }
 
   async findMany(options: GetQueries & Partial<RequestFilter>, driverId: string, driverAvailableAreas: Area[]) {
-    const { page = 1, pageSize = 10, orderBy, keyword, moveType, serviceArea, designated } = options;
+    const { page = 1, pageSize = 10, orderBy, keyword, moveType, serviceArea = true, designated } = options;
 
     const whereCondition = {
       ...(keyword && {
