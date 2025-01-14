@@ -55,3 +55,27 @@ export class UserTypeParamDTO {
   @IsEnum(UserType, { message: '사용자 형식은 user 혹은 driver 중 하나입니다.' })
   type: UserType;
 }
+
+export interface GoogleAuthType {
+  email: string;
+  name: string;
+  photo: string;
+  provider: string;
+  id: string;
+  userType: UserType;
+  accessToken?: string;
+  refreshToken?: string;
+}
+
+export interface GoogleCreateDTO {
+  email: string;
+  name: string;
+  image: string;
+  provider: string;
+  providerId: string;
+}
+
+export interface ProviderInfo {
+  provider: string;
+  providerId: string;
+}

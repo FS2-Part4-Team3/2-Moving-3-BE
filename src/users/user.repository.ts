@@ -1,4 +1,4 @@
-import { SignUpDTO } from '#auth/auth.types.js';
+import { GoogleCreateDTO, SignUpDTO } from '#auth/auth.types.js';
 import { PrismaService } from '#global/prisma.service.js';
 import { FindOptions, SortOrder } from '#types/options.type.js';
 import { IUserRepository } from '#users/interfaces/user.repository.interface.js';
@@ -47,7 +47,13 @@ export class UserRepository implements IUserRepository {
     return user;
   }
 
-  async create(data: SignUpDTO) {
+  async createBySignUp(data: SignUpDTO) {
+    const user = await this.user.create({ data });
+
+    return user;
+  }
+
+  async createByGoogleCreateDTO(data: GoogleCreateDTO) {
     const user = await this.user.create({ data });
 
     return user;

@@ -20,13 +20,16 @@ model User {
 
   email        String        @unique
   name         String
-  phoneNumber  String
+  phoneNumber  String?
   image        String?
-  password     String
-  salt         String
+  password     String?
+  salt         String?
   refreshToken String?
   serviceTypes ServiceType[]
   areas        Area[]
+
+  provider   String?
+  providerId String?
 
   reviews           Review[]
   userNotifications UserNotification[]
@@ -44,10 +47,10 @@ model Driver {
   name           String
   nickname       String?
   image          String?
-  password       String
-  salt           String
+  password       String?
+  salt           String?
   refreshToken   String?
-  phoneNumber    String
+  phoneNumber    String?
   introduce      String?
   description    String?
   serviceTypes   ServiceType[]
@@ -55,6 +58,9 @@ model Driver {
 
   applyCount Int @default(0)
   likeCount  Int @default(0)
+
+  provider   String?
+  providerId String?
 
   reviews             Review[]
   requests            Request[]

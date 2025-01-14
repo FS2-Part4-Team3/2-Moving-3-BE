@@ -1,14 +1,16 @@
 import { AuthService } from '#auth/auth.service.js';
-import { SignInDTO, SignUpDTO, SignUpDTOWithoutHash } from '#auth/auth.types.js';
+import { GoogleAuthType, SignInDTO, SignUpDTO, SignUpDTOWithoutHash } from '#auth/auth.types.js';
 import { IAuthController } from '#auth/interfaces/auth.controller.interface.js';
+import { InvalidUserTypeException } from '#exceptions/common.exception.js';
 import { BadRequestException } from '#exceptions/http.exception.js';
 import { EnumValidationPipe } from '#global/pipes/enum.validation.pipe.js';
 import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { HashPasswordGuard } from '#guards/hash-password.guard.js';
 import { RefreshTokenGuard } from '#guards/refresh-token.guard.js';
 import { UserType } from '#types/common.types.js';
-import { Body, Controller, Get, Param, Post, Res, UseGuards } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Param, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { ApiBody, ApiExcludeEndpoint, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 
 @ApiTags('auth')
@@ -66,5 +68,29 @@ export class AuthController implements IAuthController {
 
     const result = type === UserType.User ? { user: person, accessToken } : { driver: person, accessToken };
     return result;
+  }
+
+  @Get('google/:userType')
+  @UseGuards(AuthGuard('google'))
+  @ApiOperation({ summary: '구글 로그인' })
+  async googleAuth() {}
+
+  @Get('oauth2/redirect/google')
+  @ApiExcludeEndpoint()
+  @UseGuards(AuthGuard('google'))
+  async googleAuthRedirect(@Req() req, @Res({ passthrough: true }) response: Response) {
+    const redirectResult: GoogleAuthType = req.user;
+
+    const { person, accessToken, refreshToken, userType } = await this.authService.googleAuth(redirectResult);
+    response.cookie('refreshToken', refreshToken);
+
+    switch (userType) {
+      case UserType.User:
+        return { user: person, accessToken };
+      case UserType.Driver:
+        return { driver: person, accessToken };
+      default:
+        throw new InvalidUserTypeException();
+    }
   }
 }

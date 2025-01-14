@@ -1,4 +1,4 @@
-import { SignUpDTO } from '#auth/auth.types.js';
+import { GoogleCreateDTO, SignUpDTO } from '#auth/auth.types.js';
 import { DriverUpdateDTO } from '#drivers/driver.types.js';
 import { IDriverRepository } from '#drivers/interfaces/driver.repository.interface.js';
 import { PrismaService } from '#global/prisma.service.js';
@@ -47,7 +47,13 @@ export class DriverRepository implements IDriverRepository {
     return driver;
   }
 
-  async create(data: SignUpDTO) {
+  async createBySignUp(data: SignUpDTO) {
+    const driver = await this.driver.create({ data });
+
+    return driver;
+  }
+
+  async createByGoogleCreateDTO(data: GoogleCreateDTO) {
     const driver = await this.driver.create({ data });
 
     return driver;
