@@ -5,7 +5,7 @@ import { QuestionEntity, QuestionPostDTO } from '#questions/question.types.js';
 import { SortOrder } from '#types/options.type.js';
 import { GetQueries } from '#types/queries.type.js';
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags, getSchemaPath } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, getSchemaPath } from '@nestjs/swagger';
 
 @Controller('estimations')
 export class EstimationController implements IEstimationController {
@@ -34,6 +34,7 @@ export class EstimationController implements IEstimationController {
   @ApiTags('Question')
   @Get(':id/questions')
   @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth('accessToken')
   @ApiOperation({ summary: '문의 목록 조회' })
   @ApiResponse({
     status: HttpStatus.CREATED,
@@ -54,8 +55,10 @@ export class EstimationController implements IEstimationController {
   @ApiTags('Question')
   @Post(':id/questions')
   @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth('accessToken')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: '문의 생성' })
+  @ApiResponse({ status: HttpStatus.OK, type: QuestionEntity })
   async postQuestion(@Param('id') id: string, @Body() body: QuestionPostDTO) {
     const question = await this.questionService.createQuestion(id, body);
 
