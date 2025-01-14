@@ -114,6 +114,9 @@ export class FilteredDriverOutputDTO {
 
   @ApiProperty({ description: '경력 시작일' })
   startAt: Date;
+
+  @ApiProperty({ description: '경력 년수' })
+  career: number;
 }
 
 export class SignUpDTOWithoutHash extends OmitType(SignUpDTO, ['password', 'salt']) {
