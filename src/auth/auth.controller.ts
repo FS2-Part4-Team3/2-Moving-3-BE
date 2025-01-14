@@ -1,5 +1,5 @@
 import { AuthService } from '#auth/auth.service.js';
-import { FilteredDriverOutputDTO, FilteredUserOutputDTO, SignInDTO, SignUpDTO } from '#auth/auth.types.js';
+import { FilteredDriverOutputDTO, FilteredUserOutputDTO, GoogleAuthType, SignInDTO, SignUpDTO } from '#auth/auth.types.js';
 import { IAuthController } from '#auth/interfaces/auth.controller.interface.js';
 import { BadRequestException } from '#exceptions/http.exception.js';
 import { EnumValidationPipe } from '#global/pipes/enum.validation.pipe.js';
@@ -7,8 +7,17 @@ import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { HashPasswordGuard } from '#guards/hash-password.guard.js';
 import { RefreshTokenGuard } from '#guards/refresh-token.guard.js';
 import { UserType } from '#types/common.types.js';
-import { Body, Controller, Get, HttpStatus, Param, Post, Res, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiCookieAuth, ApiOperation, ApiParam, ApiResponse, getSchemaPath } from '@nestjs/swagger';
+import { Body, Controller, Get, HttpStatus, Param, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import {
+  ApiBearerAuth,
+  ApiCookieAuth,
+  ApiExcludeEndpoint,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  getSchemaPath,
+} from '@nestjs/swagger';
 import { Response } from 'express';
 
 @Controller('auth')
@@ -97,6 +106,23 @@ export class AuthController implements IAuthController {
   })
   async refreshToken(@Res({ passthrough: true }) response: Response) {
     const { person, accessToken, refreshToken, type } = await this.authService.getNewToken();
+    response.cookie('refreshToken', refreshToken);
+
+    return { person, accessToken };
+  }
+
+  @Get('google/:userType')
+  @UseGuards(AuthGuard('google'))
+  @ApiOperation({ summary: '구글 로그인' })
+  async googleAuth() {}
+
+  @Get('oauth2/redirect/google')
+  @ApiExcludeEndpoint()
+  @UseGuards(AuthGuard('google'))
+  async googleAuthRedirect(@Req() req, @Res({ passthrough: true }) response: Response) {
+    const redirectResult: GoogleAuthType = req.user;
+
+    const { person, accessToken, refreshToken, userType } = await this.authService.googleAuth(redirectResult);
     response.cookie('refreshToken', refreshToken);
 
     return { person, accessToken };

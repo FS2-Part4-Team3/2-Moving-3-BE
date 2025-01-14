@@ -1,4 +1,4 @@
-import { SignUpDTO } from '#auth/auth.types.js';
+import { GoogleCreateDTO, SignUpDTO } from '#auth/auth.types.js';
 import { FindOptions } from '#types/options.type.js';
 import { User, UserUpdateDTO } from '#users/user.types.js';
 
@@ -7,6 +7,7 @@ export interface IUserRepository {
   findMany: (option: FindOptions) => Promise<User[]>;
   findById: (id: string) => Promise<User> | null;
   findByEmail: (email: string) => Promise<User> | null;
-  create: (data: SignUpDTO) => Promise<User>;
+  createBySignUp: (data: SignUpDTO) => Promise<User>;
+  createByGoogleCreateDTO: (data: GoogleCreateDTO) => Promise<User>;
   update: (id: string, data: UserUpdateDTO) => Promise<User>;
 }

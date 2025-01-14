@@ -1,3 +1,4 @@
+import { ProviderInfo } from '#auth/auth.types.js';
 import { ModelBase } from '#types/common.types.js';
 import { PersonalInfo } from '#types/personal.type.js';
 import { ApiProperty, OmitType, PartialType } from '@nestjs/swagger';
@@ -9,7 +10,7 @@ interface UserBase extends PrismaUserBase {}
 
 export interface User extends UserBase, ModelBase {}
 
-export class UserEntity extends PersonalInfo implements User {
+export class UserEntity extends PersonalInfo {
   @ArrayNotEmpty({ message: '하나 이상의 지역을 선택해주세요' })
   @IsIn(Object.values($Enums.Area), { each: true, message: '올바른 지역을 선택해주세요.' })
   @ApiProperty({ description: '이용 지역' })
@@ -22,4 +23,4 @@ export class UserEntity extends PersonalInfo implements User {
 }
 
 export class UserPatchDTO extends PartialType(OmitType(UserEntity, ['refreshToken'])) {}
-export interface UserUpdateDTO extends Partial<Omit<User, keyof ModelBase>> {}
+export interface UserUpdateDTO extends Partial<Omit<User, keyof (ModelBase & ProviderInfo)>> {}

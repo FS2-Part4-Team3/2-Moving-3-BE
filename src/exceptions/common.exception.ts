@@ -12,3 +12,9 @@ export class UuidException extends BadRequestException {
     super(ExceptionMessages.ID_FORMAT);
   }
 }
+
+export class InvalidUserTypeException extends BadRequestException {
+  constructor() {
+    super(ExceptionMessages.INVALID_USER_TYPE);
+  }
+}
