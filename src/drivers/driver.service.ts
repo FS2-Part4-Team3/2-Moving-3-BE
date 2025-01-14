@@ -8,7 +8,7 @@ import { DriverRepository } from '#drivers/driver.repository.js';
 import { DriverPatchDTO, DriverUpdateDTO } from '#drivers/driver.types.js';
 import { IDriverService } from '#drivers/interfaces/driver.service.interface.js';
 import { IStorage, UserType } from '#types/common.types.js';
-import { FindOptions } from '#types/options.type.js';
+import { DriversFindOptions } from '#types/options.type.js';
 import filterSensitiveData from '#utils/filterSensitiveData.js';
 import { Injectable } from '@nestjs/common';
 import { AsyncLocalStorage } from 'async_hooks';
@@ -20,10 +20,22 @@ export class DriverService implements IDriverService {
     private readonly als: AsyncLocalStorage<IStorage>,
   ) {}
 
-  async findDrivers(options: FindOptions) {
-    const totalCount = await this.driverRepository.count();
+  async findDrivers(options: DriversFindOptions) {
+    const totalCount = await this.driverRepository.count(options);
     const drivers = await this.driverRepository.findMany(options);
-    const list = drivers.map(driver => filterSensitiveData(driver));
+    const list = drivers.map(driver => {
+      const result = filterSensitiveData(driver);
+      const reviews = result.reviews;
+      const rating = reviews.reduce((acc, cur) => acc + cur.score, 0) / reviews.length;
+      result.reviewCount = reviews.length;
+      result.rating = rating ? rating.toFixed(2) : 0;
+      delete result.reviews;
+
+      const career = Math.floor((Date.now() - driver.startAt) / 1000 / 86400 / 365);
+      result.career = career;
+
+      return result;
+    });
 
     return { totalCount, list };
   }

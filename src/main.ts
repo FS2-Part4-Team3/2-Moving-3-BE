@@ -12,7 +12,14 @@ async function bootstrap() {
   app.enableCors({ credentials: true, origin: true });
   app.use(cookieParser());
   app.useGlobalFilters(new HttpExceptionFilter());
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      transformOptions: {
+        enableImplicitConversion: true,
+      },
+    }),
+  );
   app.useGlobalPipes(new ForbiddenFieldsPipe());
 
   const swaggerService = app.get(SwaggerService);

@@ -55,6 +55,7 @@ model Driver {
   description    String?
   serviceTypes   ServiceType[]
   availableAreas Area[]
+  startAt        DateTime      @default(now())
 
   applyCount Int @default(0)
   likeCount  Int @default(0)

@@ -1,4 +1,5 @@
-import { FindOptions } from '#types/options.type.js';
+import { DriversFindOptions, FindOptions } from '#types/options.type.js';
 import { PartialType } from '@nestjs/swagger';
 
 export class GetQueries extends PartialType(FindOptions) {}
+export class DriversGetQueries extends PartialType(DriversFindOptions) {}

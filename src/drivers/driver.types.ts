@@ -2,7 +2,7 @@ import { ModelBase } from '#types/common.types.js';
 import { PersonalInfo } from '#types/personal.type.js';
 import { OmitType, PartialType } from '@nestjs/swagger';
 import { $Enums, Driver as PrismaDriver } from '@prisma/client';
-import { ArrayNotEmpty, IsIn, IsNotEmpty, IsString } from 'class-validator';
+import { ArrayNotEmpty, IsDate, IsIn, IsNotEmpty, IsString } from 'class-validator';
 
 interface PrismaDriverBase extends Omit<PrismaDriver, keyof ModelBase> {}
 interface DriverBase extends PrismaDriverBase {}
@@ -29,6 +29,9 @@ export class DriverEntity extends PersonalInfo {
   @ArrayNotEmpty({ message: '하나 이상의 타입을 선택해주세요' })
   @IsIn(Object.values($Enums.ServiceType), { each: true })
   serviceTypes: $Enums.ServiceType[];
+
+  @IsDate({ message: '올바르지 않은 날짜입니다.' })
+  startAt: Date;
 }
 
 export class DriverPatchDTO extends PartialType(OmitType(DriverEntity, ['refreshToken'])) {}

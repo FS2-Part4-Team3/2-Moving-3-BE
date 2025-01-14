@@ -55,18 +55,25 @@ export interface FilteredPersonWithToken extends Tokens {
 export class FilteredUserOutputDTO {
   @ApiProperty({ description: '이메일' })
   email: string;
+
   @ApiProperty({ description: '이름' })
   name: string;
+
   @ApiProperty({ description: '프로필 사진' })
   image?: string;
+
   @ApiProperty({ description: '전화번호' })
   phoneNumber?: string;
+
   @ApiProperty({ description: '서비스 타입' })
   serviceTypes: ServiceType[];
+
   @ApiProperty({ description: '이용 지역' })
   areas: Area[];
+
   @ApiProperty({ description: '소셜 로그인 프로바이더' })
   provider?: string;
+
   @ApiProperty({ description: '프로바이더 아이디' })
   providerId?: string;
 }
@@ -74,26 +81,42 @@ export class FilteredUserOutputDTO {
 export class FilteredDriverOutputDTO {
   @ApiProperty({ description: '이메일' })
   email: string;
+
   @ApiProperty({ description: '이름' })
   name: string;
+
   @ApiProperty({ description: '닉네임' })
   nickname?: string;
+
   @ApiProperty({ description: '프로필 사진' })
   image?: string;
+
   @ApiProperty({ description: '전화번호' })
   phoneNumber?: string;
+
   @ApiProperty({ description: '자기소개' })
   introduce?: string;
+
   @ApiProperty({ description: '상세 설명' })
   description?: string;
+
   @ApiProperty({ description: '서비스 타입' })
   serviceTypes: ServiceType[];
+
   @ApiProperty({ description: '서비스 가능 지역' })
   availableAreas: Area[];
+
   @ApiProperty({ description: '확정 회수' })
   applyCount: number;
+
   @ApiProperty({ description: '찜하기 회수' })
   likeCount: number;
+
+  @ApiProperty({ description: '경력 시작일' })
+  startAt: Date;
+
+  @ApiProperty({ description: '경력 년수' })
+  career: number;
 }
 
 export class SignUpDTOWithoutHash extends OmitType(SignUpDTO, ['password', 'salt']) {
