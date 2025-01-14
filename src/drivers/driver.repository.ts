@@ -26,6 +26,9 @@ export class DriverRepository implements IDriverRepository {
       case DriverSortOrder.MostApplied:
         sort = { applyCount: 'desc' };
         break;
+      case DriverSortOrder.HighestCareer:
+        sort = { startAt: 'asc' };
+        break;
       default:
         sort = { createdAt: 'desc' };
     }
