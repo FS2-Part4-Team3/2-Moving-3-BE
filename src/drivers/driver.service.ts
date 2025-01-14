@@ -31,6 +31,9 @@ export class DriverService implements IDriverService {
       result.rating = rating ? rating.toFixed(2) : 0;
       delete result.reviews;
 
+      const career = Math.floor((Date.now() - driver.startAt) / 1000 / 86400 / 365);
+      result.career = career;
+
       return result;
     });
 

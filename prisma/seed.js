@@ -81,6 +81,7 @@ async function main() {
       availableAreas: driverAreas,
       applyCount: faker.number.int({ min: 1, max: 100 }),
       likeCount: faker.number.int({ min: 1, max: 50 }),
+      startAt: faker.date.between({ from: '1980-01-01', to: '2010-12-31' }),
     };
   });
   await prisma.driver.createMany({ data: drivers });

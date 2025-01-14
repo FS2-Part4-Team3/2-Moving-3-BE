@@ -111,6 +111,9 @@ export class FilteredDriverOutputDTO {
 
   @ApiProperty({ description: '찜하기 회수' })
   likeCount: number;
+
+  @ApiProperty({ description: '경력 시작일' })
+  startAt: Date;
 }
 
 export class SignUpDTOWithoutHash extends OmitType(SignUpDTO, ['password', 'salt']) {
