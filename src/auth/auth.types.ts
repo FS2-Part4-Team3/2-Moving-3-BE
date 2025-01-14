@@ -62,6 +62,7 @@ export interface GoogleAuthType {
   photo: string;
   provider: string;
   id: string;
+  userType: UserType;
   accessToken?: string;
   refreshToken?: string;
 }

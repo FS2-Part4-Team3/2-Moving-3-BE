@@ -1,6 +1,7 @@
 import { AuthService } from '#auth/auth.service.js';
 import { GoogleAuthType, SignInDTO, SignUpDTO, SignUpDTOWithoutHash } from '#auth/auth.types.js';
 import { IAuthController } from '#auth/interfaces/auth.controller.interface.js';
+import { InvalidUserTypeException } from '#exceptions/common.exception.js';
 import { BadRequestException } from '#exceptions/http.exception.js';
 import { EnumValidationPipe } from '#global/pipes/enum.validation.pipe.js';
 import { AccessTokenGuard } from '#guards/access-token.guard.js';
@@ -69,37 +70,27 @@ export class AuthController implements IAuthController {
     return result;
   }
 
-  @Get('google/user')
-  @UseGuards(AuthGuard('google/user'))
-  @ApiOperation({ summary: '구글 유저 로그인' })
-  async googleUserAuth() {}
+  @Get('google/:userType')
+  @UseGuards(AuthGuard('google'))
+  @ApiOperation({ summary: '구글 로그인' })
+  async googleAuth() {}
 
-  @Get('google/driver')
-  @UseGuards(AuthGuard('google/driver'))
-  @ApiOperation({ summary: '구글 기사 로그인' })
-  async googleDriverAuth() {}
-
-  @Get('oauth2/redirect/google/user')
+  @Get('oauth2/redirect/google')
   @ApiExcludeEndpoint()
-  @UseGuards(AuthGuard('google/user'))
-  async googleUserAuthRedirect(@Req() req, @Res({ passthrough: true }) response: Response) {
+  @UseGuards(AuthGuard('google'))
+  async googleAuthRedirect(@Req() req, @Res({ passthrough: true }) response: Response) {
     const redirectResult: GoogleAuthType = req.user;
 
-    const { person, accessToken, refreshToken } = await this.authService.googleAuth(redirectResult, UserType.User);
+    const { person, accessToken, refreshToken, userType } = await this.authService.googleAuth(redirectResult);
     response.cookie('refreshToken', refreshToken);
 
-    return { user: person, accessToken };
-  }
-
-  @Get('oauth2/redirect/google/driver')
-  @ApiExcludeEndpoint()
-  @UseGuards(AuthGuard('google/driver'))
-  async googleDriverAuthRedirect(@Req() req, @Res({ passthrough: true }) response: Response) {
-    const redirectResult: GoogleAuthType = req.user;
-
-    const { person, accessToken, refreshToken } = await this.authService.googleAuth(redirectResult, UserType.Driver);
-    response.cookie('refreshToken', refreshToken);
-
-    return { driver: person, accessToken };
+    switch (userType) {
+      case UserType.User:
+        return { user: person, accessToken };
+      case UserType.Driver:
+        return { driver: person, accessToken };
+      default:
+        throw new InvalidUserTypeException();
+    }
   }
 }

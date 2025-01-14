@@ -7,6 +7,7 @@ import { GoogleAuthType, GoogleCreateDTO, SignInDTO, SignUpDTO } from '#auth/aut
 import { IAuthService } from '#auth/interfaces/auth.service.interface.js';
 import { JwtGenerateService } from '#auth/jwt-generate.service.js';
 import { DriverRepository } from '#drivers/driver.repository.js';
+import { InvalidUserTypeException } from '#exceptions/common.exception.js';
 import { UnauthorizedException } from '#exceptions/http.exception.js';
 import { IStorage, UserType } from '#types/common.types.js';
 import { UserRepository } from '#users/user.repository.js';
@@ -88,9 +89,14 @@ export class AuthService implements IAuthService {
     return result;
   }
 
-  async googleAuth(redirectResult: GoogleAuthType, type: UserType) {
-    const { email, name, photo, provider, id } = redirectResult;
-    const repo = type === UserType.User ? this.userRepository : this.driverRepository;
+  async googleAuth(redirectResult: GoogleAuthType) {
+    const { email, name, photo, provider, id, userType } = redirectResult;
+
+    if (!userType || !Object.values(UserType).includes(userType)) {
+      throw new InvalidUserTypeException();
+    }
+
+    const repo = userType === UserType.User ? this.userRepository : this.driverRepository;
     const target = await repo.findByEmail(email);
 
     if (target) {
@@ -98,18 +104,18 @@ export class AuthService implements IAuthService {
         throw new UnauthorizedException();
       }
 
-      const accessToken = await this.jwtGenerateService.generateAccessToken({ id: target.id, type });
-      const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: target.id, type });
+      const accessToken = await this.jwtGenerateService.generateAccessToken({ id: target.id, type: userType });
+      const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: target.id, type: userType });
 
-      return { person: filterSensitiveData(target), accessToken, refreshToken };
+      return { person: filterSensitiveData(target), accessToken, refreshToken, userType };
     }
 
     const data: GoogleCreateDTO = { email, name, image: photo, provider, providerId: id };
     const person = await repo.createByGoogleCreateDTO(data);
 
-    const accessToken = await this.jwtGenerateService.generateAccessToken({ id: person.id, type });
-    const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: person.id, type });
+    const accessToken = await this.jwtGenerateService.generateAccessToken({ id: person.id, type: userType });
+    const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: person.id, type: userType });
 
-    return { person: filterSensitiveData(person), accessToken, refreshToken };
+    return { person: filterSensitiveData(person), accessToken, refreshToken, userType };
   }
 }
