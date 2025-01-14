@@ -8,7 +8,16 @@ import { HashPasswordGuard } from '#guards/hash-password.guard.js';
 import { RefreshTokenGuard } from '#guards/refresh-token.guard.js';
 import { UserType } from '#types/common.types.js';
 import { Body, Controller, Get, HttpStatus, Param, Post, Res, UseGuards } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags, getSchemaPath } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiCookieAuth,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+  getSchemaPath,
+} from '@nestjs/swagger';
 import { Response } from 'express';
 
 @ApiTags('auth')
@@ -71,6 +80,7 @@ export class AuthController implements IAuthController {
   @Get('me')
   @UseGuards(AccessTokenGuard)
   @ApiOperation({ summary: '로그인 유저 정보 조회' })
+  @ApiBearerAuth('accessToken')
   @ApiResponse({
     status: HttpStatus.OK,
     schema: {
@@ -86,6 +96,17 @@ export class AuthController implements IAuthController {
   @Post('refresh')
   @UseGuards(RefreshTokenGuard)
   @ApiOperation({ summary: '토큰 재발급' })
+  @ApiCookieAuth('refreshToken')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    schema: {
+      type: 'object',
+      properties: {
+        person: { oneOf: [{ $ref: getSchemaPath(FilteredUserOutputDTO) }, { $ref: getSchemaPath(FilteredDriverOutputDTO) }] },
+        accessToken: { type: 'string' },
+      },
+    },
+  })
   async refreshToken(@Res({ passthrough: true }) response: Response) {
     const { person, accessToken, refreshToken, type } = await this.authService.getNewToken();
     response.cookie('refreshToken', refreshToken);
