@@ -1,5 +1,5 @@
 import { AuthService } from '#auth/auth.service.js';
-import { SignInDTO, SignUpDTO, SignUpDTOWithoutHash } from '#auth/auth.types.js';
+import { FilteredDriverOutputDTO, FilteredUserOutputDTO, SignInDTO, SignUpDTO, SignUpDTOWithoutHash } from '#auth/auth.types.js';
 import { IAuthController } from '#auth/interfaces/auth.controller.interface.js';
 import { BadRequestException } from '#exceptions/http.exception.js';
 import { EnumValidationPipe } from '#global/pipes/enum.validation.pipe.js';
@@ -7,8 +7,8 @@ import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { HashPasswordGuard } from '#guards/hash-password.guard.js';
 import { RefreshTokenGuard } from '#guards/refresh-token.guard.js';
 import { UserType } from '#types/common.types.js';
-import { Body, Controller, Get, Param, Post, Res, UseGuards } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, HttpStatus, Param, Post, Res, UseGuards } from '@nestjs/common';
+import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags, getSchemaPath } from '@nestjs/swagger';
 import { Response } from 'express';
 
 @ApiTags('auth')
@@ -21,6 +21,16 @@ export class AuthController implements IAuthController {
   @ApiOperation({ summary: '회원가입' })
   @ApiBody({ type: SignUpDTOWithoutHash })
   @ApiParam({ name: 'userType', enum: UserType })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    schema: {
+      type: 'object',
+      properties: {
+        person: { oneOf: [{ $ref: getSchemaPath(FilteredUserOutputDTO) }, { $ref: getSchemaPath(FilteredDriverOutputDTO) }] },
+        accessToken: { type: 'string' },
+      },
+    },
+  })
   async signUp(
     @Body() body: SignUpDTO,
     @Param('userType', new EnumValidationPipe(UserType)) type: UserType,
@@ -29,8 +39,7 @@ export class AuthController implements IAuthController {
     const { person, accessToken, refreshToken } = await this.authService.createPerson(body, type);
     response.cookie('refreshToken', refreshToken);
 
-    const result = type === UserType.User ? { user: person, accessToken } : { driver: person, accessToken };
-    return result;
+    return { person, accessToken };
   }
 
   @Post('signIn/:userType')
@@ -44,8 +53,7 @@ export class AuthController implements IAuthController {
     const { person, accessToken, refreshToken } = await this.authService.signIn(body, type);
     response.cookie('refreshToken', refreshToken);
 
-    const result = type === UserType.User ? { user: person, accessToken } : { driver: person, accessToken };
-    return result;
+    return { person, accessToken };
   }
 
   @Get('me')
@@ -64,7 +72,6 @@ export class AuthController implements IAuthController {
     const { person, accessToken, refreshToken, type } = await this.authService.getNewToken();
     response.cookie('refreshToken', refreshToken);
 
-    const result = type === UserType.User ? { user: person, accessToken } : { driver: person, accessToken };
-    return result;
+    return { person, accessToken };
   }
 }

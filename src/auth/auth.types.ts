@@ -3,11 +3,17 @@ import { UserType } from '#types/common.types.js';
 import { FilteredPersonalInfo } from '#types/personal.type.js';
 import { User } from '#users/user.types.js';
 import { ApiProperty, OmitType } from '@nestjs/swagger';
+import { Area, ServiceType } from '@prisma/client';
 import { IsEmail, IsEnum, IsHexadecimal, IsNotEmpty, IsString, Length, Matches } from 'class-validator';
 
 export interface TokenPayload {
   id: string;
   type: UserType;
+}
+
+export class Tokens {
+  accessToken: string;
+  refreshToken?: string;
 }
 
 export interface SignInDTO extends Pick<User, 'email' | 'password'> {}
@@ -35,14 +41,55 @@ export class SignUpDTO {
   phoneNumber: string;
 }
 
-export type FilteredPersonWithToken = {
-  accessToken: string;
-  refreshToken?: string;
-} & (
-  | { person: FilteredPersonalInfo<User> | FilteredPersonalInfo<Driver> }
-  | { user: FilteredPersonalInfo<User> }
-  | { driver: FilteredPersonalInfo<Driver> }
-);
+export type FilteredPerson = FilteredPersonalInfo<User> | FilteredPersonalInfo<Driver>;
+
+export interface FilteredPersonWithToken extends Tokens {
+  person: FilteredPerson;
+}
+
+export class FilteredUserOutputDTO {
+  @ApiProperty({ description: '이메일' })
+  email: string;
+  @ApiProperty({ description: '이름' })
+  name: string;
+  @ApiProperty({ description: '프로필 사진' })
+  image?: string;
+  @ApiProperty({ description: '전화번호' })
+  phoneNumber?: string;
+  @ApiProperty({ description: '서비스 타입' })
+  serviceTypes: ServiceType[];
+  @ApiProperty({ description: '이용 지역' })
+  areas: Area[];
+  @ApiProperty({ description: '소셜 로그인 프로바이더' })
+  provider?: string;
+  @ApiProperty({ description: '프로바이더 아이디' })
+  providerId?: string;
+}
+
+export class FilteredDriverOutputDTO {
+  @ApiProperty({ description: '이메일' })
+  email: string;
+  @ApiProperty({ description: '이름' })
+  name: string;
+  @ApiProperty({ description: '닉네임' })
+  nickname?: string;
+  @ApiProperty({ description: '프로필 사진' })
+  image?: string;
+  @ApiProperty({ description: '전화번호' })
+  phoneNumber?: string;
+  @ApiProperty({ description: '자기소개' })
+  introduce?: string;
+  @ApiProperty({ description: '상세 설명' })
+  description?: string;
+  @ApiProperty({ description: '서비스 타입' })
+  serviceTypes: ServiceType[];
+  @ApiProperty({ description: '서비스 가능 지역' })
+  availableAreas: Area[];
+  @ApiProperty({ description: '확정 회수' })
+  applyCount: number;
+  @ApiProperty({ description: '찜하기 회수' })
+  likeCount: number;
+}
 
 export class SignUpDTOWithoutHash extends OmitType(SignUpDTO, ['password', 'salt']) {
   @IsString({ message: '비밀번호는 문자열 형식입니다.' })
