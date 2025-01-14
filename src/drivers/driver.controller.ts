@@ -3,9 +3,10 @@ import { DriverService } from '#drivers/driver.service.js';
 import { DriverPatchDTO } from '#drivers/driver.types.js';
 import { IDriverController } from '#drivers/interfaces/driver.controller.interface.js';
 import { AccessTokenGuard } from '#guards/access-token.guard.js';
+import { DriverSortOrder } from '#types/options.type.js';
 import { DriversGetQueries } from '#types/queries.type.js';
 import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, getSchemaPath } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiQuery, ApiResponse, getSchemaPath } from '@nestjs/swagger';
 
 @Controller('drivers')
 export class DriverController implements IDriverController {
@@ -13,6 +14,7 @@ export class DriverController implements IDriverController {
 
   @Get()
   @ApiOperation({ summary: '기사 목록 조회' })
+  @ApiQuery({ name: 'orderBy', enum: DriverSortOrder })
   @ApiResponse({
     status: HttpStatus.OK,
     schema: {

@@ -28,7 +28,7 @@ export class DriverService implements IDriverService {
       const reviews = result.reviews;
       const rating = reviews.reduce((acc, cur) => acc + cur.score, 0) / reviews.length;
       result.reviewCount = reviews.length;
-      result.rating = rating ? rating : 0;
+      result.rating = rating ? rating.toFixed(2) : 0;
       delete result.reviews;
 
       return result;

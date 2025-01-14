@@ -2,7 +2,7 @@ import { GoogleCreateDTO, SignUpDTO } from '#auth/auth.types.js';
 import { DriverUpdateDTO } from '#drivers/driver.types.js';
 import { IDriverRepository } from '#drivers/interfaces/driver.repository.interface.js';
 import { PrismaService } from '#global/prisma.service.js';
-import { DriversFindOptions, SortOrder } from '#types/options.type.js';
+import { DriversFindOptions, DriverSortOrder } from '#types/options.type.js';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
@@ -17,13 +17,13 @@ export class DriverRepository implements IDriverRepository {
 
     let sort = {};
     switch (orderBy) {
-      case SortOrder.MostReviewed:
+      case DriverSortOrder.MostReviewed:
         sort = { reviews: { _count: 'desc' } };
         break;
-      case SortOrder.HighestRating:
+      case DriverSortOrder.HighestRating:
         sort = { reviews: { _avg: { score: 'desc' } } };
         break;
-      case SortOrder.MostApplied:
+      case DriverSortOrder.MostApplied:
         sort = { applyCount: 'desc' };
         break;
       default:
