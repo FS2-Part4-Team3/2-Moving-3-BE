@@ -33,7 +33,9 @@ export class QuestionController implements IQuestionController {
 
   @Delete(':id')
   @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth('accessToken')
   @ApiOperation({ summary: '문의 삭제' })
+  @ApiResponse({ status: HttpStatus.OK, type: QuestionEntity })
   async deleteQuestion(@Param('id') id: string) {
     const question = await this.questionService.deleteQuestion(id);
 
