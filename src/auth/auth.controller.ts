@@ -44,6 +44,18 @@ export class AuthController implements IAuthController {
 
   @Post('signIn/:userType')
   @ApiOperation({ summary: '로그인' })
+  @ApiBody({ type: SignInDTO })
+  @ApiParam({ name: 'userType', enum: UserType })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    schema: {
+      type: 'object',
+      properties: {
+        person: { oneOf: [{ $ref: getSchemaPath(FilteredUserOutputDTO) }, { $ref: getSchemaPath(FilteredDriverOutputDTO) }] },
+        accessToken: { type: 'string' },
+      },
+    },
+  })
   async signIn(@Body() body: SignInDTO, @Param('userType') userType: UserType, @Res({ passthrough: true }) response: Response) {
     if (!Object.values(UserType).includes(userType)) {
       throw new BadRequestException();

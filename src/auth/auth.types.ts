@@ -16,7 +16,12 @@ export class Tokens {
   refreshToken?: string;
 }
 
-export interface SignInDTO extends Pick<User, 'email' | 'password'> {}
+export class SignInDTO {
+  @ApiProperty({ description: '이메일' })
+  email: string;
+  @ApiProperty({ description: '비밀번호' })
+  password: string;
+}
 
 export class SignUpDTO {
   @ApiProperty({ description: '이메일' })
