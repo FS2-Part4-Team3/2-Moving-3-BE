@@ -50,19 +50,21 @@ export class AuthService implements IAuthService {
 
   async signIn(body: SignInDTO, type: UserType) {
     const { email, password } = body;
-    const user = await this.userRepository.findByEmail(email);
-    const hashed = hashingPassword(password, user.salt);
-    if (!user) {
+    const repo = type === UserType.User ? this.userRepository : this.driverRepository;
+
+    const target = await repo.findByEmail(email);
+    if (!target) {
       throw new AuthWrongCredentialException();
     }
-    if (user.password !== hashed) {
+    const hashed = hashingPassword(password, target.salt);
+    if (target.password !== hashed) {
       throw new AuthWrongCredentialException();
     }
 
-    const accessToken = await this.jwtGenerateService.generateAccessToken({ id: user.id, type });
-    const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: user.id, type });
+    const accessToken = await this.jwtGenerateService.generateAccessToken({ id: target.id, type });
+    const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: target.id, type });
 
-    return { person: filterSensitiveData(user), accessToken, refreshToken };
+    return { person: filterSensitiveData(target), accessToken, refreshToken };
   }
 
   async getNewToken() {
