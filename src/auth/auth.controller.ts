@@ -71,6 +71,12 @@ export class AuthController implements IAuthController {
   @Get('me')
   @UseGuards(AccessTokenGuard)
   @ApiOperation({ summary: '로그인 유저 정보 조회' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    schema: {
+      oneOf: [{ $ref: getSchemaPath(FilteredUserOutputDTO) }, { $ref: getSchemaPath(FilteredDriverOutputDTO) }],
+    },
+  })
   async getMe() {
     const person = await this.authService.getMe();
 
