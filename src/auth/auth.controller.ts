@@ -1,5 +1,5 @@
 import { AuthService } from '#auth/auth.service.js';
-import { FilteredDriverOutputDTO, FilteredUserOutputDTO, SignInDTO, SignUpDTO, SignUpDTOWithoutHash } from '#auth/auth.types.js';
+import { FilteredDriverOutputDTO, FilteredUserOutputDTO, SignInDTO, SignUpDTO } from '#auth/auth.types.js';
 import { IAuthController } from '#auth/interfaces/auth.controller.interface.js';
 import { BadRequestException } from '#exceptions/http.exception.js';
 import { EnumValidationPipe } from '#global/pipes/enum.validation.pipe.js';
@@ -8,16 +8,7 @@ import { HashPasswordGuard } from '#guards/hash-password.guard.js';
 import { RefreshTokenGuard } from '#guards/refresh-token.guard.js';
 import { UserType } from '#types/common.types.js';
 import { Body, Controller, Get, HttpStatus, Param, Post, Res, UseGuards } from '@nestjs/common';
-import {
-  ApiBearerAuth,
-  ApiBody,
-  ApiCookieAuth,
-  ApiOperation,
-  ApiParam,
-  ApiResponse,
-  ApiTags,
-  getSchemaPath,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiCookieAuth, ApiOperation, ApiParam, ApiResponse, ApiTags, getSchemaPath } from '@nestjs/swagger';
 import { Response } from 'express';
 
 @ApiTags('auth')
@@ -28,7 +19,6 @@ export class AuthController implements IAuthController {
   @Post('signUp/:userType')
   @UseGuards(HashPasswordGuard)
   @ApiOperation({ summary: '회원가입' })
-  @ApiBody({ type: SignUpDTOWithoutHash })
   @ApiParam({ name: 'userType', enum: UserType })
   @ApiResponse({
     status: HttpStatus.CREATED,
@@ -53,7 +43,6 @@ export class AuthController implements IAuthController {
 
   @Post('signIn/:userType')
   @ApiOperation({ summary: '로그인' })
-  @ApiBody({ type: SignInDTO })
   @ApiParam({ name: 'userType', enum: UserType })
   @ApiResponse({
     status: HttpStatus.OK,

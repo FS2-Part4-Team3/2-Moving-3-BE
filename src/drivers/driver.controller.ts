@@ -6,7 +6,7 @@ import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { SortOrder } from '#types/options.type.js';
 import { GetQueries } from '#types/queries.type.js';
 import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
-import { ApiOperation, ApiParam, ApiResponse, getSchemaPath } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, getSchemaPath } from '@nestjs/swagger';
 
 @Controller('drivers')
 export class DriverController implements IDriverController {
@@ -47,7 +47,12 @@ export class DriverController implements IDriverController {
 
   @Patch('update')
   @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth('accessToken')
   @ApiOperation({ summary: '기사 정보 수정' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: FilteredDriverOutputDTO,
+  })
   async patchUser(@Body() body: DriverPatchDTO) {
     const user = await this.driverService.updateDriver(body);
 
@@ -56,7 +61,13 @@ export class DriverController implements IDriverController {
 
   @Post(':id/like')
   @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth('accessToken')
   @ApiOperation({ summary: '기사 찜하기' })
+  @ApiParam({ name: 'id', type: 'string' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: FilteredDriverOutputDTO,
+  })
   async postLikeDriver(@Param('id') id: string) {
     const driver = await this.driverService.likeDriver(id);
 
@@ -65,7 +76,13 @@ export class DriverController implements IDriverController {
 
   @Delete(':id/like')
   @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth('accessToken')
   @ApiOperation({ summary: '기사 찜하기 해제' })
+  @ApiParam({ name: 'id', type: 'string' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: FilteredDriverOutputDTO,
+  })
   async deleteLikeDriver(@Param('id') id: string) {
     const driver = await this.driverService.unlikeDriver(id);
 
