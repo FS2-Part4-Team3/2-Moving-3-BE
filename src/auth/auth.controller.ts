@@ -114,6 +114,17 @@ export class AuthController implements IAuthController {
   @Get('google/:userType')
   @UseGuards(AuthGuard('google'))
   @ApiOperation({ summary: '구글 로그인' })
+  @ApiParam({ name: 'userType', enum: UserType })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    schema: {
+      type: 'object',
+      properties: {
+        person: { oneOf: [{ $ref: getSchemaPath(FilteredUserOutputDTO) }, { $ref: getSchemaPath(FilteredDriverOutputDTO) }] },
+        accessToken: { type: 'string' },
+      },
+    },
+  })
   async googleAuth() {}
 
   @Get('oauth2/redirect/google')
