@@ -4,15 +4,17 @@ import { FindOptions, RequestFilter } from '#types/options.type.js';
 import { Controller, Get, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 import { MoveService } from './move.service.js';
+import { GetQueries } from '#types/queries.type.js';
 
 @Controller('moves')
 export class MoveController implements IMoveController {
   constructor(private readonly moveService: MoveService) {}
 
   @Get()
+  @UseGuards(AccessTokenGuard)
   @ApiOperation({ summary: '이사 정보 목록 조회' })
-  async getMoveInfos(@Query('driverId') driverId?: string, @Query() options?: FindOptions & RequestFilter) {
-    const request = await this.moveService.getMoveInfos(driverId, options);
+  async getMoveInfos(@Query() options: GetQueries & Partial<RequestFilter>) {
+    const request = await this.moveService.getMoveInfos(options);
 
     return request;
   }

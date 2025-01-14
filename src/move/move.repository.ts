@@ -2,6 +2,8 @@ import { PrismaService } from '#global/prisma.service.js';
 import { IMoveRepository } from '#move/interfaces/move.repository.interface.js';
 import { MoveInfoInputDTO } from '#move/move.types.js';
 import { FindOptions, RequestFilter, SortOrder } from '#types/options.type.js';
+import { GetQueries } from '#types/queries.type.js';
+import { areaToKeyword } from '#utils/address-utils.js';
 import { Injectable } from '@nestjs/common';
 import { Area, Progress, ServiceType } from '@prisma/client';
 
@@ -12,8 +14,8 @@ export class MoveRepository implements IMoveRepository {
     this.moveInfo = prisma.moveInfo;
   }
 
-  async findMany(options?: FindOptions & RequestFilter, driverId?: string) {
-    const { page = 1, pageSize = 10, orderBy = SortOrder.Recent, keyword, moveType, serviceArea, designated = true } = options;
+  async findMany(options: GetQueries & Partial<RequestFilter>, driverId: string, driverAvailableAreas: Area[]) {
+    const { page = 1, pageSize = 10, orderBy, keyword, moveType, serviceArea = true, designated } = options;
 
     const whereCondition = {
       ...(keyword && {
@@ -28,10 +30,14 @@ export class MoveRepository implements IMoveRepository {
       }),
 
       ...(serviceArea && {
-        OR: [{ fromAddress: { contains: serviceArea } }, { toAddress: { contains: serviceArea } }],
-        driver: {
-          availableAreas: { has: serviceArea as Area },
-        },
+        OR: [
+          ...driverAvailableAreas.map(area => ({
+            fromAddress: { contains: areaToKeyword(area) },
+          })),
+          ...driverAvailableAreas.map(area => ({
+            toAddress: { contains: areaToKeyword(area) },
+          })),
+        ],
       }),
 
       ...(designated &&
@@ -44,22 +50,26 @@ export class MoveRepository implements IMoveRepository {
         }),
     };
 
+    let orderByCondition;
+    if (orderBy === SortOrder.UpcomingMoveDate) {
+      orderByCondition = { date: 'asc' };
+    } else if (orderBy === SortOrder.RecentRequest) {
+      orderByCondition = { createdAt: 'desc' };
+    } else {
+      orderByCondition = { createdAt: 'desc' };
+    }
+
     const list = await this.moveInfo.findMany({
       where: whereCondition,
       skip: (page - 1) * pageSize,
       take: pageSize,
-      orderBy:
-        orderBy === SortOrder.MoveDate
-          ? { scheduledTime: SortOrder.Recent ? 'desc' : 'asc' }
-          : { createdAt: SortOrder.Recent ? 'desc' : 'asc' },
+      orderBy: orderByCondition,
       include: {
-        owner: true,
-        requests: true,
+        owner: { select: { name: true } },
       },
     });
 
     const totalCount = await this.moveInfo.count({ where: whereCondition });
-    console.log('totalCount', totalCount);
 
     return { totalCount, list };
   }
