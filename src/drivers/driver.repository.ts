@@ -62,13 +62,8 @@ export class DriverRepository implements IDriverRepository {
       ...findCondition,
       skip: (page - 1) * pageSize,
       take: pageSize,
-      select: {
-        reviews: {
-          _count: true,
-          _avg: {
-            score: true,
-          },
-        },
+      include: {
+        reviews: { select: { score: true } },
       },
     });
 

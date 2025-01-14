@@ -23,7 +23,16 @@ export class DriverService implements IDriverService {
   async findDrivers(options: DriversFindOptions) {
     const totalCount = await this.driverRepository.count(options);
     const drivers = await this.driverRepository.findMany(options);
-    const list = drivers.map(driver => filterSensitiveData(driver));
+    const list = drivers.map(driver => {
+      const result = filterSensitiveData(driver);
+      const reviews = result.reviews;
+      const rating = reviews.reduce((acc, cur) => acc + cur.score, 0) / reviews.length;
+      result.reviewCount = reviews.length;
+      result.rating = rating ? rating : 0;
+      delete result.reviews;
+
+      return result;
+    });
 
     return { totalCount, list };
   }
