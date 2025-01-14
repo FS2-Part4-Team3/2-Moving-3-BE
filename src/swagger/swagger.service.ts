@@ -1,4 +1,6 @@
+import { FilteredDriverOutputDTO, FilteredUserOutputDTO } from '#auth/auth.types.js';
 import { swaggerConfig } from '#configs/swagger.config.js';
+import { QuestionEntity } from '#questions/question.types.js';
 import { INestApplication, Injectable } from '@nestjs/common';
 import { OpenAPIObject, SwaggerModule } from '@nestjs/swagger';
 import * as fs from 'fs';
@@ -10,7 +12,9 @@ export class SwaggerService {
   private document: OpenAPIObject;
 
   setupSwagger(app: INestApplication) {
-    this.document = SwaggerModule.createDocument(app, swaggerConfig);
+    this.document = SwaggerModule.createDocument(app, swaggerConfig, {
+      extraModels: [FilteredUserOutputDTO, FilteredDriverOutputDTO, QuestionEntity],
+    });
 
     SwaggerModule.setup('api-docs', app, this.document);
 

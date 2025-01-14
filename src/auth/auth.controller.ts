@@ -1,19 +1,25 @@
 import { AuthService } from '#auth/auth.service.js';
-import { GoogleAuthType, SignInDTO, SignUpDTO, SignUpDTOWithoutHash } from '#auth/auth.types.js';
+import { FilteredDriverOutputDTO, FilteredUserOutputDTO, GoogleAuthType, SignInDTO, SignUpDTO } from '#auth/auth.types.js';
 import { IAuthController } from '#auth/interfaces/auth.controller.interface.js';
-import { InvalidUserTypeException } from '#exceptions/common.exception.js';
 import { BadRequestException } from '#exceptions/http.exception.js';
 import { EnumValidationPipe } from '#global/pipes/enum.validation.pipe.js';
 import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { HashPasswordGuard } from '#guards/hash-password.guard.js';
 import { RefreshTokenGuard } from '#guards/refresh-token.guard.js';
 import { UserType } from '#types/common.types.js';
-import { Body, Controller, Get, Param, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Param, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBody, ApiExcludeEndpoint, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiCookieAuth,
+  ApiExcludeEndpoint,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  getSchemaPath,
+} from '@nestjs/swagger';
 import { Response } from 'express';
 
-@ApiTags('auth')
 @Controller('auth')
 export class AuthController implements IAuthController {
   constructor(private readonly authService: AuthService) {}
@@ -21,8 +27,17 @@ export class AuthController implements IAuthController {
   @Post('signUp/:userType')
   @UseGuards(HashPasswordGuard)
   @ApiOperation({ summary: '회원가입' })
-  @ApiBody({ type: SignUpDTOWithoutHash })
   @ApiParam({ name: 'userType', enum: UserType })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    schema: {
+      type: 'object',
+      properties: {
+        person: { oneOf: [{ $ref: getSchemaPath(FilteredUserOutputDTO) }, { $ref: getSchemaPath(FilteredDriverOutputDTO) }] },
+        accessToken: { type: 'string' },
+      },
+    },
+  })
   async signUp(
     @Body() body: SignUpDTO,
     @Param('userType', new EnumValidationPipe(UserType)) type: UserType,
@@ -31,12 +46,22 @@ export class AuthController implements IAuthController {
     const { person, accessToken, refreshToken } = await this.authService.createPerson(body, type);
     response.cookie('refreshToken', refreshToken);
 
-    const result = type === UserType.User ? { user: person, accessToken } : { driver: person, accessToken };
-    return result;
+    return { person, accessToken };
   }
 
   @Post('signIn/:userType')
   @ApiOperation({ summary: '로그인' })
+  @ApiParam({ name: 'userType', enum: UserType })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    schema: {
+      type: 'object',
+      properties: {
+        person: { oneOf: [{ $ref: getSchemaPath(FilteredUserOutputDTO) }, { $ref: getSchemaPath(FilteredDriverOutputDTO) }] },
+        accessToken: { type: 'string' },
+      },
+    },
+  })
   async signIn(@Body() body: SignInDTO, @Param('userType') userType: UserType, @Res({ passthrough: true }) response: Response) {
     if (!Object.values(UserType).includes(userType)) {
       throw new BadRequestException();
@@ -46,13 +71,19 @@ export class AuthController implements IAuthController {
     const { person, accessToken, refreshToken } = await this.authService.signIn(body, type);
     response.cookie('refreshToken', refreshToken);
 
-    const result = type === UserType.User ? { user: person, accessToken } : { driver: person, accessToken };
-    return result;
+    return { person, accessToken };
   }
 
   @Get('me')
   @UseGuards(AccessTokenGuard)
   @ApiOperation({ summary: '로그인 유저 정보 조회' })
+  @ApiBearerAuth('accessToken')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    schema: {
+      oneOf: [{ $ref: getSchemaPath(FilteredUserOutputDTO) }, { $ref: getSchemaPath(FilteredDriverOutputDTO) }],
+    },
+  })
   async getMe() {
     const person = await this.authService.getMe();
 
@@ -62,17 +93,38 @@ export class AuthController implements IAuthController {
   @Post('refresh')
   @UseGuards(RefreshTokenGuard)
   @ApiOperation({ summary: '토큰 재발급' })
+  @ApiCookieAuth('refreshToken')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    schema: {
+      type: 'object',
+      properties: {
+        person: { oneOf: [{ $ref: getSchemaPath(FilteredUserOutputDTO) }, { $ref: getSchemaPath(FilteredDriverOutputDTO) }] },
+        accessToken: { type: 'string' },
+      },
+    },
+  })
   async refreshToken(@Res({ passthrough: true }) response: Response) {
     const { person, accessToken, refreshToken, type } = await this.authService.getNewToken();
     response.cookie('refreshToken', refreshToken);
 
-    const result = type === UserType.User ? { user: person, accessToken } : { driver: person, accessToken };
-    return result;
+    return { person, accessToken };
   }
 
   @Get('google/:userType')
   @UseGuards(AuthGuard('google'))
   @ApiOperation({ summary: '구글 로그인' })
+  @ApiParam({ name: 'userType', enum: UserType })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    schema: {
+      type: 'object',
+      properties: {
+        person: { oneOf: [{ $ref: getSchemaPath(FilteredUserOutputDTO) }, { $ref: getSchemaPath(FilteredDriverOutputDTO) }] },
+        accessToken: { type: 'string' },
+      },
+    },
+  })
   async googleAuth() {}
 
   @Get('oauth2/redirect/google')
@@ -84,13 +136,6 @@ export class AuthController implements IAuthController {
     const { person, accessToken, refreshToken, userType } = await this.authService.googleAuth(redirectResult);
     response.cookie('refreshToken', refreshToken);
 
-    switch (userType) {
-      case UserType.User:
-        return { user: person, accessToken };
-      case UserType.Driver:
-        return { driver: person, accessToken };
-      default:
-        throw new InvalidUserTypeException();
-    }
+    return { person, accessToken };
   }
 }
