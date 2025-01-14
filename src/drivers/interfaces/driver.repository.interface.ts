@@ -1,10 +1,10 @@
 import { GoogleCreateDTO, SignUpDTO } from '#auth/auth.types.js';
 import { Driver, DriverUpdateDTO } from '#drivers/driver.types.js';
-import { FindOptions } from '#types/options.type.js';
+import { DriversFindOptions } from '#types/options.type.js';
 
 export interface IDriverRepository {
-  count: () => Promise<number>;
-  findMany: (options: FindOptions) => Promise<Driver[]>;
+  count: (options: DriversFindOptions) => Promise<number>;
+  findMany: (options: DriversFindOptions) => Promise<Driver[]>;
   findById: (id: string) => Promise<Driver> | null;
   findByEmail: (email: string) => Promise<Driver> | null;
   createBySignUp: (data: SignUpDTO) => Promise<Driver>;

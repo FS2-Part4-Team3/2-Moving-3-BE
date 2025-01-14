@@ -2,7 +2,7 @@ import { GoogleCreateDTO, SignUpDTO } from '#auth/auth.types.js';
 import { DriverUpdateDTO } from '#drivers/driver.types.js';
 import { IDriverRepository } from '#drivers/interfaces/driver.repository.interface.js';
 import { PrismaService } from '#global/prisma.service.js';
-import { FindOptions, SortOrder } from '#types/options.type.js';
+import { DriversFindOptions, SortOrder } from '#types/options.type.js';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
@@ -12,24 +12,64 @@ export class DriverRepository implements IDriverRepository {
     this.driver = prisma.driver;
   }
 
-  async count() {
-    const count = await this.driver.count();
+  private generateFindCondition(options: DriversFindOptions) {
+    const { orderBy, keyword, area, serviceType } = options;
+
+    let sort = {};
+    switch (orderBy) {
+      case SortOrder.MostReviewed:
+        sort = { reviews: { _count: 'desc' } };
+        break;
+      case SortOrder.HighestRating:
+        sort = { reviews: { _avg: { score: 'desc' } } };
+        break;
+      case SortOrder.MostApplied:
+        sort = { applyCount: 'desc' };
+        break;
+      default:
+        sort = { createdAt: 'desc' };
+    }
+
+    const areaCondition = area ? { availableAreas: { has: area } } : {};
+    const typeCondition = serviceType ? { serviceTypes: { has: serviceType } } : {};
+
+    const where = {
+      name: { contains: keyword },
+      ...areaCondition,
+      ...typeCondition,
+    };
+
+    return {
+      where,
+      orderBy: sort,
+    };
+  }
+
+  async count(options: DriversFindOptions) {
+    const findCondition = this.generateFindCondition(options);
+
+    const count = await this.driver.count({ ...findCondition });
 
     return count;
   }
 
-  async findMany(options: FindOptions) {
-    const { page, pageSize, orderBy } = options;
-    // prettier-ignore
-    const sort = (
-      orderBy === SortOrder.Oldest ? {createdAt: 'asc'} :
-      orderBy === SortOrder.Latest ? {createdAt: 'desc'} : {createdAt: 'desc'}
-    )
+  async findMany(options: DriversFindOptions) {
+    const { page, pageSize } = options;
+
+    const findCondition = this.generateFindCondition(options);
 
     const drivers = await this.driver.findMany({
-      orderBy: sort,
+      ...findCondition,
       skip: (page - 1) * pageSize,
       take: pageSize,
+      select: {
+        reviews: {
+          _count: true,
+          _avg: {
+            score: true,
+          },
+        },
+      },
     });
 
     return drivers;

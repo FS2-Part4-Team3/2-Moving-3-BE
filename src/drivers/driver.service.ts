@@ -8,7 +8,7 @@ import { DriverRepository } from '#drivers/driver.repository.js';
 import { DriverPatchDTO, DriverUpdateDTO } from '#drivers/driver.types.js';
 import { IDriverService } from '#drivers/interfaces/driver.service.interface.js';
 import { IStorage, UserType } from '#types/common.types.js';
-import { FindOptions } from '#types/options.type.js';
+import { DriversFindOptions } from '#types/options.type.js';
 import filterSensitiveData from '#utils/filterSensitiveData.js';
 import { Injectable } from '@nestjs/common';
 import { AsyncLocalStorage } from 'async_hooks';
@@ -20,8 +20,8 @@ export class DriverService implements IDriverService {
     private readonly als: AsyncLocalStorage<IStorage>,
   ) {}
 
-  async findDrivers(options: FindOptions) {
-    const totalCount = await this.driverRepository.count();
+  async findDrivers(options: DriversFindOptions) {
+    const totalCount = await this.driverRepository.count(options);
     const drivers = await this.driverRepository.findMany(options);
     const list = drivers.map(driver => filterSensitiveData(driver));
 
