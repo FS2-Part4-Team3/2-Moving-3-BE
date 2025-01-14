@@ -13,8 +13,8 @@ export class RequestRepository implements IRequestRepository {
   }
   async findMany(options: FindOptions) {}
 
-  async findById(id: string) {
-    const request = await this.request.findUnique({ where: { id } });
+  async findById(requestId: string) {
+    const request = await this.request.findUnique({ where: { requestId }, include: { moveInfo: { select: { ownerId: true } } } });
 
     return request;
   }
@@ -27,5 +27,9 @@ export class RequestRepository implements IRequestRepository {
 
   async update(id: string, data: Partial<RequestInputDTO>) {}
 
-  async delete(id: string) {}
+  async delete(id: string) {
+    const request = await this.request.delete({ where: { id } });
+
+    return request;
+  }
 }
