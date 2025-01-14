@@ -1,5 +1,12 @@
 import { AuthService } from '#auth/auth.service.js';
-import { FilteredDriverOutputDTO, FilteredUserOutputDTO, GoogleAuthType, SignInDTO, SignUpDTO } from '#auth/auth.types.js';
+import {
+  FilteredDriverOutputDTO,
+  FilteredUserOutputDTO,
+  GoogleAuthType,
+  SignInDTO,
+  SignUpDTO,
+  SignUpDTOWithoutHash,
+} from '#auth/auth.types.js';
 import { IAuthController } from '#auth/interfaces/auth.controller.interface.js';
 import { BadRequestException } from '#exceptions/http.exception.js';
 import { EnumValidationPipe } from '#global/pipes/enum.validation.pipe.js';
@@ -11,6 +18,7 @@ import { Body, Controller, Get, HttpStatus, Param, Post, Req, Res, UseGuards } f
 import { AuthGuard } from '@nestjs/passport';
 import {
   ApiBearerAuth,
+  ApiBody,
   ApiCookieAuth,
   ApiExcludeEndpoint,
   ApiOperation,
@@ -28,6 +36,7 @@ export class AuthController implements IAuthController {
   @UseGuards(HashPasswordGuard)
   @ApiOperation({ summary: '회원가입' })
   @ApiParam({ name: 'userType', enum: UserType })
+  @ApiBody({ type: SignUpDTOWithoutHash })
   @ApiResponse({
     status: HttpStatus.CREATED,
     schema: {
