@@ -58,7 +58,7 @@ export class EstimationController implements IEstimationController {
   @ApiBearerAuth('accessToken')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: '문의 생성' })
-  @ApiResponse({ status: HttpStatus.OK, type: QuestionEntity })
+  @ApiResponse({ status: HttpStatus.CREATED, type: QuestionEntity })
   async postQuestion(@Param('id') id: string, @Body() body: QuestionPostDTO) {
     const question = await this.questionService.createQuestion(id, body);
 

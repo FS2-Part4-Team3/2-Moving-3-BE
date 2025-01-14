@@ -22,7 +22,9 @@ export class QuestionController implements IQuestionController {
 
   @Patch(':id')
   @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth('accessToken')
   @ApiOperation({ summary: '문의 수정' })
+  @ApiResponse({ status: HttpStatus.OK, type: QuestionEntity })
   async patchQuestion(@Param('id') id: string, @Body() body: QuestionPatchDTO) {
     const question = await this.questionService.updateQuestion(id, body);
 
