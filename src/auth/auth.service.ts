@@ -46,6 +46,7 @@ export class AuthService implements IAuthService {
     const person = await repo.createBySignUp(data);
     const accessToken = await this.jwtGenerateService.generateAccessToken({ id: person.id, type });
     const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: person.id, type });
+    person.type = type;
 
     return { person: filterSensitiveData(person), accessToken, refreshToken };
   }
