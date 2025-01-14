@@ -7,7 +7,8 @@ export enum SortOrder {
   Latest = 'Latest',
   Oldest = 'Oldest',
   Recent = 'Recent',
-  MoveDate = 'MoveDate',
+  UpcomingMoveDate = 'UpcomingMoveDate',
+  RecentRequest = 'RecentRequest',
 }
 
 export interface FindOptions extends OffsetPaginationOptions {
@@ -17,6 +18,6 @@ export interface FindOptions extends OffsetPaginationOptions {
 
 export interface RequestFilter {
   moveType?: string;
-  serviceArea?: string;
+  serviceArea?: boolean;
   designated?: boolean;
 }

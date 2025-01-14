@@ -15,7 +15,7 @@ export class MoveRepository implements IMoveRepository {
   }
 
   async findMany(options: GetQueries & Partial<RequestFilter>, driverId: string, driverAvailableAreas: Area[]) {
-    const { page = 1, pageSize = 10, orderBy = SortOrder.Recent, keyword, moveType, serviceArea, designated } = options;
+    const { page = 1, pageSize = 10, orderBy, keyword, moveType, serviceArea, designated } = options;
 
     const whereCondition = {
       ...(keyword && {
@@ -50,14 +50,20 @@ export class MoveRepository implements IMoveRepository {
         }),
     };
 
+    let orderByCondition;
+    if (orderBy === SortOrder.UpcomingMoveDate) {
+      orderByCondition = { date: 'asc' };
+    } else if (orderBy === SortOrder.RecentRequest) {
+      orderByCondition = { createdAt: 'desc' };
+    } else {
+      orderByCondition = { createdAt: 'desc' };
+    }
+
     const list = await this.moveInfo.findMany({
       where: whereCondition,
       skip: (page - 1) * pageSize,
       take: pageSize,
-      orderBy:
-        orderBy === SortOrder.MoveDate
-          ? { date: SortOrder.Recent ? 'desc' : 'asc' }
-          : { createdAt: SortOrder.Recent ? 'desc' : 'asc' },
+      orderBy: orderByCondition,
       include: {
         owner: { select: { name: true } },
       },
