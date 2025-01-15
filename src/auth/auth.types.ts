@@ -57,14 +57,6 @@ export class UpdatePasswordDTO {
   newSalt?: string;
 }
 
-export class UpdatePasswordDTOWithoutHash extends OmitType(UpdatePasswordDTO, ['oldPw', 'oldSalt', 'newPw', 'newSalt']) {
-  @ApiProperty({ description: '기존 비밀번호' })
-  oldPw: string;
-
-  @ApiProperty({ description: '새 비밀번호' })
-  newPw: string;
-}
-
 export type FilteredPerson = FilteredPersonalInfo<User> | FilteredPersonalInfo<Driver>;
 
 export interface FilteredPersonWithToken extends Tokens {
