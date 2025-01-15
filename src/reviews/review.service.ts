@@ -5,6 +5,8 @@ import { Injectable } from '@nestjs/common';
 import { AsyncLocalStorage } from 'async_hooks';
 import { ReviewRepository } from './review.repository.js';
 import { ReviewInputDTO } from './review.types.js';
+import { ForbiddenException } from '#exceptions/http.exception.js';
+import { ReviewNotFoundException } from './review.exception.js';
 
 @Injectable()
 export class ReviewService implements IReviewService {
@@ -41,12 +43,30 @@ export class ReviewService implements IReviewService {
   }
 
   async patchReview(reviewId: string, body: Partial<ReviewInputDTO>) {
+    const { userId } = this.als.getStore();
+    const reviewInfo = await this.reviewRepository.findByReviewId(reviewId);
+    if (!reviewInfo) {
+      throw new ReviewNotFoundException();
+    }
+    if (reviewInfo.ownerId !== userId) {
+      throw new ForbiddenException();
+    }
+
     const review = await this.reviewRepository.update(reviewId, body);
 
     return review;
   }
 
   async deleteReview(reviewId: string) {
+    const { userId } = this.als.getStore();
+    const reviewInfo = await this.reviewRepository.findByReviewId(reviewId);
+    if (!reviewInfo) {
+      throw new ReviewNotFoundException();
+    }
+    if (reviewInfo.ownerId !== userId) {
+      throw new ForbiddenException();
+    }
+
     const review = await this.reviewRepository.delete(reviewId);
 
     return review;
