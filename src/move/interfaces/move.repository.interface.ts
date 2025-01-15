@@ -10,7 +10,7 @@ export interface IMoveRepository {
   ) => Promise<{ totalCount: number; list: MoveInfo[] }>;
   findByUserId: (userId: string) => Promise<MoveInfo[]>;
   findByMoveInfoId: (userId: string) => Promise<MoveInfo> | null;
-  create: (data: MoveInfoInputDTO) => void;
+  createMoveInfo: (moveData: MoveInfoInputDTO) => Promise<MoveInfo>; 
   update: (id: string, data: Partial<MoveInfoInputDTO>) => void;
   delete: (id: string) => void;
 }

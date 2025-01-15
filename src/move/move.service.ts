@@ -5,6 +5,7 @@ import { Injectable } from '@nestjs/common';
 import { AsyncLocalStorage } from 'async_hooks';
 import { MoveRepository } from './move.repository.js';
 import { GetQueries } from '#types/queries.type.js';
+import { MoveInfoInputDTO, MoveInfo } from './move.types.js';
 
 @Injectable()
 export class MoveService implements IMoveService {
@@ -27,4 +28,10 @@ export class MoveService implements IMoveService {
 
     return moveInfo;
   }
+
+  async createMoveInfo(moveData: MoveInfoInputDTO): Promise<MoveInfo> {
+      const moveInfo = await this.moveRepository.createMoveInfo(moveData);
+      return moveInfo;
+  }
+
 }

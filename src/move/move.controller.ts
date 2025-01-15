@@ -1,10 +1,11 @@
 import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { IMoveController } from '#move/interfaces/move.controller.interface.js';
 import { FindOptions, RequestFilter } from '#types/options.type.js';
-import { Controller, Get, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Patch, Post, Query, UseGuards, Body } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 import { MoveService } from './move.service.js';
 import { GetQueries } from '#types/queries.type.js';
+import { MoveInfoInputDTO, MoveInfo } from './move.types.js';
 
 @Controller('moves')
 export class MoveController implements IMoveController {
@@ -15,7 +16,6 @@ export class MoveController implements IMoveController {
   @ApiOperation({ summary: '이사 정보 목록 조회' })
   async getMoveInfos(@Query() options: GetQueries & Partial<RequestFilter>) {
     const request = await this.moveService.getMoveInfos(options);
-
     return request;
   }
 
@@ -28,8 +28,12 @@ export class MoveController implements IMoveController {
   }
 
   @Post()
+  //@UseGuards(AccessTokenGuard)
   @ApiOperation({ summary: '이사 정보 생성' })
-  async postMoveInfo() {}
+  async creatMoveInfo(@Body() moveData: MoveInfoInputDTO): Promise<MoveInfo> {
+    const moveInfo = await this.moveService.createMoveInfo(moveData);
+    return moveInfo;
+  }
 
   @Patch(':id')
   @ApiOperation({ summary: '이사 정보 수정' })
