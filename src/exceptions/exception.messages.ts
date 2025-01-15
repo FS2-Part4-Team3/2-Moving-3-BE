@@ -9,6 +9,7 @@ enum ExceptionMessages {
   USER_ALREADY_EXIST = '이미 존재하는 사용자입니다.',
   WRONG_CREDENTIAL = '아이디 혹은 비밀번호가 틀렸습니다.',
   WRONG_PASSWORD = '비밀번호가 틀렸습니다.',
+  INVALID_PASSWORD_TYPE = '비밀번호는 8자 이상의 영문/숫자/특수문자의 조합입니다.',
 
   DRIVER_NOT_FOUND = '찾을 수 없는 기사입니다.',
   ALREADY_LIKED = '이미 찜해둔 기사입니다.',

@@ -1,4 +1,5 @@
 import { Driver } from '#drivers/driver.types.js';
+import ExceptionMessages from '#exceptions/exception.messages.js';
 import { UserType } from '#types/common.types.js';
 import { FilteredPersonalInfo } from '#types/personal.type.js';
 import { User } from '#users/user.types.js';
@@ -23,9 +24,9 @@ export class SignInDTO {
   password: string;
 }
 
-const phoneNumberRegex =
+export const phoneNumberRegex =
   /^(010\d{4}\d{4}|02\d{4}\d{4}|032\d{4}\d{4}|042\d{4}\d{4}|051\d{4}\d{4}|052\d{4}\d{4}|053\d{4}\d{4}|062\d{4}\d{4}|064\d{4}\d{4}|031\d{4}\d{4}|033\d{4}\d{4}|041\d{4}\d{4}|043\d{4}\d{4}|054\d{4}\d{4}|055\d{4}\d{4}|061\d{4}\d{4}|063\d{4}\d{4})$/;
-const passwordRegex = /^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
+export const passwordRegex = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*])[a-zA-Z\d!@#$%^&*]{8,}$/;
 
 export class SignUpDTO {
   @ApiProperty({ description: '이메일' })
@@ -48,6 +49,7 @@ export class SignUpDTO {
 
 export class UpdatePasswordDTO {
   @ApiProperty({ description: '기존 비밀번호' })
+  @Matches(passwordRegex, { message: `oldPw: ${ExceptionMessages.INVALID_PASSWORD_TYPE}` })
   oldPw: string;
   oldSalt?: string;
 
