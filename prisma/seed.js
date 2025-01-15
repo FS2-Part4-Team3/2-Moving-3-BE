@@ -133,7 +133,22 @@ async function main() {
     driverId: drivers[faker.number.int({ min: 0, max: 19 })].id,
     ownerId: users[faker.number.int({ min: 0, max: 19 })].id,
   }));
-  await prisma.review.createMany({ data: reviews });
+  // await prisma.review.createMany({ data: reviews });
+  for (const review of reviews) {
+    await prisma.$transaction(async tx => {
+      await tx.review.create({ data: review });
+
+      const rating = await tx.review.aggregate({
+        where: { driverId: review.driverId },
+        _avg: { score: true },
+      });
+
+      await tx.driver.update({
+        where: { id: review.driverId },
+        data: { rating: Number(rating._avg.score.toFixed(2)) || 0 },
+      });
+    });
+  }
 
   // Generate mock data for UserNotification
   const userNotifications = Array.from({ length: 20 }).map(() => ({

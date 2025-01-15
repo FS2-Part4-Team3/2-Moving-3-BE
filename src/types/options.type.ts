@@ -31,6 +31,7 @@ export enum DriverSortOrder {
   MostReviewed = 'MostReviewed',
   HighestRating = 'HighestRating',
   MostApplied = 'MostApplied',
+  HighestCareer = 'HighestCareer',
 }
 
 export class FindOptions extends OffsetPaginationOptions {

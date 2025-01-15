@@ -41,6 +41,7 @@ export class RefreshTokenGuard implements CanActivate {
       const storage = this.als.getStore();
       storage.refreshToken = token;
       storage.type = payload.type;
+      person.type = payload.type;
 
       switch (payload.type) {
         case UserType.User:
