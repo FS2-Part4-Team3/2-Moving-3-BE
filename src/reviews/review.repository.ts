@@ -73,7 +73,11 @@ export class ReviewRepository implements IReviewRepository {
     return list;
   }
 
-  async findById(id: string) {}
+  async findByReviewId(id: string) {
+    const review = await this.review.findUnique({ where: { id } });
+
+    return review;
+  }
 
   async create(data: ReviewInputDTO) {
     const review = await this.review.create({ data });
