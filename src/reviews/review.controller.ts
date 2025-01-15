@@ -1,9 +1,9 @@
 import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { IReviewController } from '#reviews/interfaces/review.controller.interface.js';
-import { Body, Controller, Delete, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
-import { ApiOperation } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { ReviewService } from './review.service.js';
-import { ReviewInputDTO } from './review.types.js';
+import { DriverReviewResponseDTO, MyReviewResponseDTO, ReviewInputDTO, ReviewOutputDTO } from './review.types.js';
 import { GetQueries } from '#types/queries.type.js';
 import { SortOrder } from '#types/options.type.js';
 
@@ -13,7 +13,12 @@ export class ReviewController implements IReviewController {
 
   @Get('my')
   @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth('accessToken')
   @ApiOperation({ summary: '내가 작성한 리뷰 조회' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: MyReviewResponseDTO,
+  })
   async getMyReviews(@Query() query: GetQueries) {
     const { page = 1, pageSize = 10, orderBy = SortOrder.Recent, keyword = '' } = query;
     const options = { page, pageSize, orderBy, keyword };
@@ -25,6 +30,11 @@ export class ReviewController implements IReviewController {
 
   @Get(':driverId')
   @ApiOperation({ summary: '기사 리뷰 조회' })
+  @ApiParam({ name: 'driverId', description: '기사 ID', type: 'string' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: DriverReviewResponseDTO,
+  })
   async getDriverReviews(@Param('driverId') driverId: string, @Query() query: GetQueries) {
     const { page = 1, pageSize = 10, orderBy = SortOrder.Recent, keyword = '' } = query;
     const options = { page, pageSize, orderBy, keyword };
@@ -36,16 +46,30 @@ export class ReviewController implements IReviewController {
 
   @Post(':driverId')
   @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth('accessToken')
   @ApiOperation({ summary: '리뷰 생성' })
+  @ApiParam({ name: 'driverId', description: '기사 ID', type: 'string' })
+  @ApiBody({ type: ReviewInputDTO })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: ReviewOutputDTO,
+  })
   async postReview(@Param('driverId') driverId: string, @Body() body: ReviewInputDTO) {
     const review = await this.reviewService.postReview(driverId, body);
 
     return review;
   }
 
-  @Post('patch/:reviewId')
+  @Patch(':reviewId')
   @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth('accessToken')
   @ApiOperation({ summary: '리뷰 수정' })
+  @ApiParam({ name: 'reviewId', description: '리뷰 ID', type: 'string' })
+  @ApiBody({ type: ReviewInputDTO })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: ReviewOutputDTO,
+  })
   async patchReview(@Param('reviewId') reviewId: string, @Body() body: Partial<ReviewInputDTO>) {
     const review = await this.reviewService.patchReview(reviewId, body);
 
@@ -54,7 +78,13 @@ export class ReviewController implements IReviewController {
 
   @Delete(':reviewId')
   @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth('accessToken')
   @ApiOperation({ summary: '리뷰 삭제' })
+  @ApiParam({ name: 'reviewId', description: '리뷰 ID', type: 'string' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: ReviewOutputDTO,
+  })
   async deleteReview(@Param('reviewId') reviewId: string) {
     const review = await this.reviewService.deleteReview(reviewId);
 
