@@ -13,7 +13,7 @@ export interface MoveInfoInputDTO extends Omit<MoveInfo, keyof ModelBase> {}
 export class MoveInfoInputDTO {
   @IsNotEmpty()
   @IsEnum(ServiceType)
-  type: ServiceType;
+  ServiceType: ServiceType;
 
   @IsNotEmpty()
   @Type(() => Date)
