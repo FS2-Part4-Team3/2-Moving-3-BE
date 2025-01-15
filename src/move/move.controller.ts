@@ -28,7 +28,7 @@ export class MoveController implements IMoveController {
   }
 
   @Post()
-  //@UseGuards(AccessTokenGuard)
+  @UseGuards(AccessTokenGuard)
   @ApiOperation({ summary: '이사 정보 생성' })
   async creatMoveInfo(@Body() moveData: MoveInfoInputDTO): Promise<MoveInfo> {
     const moveInfo = await this.moveService.createMoveInfo(moveData);
