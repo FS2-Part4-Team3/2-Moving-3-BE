@@ -160,7 +160,7 @@ export class AuthController implements IAuthController {
   async googleAuthRedirect(@Req() req, @Res({ passthrough: true }) response: Response) {
     const redirectResult: GoogleAuthType = req.user;
 
-    const { person, accessToken, refreshToken, userType } = await this.authService.googleAuth(redirectResult);
+    const { person, accessToken, refreshToken } = await this.authService.googleAuth(redirectResult);
     response.cookie('refreshToken', refreshToken);
 
     return { person, accessToken };

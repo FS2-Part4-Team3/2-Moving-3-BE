@@ -1,10 +1,10 @@
 import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { IMoveController } from '#move/interfaces/move.controller.interface.js';
-import { FindOptions, RequestFilter } from '#types/options.type.js';
+import { RequestFilter } from '#types/options.type.js';
+import { GetQueries } from '#types/queries.type.js';
 import { Controller, Get, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 import { MoveService } from './move.service.js';
-import { GetQueries } from '#types/queries.type.js';
 
 @Controller('moves')
 export class MoveController implements IMoveController {

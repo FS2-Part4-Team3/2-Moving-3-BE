@@ -129,8 +129,9 @@ export class AuthService implements IAuthService {
 
       const accessToken = await this.jwtGenerateService.generateAccessToken({ id: target.id, type: userType });
       const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: target.id, type: userType });
+      target.type = userType;
 
-      return { person: filterSensitiveData(target), accessToken, refreshToken, userType };
+      return { person: filterSensitiveData(target), accessToken, refreshToken };
     }
 
     const data: GoogleCreateDTO = { email, name, image: photo, provider, providerId: id };
@@ -138,7 +139,8 @@ export class AuthService implements IAuthService {
 
     const accessToken = await this.jwtGenerateService.generateAccessToken({ id: person.id, type: userType });
     const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: person.id, type: userType });
+    person.type = userType;
 
-    return { person: filterSensitiveData(person), accessToken, refreshToken, userType };
+    return { person: filterSensitiveData(person), accessToken, refreshToken };
   }
 }
