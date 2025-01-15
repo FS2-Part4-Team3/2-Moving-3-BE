@@ -54,7 +54,7 @@ class OwnerMoveInfosDTO {
 }
 
 class OwnerNameDTO {
-  @ApiProperty({ description: '이사 정보 목록', type: String })
+  @ApiProperty({ description: '작성자 이름', type: String })
   name: String;
 }
 

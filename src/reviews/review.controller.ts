@@ -51,7 +51,7 @@ export class ReviewController implements IReviewController {
   @ApiParam({ name: 'driverId', description: '기사 ID', type: 'string' })
   @ApiBody({ type: ReviewInputDTO })
   @ApiResponse({
-    status: HttpStatus.OK,
+    status: HttpStatus.CREATED,
     type: ReviewOutputDTO,
   })
   async postReview(@Param('driverId') driverId: string, @Body() body: ReviewInputDTO) {
