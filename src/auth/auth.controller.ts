@@ -5,7 +5,7 @@ import {
   GoogleAuthType,
   SignInDTO,
   SignUpDTO,
-  SignUpDTOWithoutHash,
+  UpdatePasswordDTO,
 } from '#auth/auth.types.js';
 import { IAuthController } from '#auth/interfaces/auth.controller.interface.js';
 import { BadRequestException } from '#exceptions/http.exception.js';
@@ -14,11 +14,10 @@ import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { HashPasswordGuard } from '#guards/hash-password.guard.js';
 import { RefreshTokenGuard } from '#guards/refresh-token.guard.js';
 import { UserType } from '#types/common.types.js';
-import { Body, Controller, Get, HttpStatus, Param, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Param, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import {
   ApiBearerAuth,
-  ApiBody,
   ApiCookieAuth,
   ApiExcludeEndpoint,
   ApiOperation,
@@ -36,7 +35,6 @@ export class AuthController implements IAuthController {
   @UseGuards(HashPasswordGuard)
   @ApiOperation({ summary: '회원가입' })
   @ApiParam({ name: 'userType', enum: UserType })
-  @ApiBody({ type: SignUpDTOWithoutHash })
   @ApiResponse({
     status: HttpStatus.CREATED,
     schema: {
@@ -53,6 +51,26 @@ export class AuthController implements IAuthController {
     @Res({ passthrough: true }) response: Response,
   ) {
     const { person, accessToken, refreshToken } = await this.authService.createPerson(body, type);
+    response.cookie('refreshToken', refreshToken);
+
+    return { person, accessToken };
+  }
+
+  @Patch('password')
+  @UseGuards(HashPasswordGuard, AccessTokenGuard)
+  @ApiOperation({ summary: '비밀번호 변경' })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    schema: {
+      type: 'object',
+      properties: {
+        person: { oneOf: [{ $ref: getSchemaPath(FilteredUserOutputDTO) }, { $ref: getSchemaPath(FilteredDriverOutputDTO) }] },
+        accessToken: { type: 'string' },
+      },
+    },
+  })
+  async updatePassword(@Body() body: UpdatePasswordDTO, @Res({ passthrough: true }) response: Response) {
+    const { person, accessToken, refreshToken } = await this.authService.updatePassword(body);
     response.cookie('refreshToken', refreshToken);
 
     return { person, accessToken };
@@ -142,7 +160,7 @@ export class AuthController implements IAuthController {
   async googleAuthRedirect(@Req() req, @Res({ passthrough: true }) response: Response) {
     const redirectResult: GoogleAuthType = req.user;
 
-    const { person, accessToken, refreshToken, userType } = await this.authService.googleAuth(redirectResult);
+    const { person, accessToken, refreshToken } = await this.authService.googleAuth(redirectResult);
     response.cookie('refreshToken', refreshToken);
 
     return { person, accessToken };

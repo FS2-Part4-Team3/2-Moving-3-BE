@@ -4,7 +4,7 @@ import { FilteredPersonalInfo } from '#types/personal.type.js';
 import { User } from '#users/user.types.js';
 import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { Area, ServiceType } from '@prisma/client';
-import { IsEmail, IsEnum, IsHexadecimal, IsNotEmpty, IsString, Length, Matches } from 'class-validator';
+import { IsEmail, IsEnum, IsNotEmpty, IsString, Matches } from 'class-validator';
 
 export interface TokenPayload {
   id: string;
@@ -36,17 +36,28 @@ export class SignUpDTO {
   @IsNotEmpty({ message: '이름은 1글자 이상이어야 합니다.' })
   name: string;
 
-  @IsHexadecimal()
-  @Length(128, 128)
+  @ApiProperty({ description: '비밀번호' })
   password: string;
-
-  @IsHexadecimal()
-  @Length(32, 32)
-  salt: string;
+  salt?: string;
 
   @ApiProperty({ description: '전화번호' })
   @Matches(phoneNumberRegex, { message: '올바른 휴대전화 번호를 입력해주세요.' })
   phoneNumber: string;
+}
+
+export class SignUpDTOWithoutHash extends OmitType(SignUpDTO, ['password', 'salt']) {
+  @ApiProperty({ description: '비밀번호' })
+  password: string;
+}
+
+export class UpdatePasswordDTO {
+  @ApiProperty({ description: '기존 비밀번호' })
+  oldPw: string;
+  oldSalt?: string;
+
+  @ApiProperty({ description: '새 비밀번호' })
+  newPw: string;
+  newSalt?: string;
 }
 
 export type FilteredPerson = FilteredPersonalInfo<User> | FilteredPersonalInfo<Driver>;
@@ -120,13 +131,6 @@ export class FilteredDriverOutputDTO {
 
   @ApiProperty({ description: '경력 년수' })
   career: number;
-}
-
-export class SignUpDTOWithoutHash extends OmitType(SignUpDTO, ['password', 'salt']) {
-  @IsString({ message: '비밀번호는 문자열 형식입니다.' })
-  @IsNotEmpty({ message: '비밀번호는 1글자 이상이어야 합니다.' })
-  @ApiProperty({ description: '비밀번호' })
-  password: string;
 }
 
 export class UserTypeParamDTO {

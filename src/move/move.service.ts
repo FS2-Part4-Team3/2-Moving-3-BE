@@ -1,10 +1,10 @@
 import { IMoveService } from '#move/interfaces/move.service.interface.js';
 import { IStorage } from '#types/common.types.js';
-import { FindOptions, RequestFilter } from '#types/options.type.js';
+import { RequestFilter } from '#types/options.type.js';
+import { GetQueries } from '#types/queries.type.js';
 import { Injectable } from '@nestjs/common';
 import { AsyncLocalStorage } from 'async_hooks';
 import { MoveRepository } from './move.repository.js';
-import { GetQueries } from '#types/queries.type.js';
 
 @Injectable()
 export class MoveService implements IMoveService {
