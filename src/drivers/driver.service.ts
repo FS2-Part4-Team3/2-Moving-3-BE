@@ -26,9 +26,7 @@ export class DriverService implements IDriverService {
     const list = drivers.map(driver => {
       const result = filterSensitiveData(driver);
       const reviews = result.reviews;
-      const rating = reviews.reduce((acc, cur) => acc + cur.score, 0) / reviews.length;
       result.reviewCount = reviews.length;
-      result.rating = rating ? rating.toFixed(2) : 0;
       delete result.reviews;
 
       const career = Math.floor((Date.now() - driver.startAt) / 1000 / 86400 / 365);

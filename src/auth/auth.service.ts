@@ -46,6 +46,7 @@ export class AuthService implements IAuthService {
     const person = await repo.createBySignUp(data);
     const accessToken = await this.jwtGenerateService.generateAccessToken({ id: person.id, type });
     const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: person.id, type });
+    person.type = type;
 
     return { person: filterSensitiveData(person), accessToken, refreshToken };
   }
@@ -65,6 +66,7 @@ export class AuthService implements IAuthService {
 
     const accessToken = await this.jwtGenerateService.generateAccessToken({ id: target.id, type });
     const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: target.id, type });
+    target.type = type;
 
     return { person: filterSensitiveData(target), accessToken, refreshToken };
   }

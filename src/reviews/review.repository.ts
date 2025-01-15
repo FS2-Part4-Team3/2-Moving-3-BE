@@ -11,6 +11,18 @@ export class ReviewRepository implements IReviewRepository {
     this.review = prisma.review;
   }
 
+  private async updateDriverRating(tx: any, driverId: string) {
+    const rating = await tx.review.aggregate({
+      where: { driverId },
+      _avg: { score: true },
+    });
+
+    await tx.driver.update({
+      where: { id: driverId },
+      data: { rating: Number(rating._avg.score.toFixed(2)) || 0 },
+    });
+  }
+
   async totalCount(id: string, type: 'user' | 'driver') {
     const whereCondition = type === 'user' ? { ownerId: id } : type === 'driver' ? { driverId: id } : {};
     const totalCount = await this.review.count({ where: whereCondition });
@@ -80,19 +92,38 @@ export class ReviewRepository implements IReviewRepository {
   }
 
   async create(data: ReviewInputDTO) {
-    const review = await this.review.create({ data });
+    const review = await this.prisma.$transaction(async tx => {
+      const review = await tx.review.create({ data });
+      await this.updateDriverRating(tx, data.driverId);
+      return review;
+    });
 
     return review;
   }
 
   async update(id: string, data: Partial<ReviewInputDTO>) {
-    const review = await this.review.update({ where: { id }, data });
+    const review = await this.prisma.$transaction(async tx => {
+      const review = await tx.review.update({
+        where: { id },
+        data,
+      });
+      await this.updateDriverRating(tx, review.driverId);
+      return review;
+    });
 
     return review;
   }
 
   async delete(id: string) {
-    const review = await this.review.delete({ where: { id } });
+    const review = await this.prisma.$transaction(async tx => {
+      const review = await tx.review.findUnique({
+        where: { id },
+      });
+      await tx.review.delete({ where: { id } });
+      await this.updateDriverRating(tx, review.driverId);
+
+      return review;
+    });
 
     return review;
   }

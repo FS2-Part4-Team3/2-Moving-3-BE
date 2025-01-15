@@ -38,6 +38,7 @@ export class AccessTokenGuard implements CanActivate {
       const storage = this.als.getStore();
       storage.accessToken = token;
       storage.type = payload.type;
+      person.type = payload.type;
 
       switch (payload.type) {
         case UserType.User:

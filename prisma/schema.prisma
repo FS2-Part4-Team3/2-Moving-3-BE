@@ -57,8 +57,9 @@ model Driver {
   availableAreas Area[]
   startAt        DateTime      @default(now())
 
-  applyCount Int @default(0)
-  likeCount  Int @default(0)
+  applyCount Int   @default(0)
+  likeCount  Int   @default(0)
+  rating     Float @default(0)
 
   provider   String?
   providerId String?

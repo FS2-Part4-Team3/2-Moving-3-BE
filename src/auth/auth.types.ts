@@ -23,6 +23,9 @@ export class SignInDTO {
   password: string;
 }
 
+const numberRegex =
+  /^(010\d{4}\d{4}|02\d{4}\d{4}|032\d{4}\d{4}|042\d{4}\d{4}|051\d{4}\d{4}|052\d{4}\d{4}|053\d{4}\d{4}|062\d{4}\d{4}|064\d{4}\d{4}|031\d{4}\d{4}|033\d{4}\d{4}|041\d{4}\d{4}|043\d{4}\d{4}|054\d{4}\d{4}|055\d{4}\d{4}|061\d{4}\d{4}|063\d{4}\d{4})$/;
+
 export class SignUpDTO {
   @ApiProperty({ description: '이메일' })
   @IsEmail({}, { message: '이메일 형식 입력이 필요합니다.' })
@@ -42,7 +45,7 @@ export class SignUpDTO {
   salt: string;
 
   @ApiProperty({ description: '전화번호' })
-  @Matches(/(010)-\d{3,4}-\d{4}/, { message: '010으로 시작하는 휴대전화 번호를 입력해주세요.' })
+  @Matches(numberRegex, { message: '올바른 휴대전화 번호를 입력해주세요.' })
   phoneNumber: string;
 }
 
