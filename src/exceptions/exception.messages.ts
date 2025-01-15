@@ -8,6 +8,7 @@ enum ExceptionMessages {
   USER_NOT_FOUND = '찾을 수 없는 사용자입니다.',
   USER_ALREADY_EXIST = '이미 존재하는 사용자입니다.',
   WRONG_CREDENTIAL = '아이디 혹은 비밀번호가 틀렸습니다.',
+  WRONG_PASSWORD = '비밀번호가 틀렸습니다.',
 
   DRIVER_NOT_FOUND = '찾을 수 없는 기사입니다.',
   ALREADY_LIKED = '이미 찜해둔 기사입니다.',
@@ -18,6 +19,8 @@ enum ExceptionMessages {
   ESTIMATION_NOT_FOUND = '찾을 수 없는 견적입니다.',
 
   QUESTION_NOT_FOUND = '찾을 수 없는 문의입니다.',
+
+  REVIEW_NOT_FOUND = '찾을 수 없는 리뷰입니다.',
 
   INVALID_USER_TYPE = '사용자 형식이 올바르지 않습니다.',
   ID_FORMAT = 'ID 형식이 올바르지 않습니다.',

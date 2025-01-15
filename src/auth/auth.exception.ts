@@ -7,6 +7,12 @@ export class AuthWrongCredentialException extends UnauthorizedException {
   }
 }
 
+export class AuthWrongPasswordException extends UnauthorizedException {
+  constructor() {
+    super(ExceptionMessages.WRONG_PASSWORD);
+  }
+}
+
 export class AuthInvalidTokenException extends UnauthorizedException {
   constructor() {
     super(ExceptionMessages.INVALID_TOKEN);

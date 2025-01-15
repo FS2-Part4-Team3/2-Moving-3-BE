@@ -7,6 +7,7 @@ import { MoveService } from './move.service.js';
 import { GetQueries } from '#types/queries.type.js';
 import { MoveInfoInputDTO, MoveInfo } from './move.types.js';
 
+
 @Controller('moves')
 export class MoveController implements IMoveController {
   constructor(private readonly moveService: MoveService) {}
