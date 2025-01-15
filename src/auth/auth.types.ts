@@ -4,7 +4,7 @@ import { FilteredPersonalInfo } from '#types/personal.type.js';
 import { User } from '#users/user.types.js';
 import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { Area, ServiceType } from '@prisma/client';
-import { IsEmail, IsEnum, IsHexadecimal, IsNotEmpty, IsString, Length, Matches } from 'class-validator';
+import { IsEmail, IsEnum, IsNotEmpty, IsString, Matches } from 'class-validator';
 
 export interface TokenPayload {
   id: string;
@@ -23,6 +23,9 @@ export class SignInDTO {
   password: string;
 }
 
+const numberRegex =
+  /^(010\d{4}\d{4}|02\d{4}\d{4}|032\d{4}\d{4}|042\d{4}\d{4}|051\d{4}\d{4}|052\d{4}\d{4}|053\d{4}\d{4}|062\d{4}\d{4}|064\d{4}\d{4}|031\d{4}\d{4}|033\d{4}\d{4}|041\d{4}\d{4}|043\d{4}\d{4}|054\d{4}\d{4}|055\d{4}\d{4}|061\d{4}\d{4}|063\d{4}\d{4})$/;
+
 export class SignUpDTO {
   @ApiProperty({ description: '이메일' })
   @IsEmail({}, { message: '이메일 형식 입력이 필요합니다.' })
@@ -33,17 +36,28 @@ export class SignUpDTO {
   @IsNotEmpty({ message: '이름은 1글자 이상이어야 합니다.' })
   name: string;
 
-  @IsHexadecimal()
-  @Length(128, 128)
+  @ApiProperty({ description: '비밀번호' })
   password: string;
-
-  @IsHexadecimal()
-  @Length(32, 32)
-  salt: string;
+  salt?: string;
 
   @ApiProperty({ description: '전화번호' })
-  @Matches(/(010)-\d{3,4}-\d{4}/, { message: '010으로 시작하는 휴대전화 번호를 입력해주세요.' })
+  @Matches(numberRegex, { message: '올바른 휴대전화 번호를 입력해주세요.' })
   phoneNumber: string;
+}
+
+export class SignUpDTOWithoutHash extends OmitType(SignUpDTO, ['password', 'salt']) {
+  @ApiProperty({ description: '비밀번호' })
+  password: string;
+}
+
+export class UpdatePasswordDTO {
+  @ApiProperty({ description: '기존 비밀번호' })
+  oldPw: string;
+  oldSalt?: string;
+
+  @ApiProperty({ description: '새 비밀번호' })
+  newPw: string;
+  newSalt?: string;
 }
 
 export type FilteredPerson = FilteredPersonalInfo<User> | FilteredPersonalInfo<Driver>;
@@ -117,13 +131,6 @@ export class FilteredDriverOutputDTO {
 
   @ApiProperty({ description: '경력 년수' })
   career: number;
-}
-
-export class SignUpDTOWithoutHash extends OmitType(SignUpDTO, ['password', 'salt']) {
-  @IsString({ message: '비밀번호는 문자열 형식입니다.' })
-  @IsNotEmpty({ message: '비밀번호는 1글자 이상이어야 합니다.' })
-  @ApiProperty({ description: '비밀번호' })
-  password: string;
 }
 
 export class UserTypeParamDTO {

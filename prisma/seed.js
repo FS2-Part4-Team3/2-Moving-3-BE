@@ -56,13 +56,13 @@ async function main() {
   // Generate mock data for Driver
   const drivers = Array.from({ length: 20 }).map(() => {
     const driverServiceTypes = [];
-    for (let i = 0; i < faker.number.int({ min: 1, max: 3 }); i++) {
-      const index = faker.number.int({ min: 0, max: 2 });
+    for (let i = 0; i < faker.number.int({ min: 1, max: serviceTypes.length }); i++) {
+      const index = faker.number.int({ min: 0, max: serviceTypes.length - 1 });
       if (!driverServiceTypes.includes(serviceTypes[index])) driverServiceTypes.push(serviceTypes[index]);
     }
     const driverAreas = [];
-    for (let i = 0; i < faker.number.int({ min: 1, max: 17 }); i++) {
-      const index = faker.number.int({ min: 0, max: 16 });
+    for (let i = 0; i < faker.number.int({ min: 1, max: areas.length }); i++) {
+      const index = faker.number.int({ min: 0, max: areas.length - 1 });
       if (!driverAreas.includes(areas[index])) driverAreas.push(areas[index]);
     }
 
@@ -133,7 +133,22 @@ async function main() {
     driverId: drivers[faker.number.int({ min: 0, max: 19 })].id,
     ownerId: users[faker.number.int({ min: 0, max: 19 })].id,
   }));
-  await prisma.review.createMany({ data: reviews });
+  // await prisma.review.createMany({ data: reviews });
+  for (const review of reviews) {
+    await prisma.$transaction(async tx => {
+      await tx.review.create({ data: review });
+
+      const rating = await tx.review.aggregate({
+        where: { driverId: review.driverId },
+        _avg: { score: true },
+      });
+
+      await tx.driver.update({
+        where: { id: review.driverId },
+        data: { rating: Number(rating._avg.score.toFixed(2)) || 0 },
+      });
+    });
+  }
 
   // Generate mock data for UserNotification
   const userNotifications = Array.from({ length: 20 }).map(() => ({

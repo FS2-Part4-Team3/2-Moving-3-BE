@@ -21,10 +21,13 @@ export class DriverRepository implements IDriverRepository {
         sort = { reviews: { _count: 'desc' } };
         break;
       case DriverSortOrder.HighestRating:
-        sort = { reviews: { _avg: { score: 'desc' } } };
+        sort = { rating: 'desc' };
         break;
       case DriverSortOrder.MostApplied:
         sort = { applyCount: 'desc' };
+        break;
+      case DriverSortOrder.HighestCareer:
+        sort = { startAt: 'asc' };
         break;
       default:
         sort = { createdAt: 'desc' };
@@ -34,7 +37,7 @@ export class DriverRepository implements IDriverRepository {
     const typeCondition = serviceType ? { serviceTypes: { has: serviceType } } : {};
 
     const where = {
-      name: { contains: keyword },
+      OR: [{ name: { contains: keyword } }, { introduce: { contains: keyword } }],
       ...areaCondition,
       ...typeCondition,
     };
@@ -46,9 +49,9 @@ export class DriverRepository implements IDriverRepository {
   }
 
   async count(options: DriversFindOptions) {
-    const findCondition = this.generateFindCondition(options);
+    const { where } = this.generateFindCondition(options);
 
-    const count = await this.driver.count({ ...findCondition });
+    const count = await this.driver.count({ where });
 
     return count;
   }

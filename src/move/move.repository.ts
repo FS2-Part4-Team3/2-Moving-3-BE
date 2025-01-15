@@ -1,7 +1,7 @@
 import { PrismaService } from '#global/prisma.service.js';
 import { IMoveRepository } from '#move/interfaces/move.repository.interface.js';
 import { MoveInfoInputDTO } from '#move/move.types.js';
-import { FindOptions, RequestFilter, SortOrder } from '#types/options.type.js';
+import { RequestFilter, SortOrder } from '#types/options.type.js';
 import { GetQueries } from '#types/queries.type.js';
 import { areaToKeyword } from '#utils/address-utils.js';
 import { Injectable } from '@nestjs/common';

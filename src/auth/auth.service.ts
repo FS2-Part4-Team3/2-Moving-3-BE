@@ -2,8 +2,9 @@ import {
   AuthInvalidRefreshTokenException,
   AuthUserAlreadyExistException,
   AuthWrongCredentialException,
+  AuthWrongPasswordException,
 } from '#auth/auth.exception.js';
-import { GoogleAuthType, GoogleCreateDTO, SignInDTO, SignUpDTO } from '#auth/auth.types.js';
+import { GoogleAuthType, GoogleCreateDTO, SignInDTO, SignUpDTO, UpdatePasswordDTO } from '#auth/auth.types.js';
 import { IAuthService } from '#auth/interfaces/auth.service.interface.js';
 import { JwtGenerateService } from '#auth/jwt-generate.service.js';
 import { DriverRepository } from '#drivers/driver.repository.js';
@@ -46,6 +47,25 @@ export class AuthService implements IAuthService {
     const person = await repo.createBySignUp(data);
     const accessToken = await this.jwtGenerateService.generateAccessToken({ id: person.id, type });
     const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: person.id, type });
+    person.type = type;
+
+    return { person: filterSensitiveData(person), accessToken, refreshToken };
+  }
+
+  async updatePassword(body: UpdatePasswordDTO) {
+    const { type, user, driver } = this.als.getStore();
+    const repo = type === UserType.User ? this.userRepository : this.driverRepository;
+
+    const target = type === UserType.User ? user : driver;
+    if (target.password !== hashingPassword(body.oldPw, target.salt)) {
+      throw new AuthWrongPasswordException();
+    }
+
+    const data = { password: body.newPw, salt: body.newSalt };
+    const person = await repo.update(target.id, data);
+    const accessToken = await this.jwtGenerateService.generateAccessToken({ id: person.id, type });
+    const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: person.id, type });
+    person.type = type;
 
     return { person: filterSensitiveData(person), accessToken, refreshToken };
   }
@@ -65,6 +85,7 @@ export class AuthService implements IAuthService {
 
     const accessToken = await this.jwtGenerateService.generateAccessToken({ id: target.id, type });
     const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: target.id, type });
+    target.type = type;
 
     return { person: filterSensitiveData(target), accessToken, refreshToken };
   }
@@ -108,8 +129,9 @@ export class AuthService implements IAuthService {
 
       const accessToken = await this.jwtGenerateService.generateAccessToken({ id: target.id, type: userType });
       const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: target.id, type: userType });
+      target.type = userType;
 
-      return { person: filterSensitiveData(target), accessToken, refreshToken, userType };
+      return { person: filterSensitiveData(target), accessToken, refreshToken };
     }
 
     const data: GoogleCreateDTO = { email, name, image: photo, provider, providerId: id };
@@ -117,7 +139,8 @@ export class AuthService implements IAuthService {
 
     const accessToken = await this.jwtGenerateService.generateAccessToken({ id: person.id, type: userType });
     const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: person.id, type: userType });
+    person.type = userType;
 
-    return { person: filterSensitiveData(person), accessToken, refreshToken, userType };
+    return { person: filterSensitiveData(person), accessToken, refreshToken };
   }
 }
