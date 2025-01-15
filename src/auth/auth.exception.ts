@@ -25,6 +25,12 @@ export class AuthUserAlreadyExistException extends BadRequestException {
   }
 }
 
+export class AuthInvalidPasswordException extends BadRequestException {
+  constructor(fieldName: string) {
+    super(`${fieldName}: ${ExceptionMessages.INVALID_PASSWORD_TYPE}`);
+  }
+}
+
 export class AuthInvalidAccessTokenException extends NotFoundException {
   constructor() {
     super(ExceptionMessages.INVALID_TOKEN);
