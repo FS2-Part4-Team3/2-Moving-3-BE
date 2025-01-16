@@ -16,6 +16,7 @@ export class MoveRepository implements IMoveRepository {
 
   async findMany(options: MoveInfoGetQueries, driverId: string, driverAvailableAreas: Area[]) {
     const { page = 1, pageSize = 10, orderBy, keyword, serviceType, serviceArea, designatedRequest } = options;
+    const serviceTypes = options.serviceType ? options.serviceType.split(',') : undefined;
 
     const whereCondition = {
       AND: [
@@ -33,10 +34,11 @@ export class MoveRepository implements IMoveRepository {
         ...(serviceType
           ? [
               {
-                serviceType: { in: Array.isArray(serviceType) ? serviceType : [serviceType] },
+                serviceType: { in: serviceTypes },
               },
             ]
           : []),
+
         ...(serviceArea === IsActivate.Active
           ? [
               {

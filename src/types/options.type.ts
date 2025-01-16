@@ -78,9 +78,9 @@ export class MoveInfoFilter extends OmitType(FindOptions, ['orderBy']) {
   orderBy: MoveInfoSortOrder;
 
   @IsOptional()
-  @IsEnum(ServiceType, { each: true, message: '올바른 서비스 타입을 골라주세요.' })
+  @IsString({ message: 'Active, Inactive 보내주세요' })
   @ApiProperty({ description: '서비스 타입' })
-  serviceType: ServiceType[];
+  serviceType: string;
 
   @IsOptional()
   @IsString({ message: 'Active, Inactive 보내주세요' })
