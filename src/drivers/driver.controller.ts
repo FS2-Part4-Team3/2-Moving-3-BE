@@ -55,9 +55,9 @@ export class DriverController implements IDriverController {
     type: FilteredDriverOutputDTO,
   })
   async patchUser(@Body() body: DriverPatchDTO) {
-    const user = await this.driverService.updateDriver(body);
+    const driver = await this.driverService.updateDriver(body);
 
-    return user;
+    return driver;
   }
 
   @Post(':id/like')
