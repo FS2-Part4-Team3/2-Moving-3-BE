@@ -33,7 +33,7 @@ export class MoveRepository implements IMoveRepository {
         ...(serviceType
           ? [
               {
-                type: { in: Array.isArray(serviceType) ? serviceType : [serviceType] },
+                serviceType: { in: Array.isArray(serviceType) ? serviceType : [serviceType] },
               },
             ]
           : []),
