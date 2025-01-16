@@ -34,5 +34,5 @@ export class DriverEntity extends PersonalInfo {
   startAt: Date;
 }
 
-export class DriverPatchDTO extends PartialType(OmitType(DriverEntity, ['refreshToken'])) {}
+export class DriverPatchDTO extends PartialType(OmitType(DriverEntity, ['refreshToken', 'password'])) {}
 export interface DriverUpdateDTO extends Partial<Omit<Driver, keyof ModelBase>> {}
