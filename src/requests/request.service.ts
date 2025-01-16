@@ -4,9 +4,10 @@ import { IStorage } from '#types/common.types.js';
 import { Injectable } from '@nestjs/common';
 import { Status } from '@prisma/client';
 import { AsyncLocalStorage } from 'async_hooks';
-import { MoveInfoNotFoundException } from './request.exception.js';
+import { RequestNotFoundException } from './request.exception.js';
 import { ForbiddenException } from '#exceptions/http.exception.js';
 import { RequestRepository } from './request.repository.js';
+import { MoveInfoNotFoundException } from '#move/move.exception.js';
 
 @Injectable()
 export class RequestService implements IRequestService {
@@ -20,7 +21,7 @@ export class RequestService implements IRequestService {
     const request = await this.requestRepository.findById(requestId);
 
     if (!request) {
-      throw new MoveInfoNotFoundException();
+      throw new RequestNotFoundException();
     }
 
     return request;
