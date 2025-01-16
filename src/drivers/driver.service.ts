@@ -10,7 +10,6 @@ import { IDriverService } from '#drivers/interfaces/driver.service.interface.js'
 import { IStorage, UserType } from '#types/common.types.js';
 import { DriversFindOptions } from '#types/options.type.js';
 import filterSensitiveData from '#utils/filterSensitiveData.js';
-import { generateS3DownloadUrl } from '#utils/S3/generate-s3-download-url.js';
 import { generateS3UploadUrl } from '#utils/S3/generate-s3-upload-url.js';
 import { Injectable } from '@nestjs/common';
 import { AsyncLocalStorage } from 'async_hooks';
@@ -27,8 +26,7 @@ export class DriverService implements IDriverService {
     const drivers = await this.driverRepository.findMany(options);
     const list = await Promise.all(
       drivers.map(async driver => {
-        await generateS3DownloadUrl(driver);
-        const result = filterSensitiveData(driver);
+        const result = await filterSensitiveData(driver);
         const reviews = result.reviews;
         result.reviewCount = reviews.length;
         delete result.reviews;
@@ -49,9 +47,7 @@ export class DriverService implements IDriverService {
       throw new DriverNotFoundException();
     }
 
-    await generateS3DownloadUrl(driver);
-
-    return filterSensitiveData(driver);
+    return await filterSensitiveData(driver);
   }
 
   async updateDriver(body: DriverPatchDTO) {

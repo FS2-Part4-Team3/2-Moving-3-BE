@@ -32,7 +32,7 @@ export class AuthService implements IAuthService {
 
     const person = storage.type === UserType.User ? storage.user : storage.driver;
 
-    return filterSensitiveData(person);
+    return await filterSensitiveData(person);
   }
 
   async createPerson(body: SignUpDTO, type: UserType) {
@@ -49,7 +49,7 @@ export class AuthService implements IAuthService {
     const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: person.id, type });
     person.type = type;
 
-    return { person: filterSensitiveData(person), accessToken, refreshToken };
+    return { person: await filterSensitiveData(person), accessToken, refreshToken };
   }
 
   async updatePassword(body: UpdatePasswordDTO) {
@@ -87,7 +87,7 @@ export class AuthService implements IAuthService {
     const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: target.id, type });
     target.type = type;
 
-    return { person: filterSensitiveData(target), accessToken, refreshToken };
+    return { person: await filterSensitiveData(target), accessToken, refreshToken };
   }
 
   async getNewToken() {
@@ -100,7 +100,7 @@ export class AuthService implements IAuthService {
 
     const accessToken = this.jwtGenerateService.generateAccessToken({ id: person.id, type });
 
-    const result = { person: filterSensitiveData(person), accessToken, refreshToken, type };
+    const result = { person: await filterSensitiveData(person), accessToken, refreshToken, type };
     // NOTE 리프레시 토큰의 남은 시간이 2시간 이내일경우
     const timeRemaining = compareExp(exp);
     if (timeRemaining < 3600 * 2) {
@@ -131,7 +131,7 @@ export class AuthService implements IAuthService {
       const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: target.id, type: userType });
       target.type = userType;
 
-      return { person: filterSensitiveData(target), accessToken, refreshToken };
+      return { person: await filterSensitiveData(target), accessToken, refreshToken };
     }
 
     const data: GoogleCreateDTO = { email, name, image: photo, provider, providerId: id };
@@ -141,6 +141,6 @@ export class AuthService implements IAuthService {
     const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: person.id, type: userType });
     person.type = userType;
 
-    return { person: filterSensitiveData(person), accessToken, refreshToken };
+    return { person: await filterSensitiveData(person), accessToken, refreshToken };
   }
 }
