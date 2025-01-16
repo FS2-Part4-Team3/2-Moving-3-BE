@@ -22,5 +22,5 @@ export class UserEntity extends PersonalInfo {
   serviceTypes: $Enums.ServiceType[];
 }
 
-export class UserPatchDTO extends PartialType(OmitType(UserEntity, ['refreshToken'])) {}
+export class UserPatchDTO extends PartialType(OmitType(UserEntity, ['refreshToken', 'password'])) {}
 export interface UserUpdateDTO extends Partial<Omit<User, keyof (ModelBase & ProviderInfo)>> {}

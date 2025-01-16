@@ -4,7 +4,7 @@ import { IUserController } from '#users/interfaces/user.controller.interface.js'
 import { UserService } from '#users/user.service.js';
 import { UserPatchDTO } from '#users/user.types.js';
 import { Body, Controller, HttpStatus, Patch, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @Controller('users')
 export class UserController implements IUserController {
@@ -14,7 +14,6 @@ export class UserController implements IUserController {
   @UseGuards(AccessTokenGuard)
   @ApiOperation({ summary: '유저 정보 수정' })
   @ApiBearerAuth('accessToken')
-  @ApiBody({ type: UserPatchDTO })
   @ApiResponse({
     status: HttpStatus.OK,
     type: FilteredUserOutputDTO,
