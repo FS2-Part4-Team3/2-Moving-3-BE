@@ -10,6 +10,7 @@ import { IDriverService } from '#drivers/interfaces/driver.service.interface.js'
 import { IStorage, UserType } from '#types/common.types.js';
 import { DriversFindOptions } from '#types/options.type.js';
 import filterSensitiveData from '#utils/filterSensitiveData.js';
+import { generateS3DownloadUrl } from '#utils/S3/generate-s3-download-url.js';
 import { generateS3UploadUrl } from '#utils/S3/generate-s3-upload-url.js';
 import { Injectable } from '@nestjs/common';
 import { AsyncLocalStorage } from 'async_hooks';
@@ -24,17 +25,22 @@ export class DriverService implements IDriverService {
   async findDrivers(options: DriversFindOptions) {
     const totalCount = await this.driverRepository.count(options);
     const drivers = await this.driverRepository.findMany(options);
-    const list = drivers.map(driver => {
-      const result = filterSensitiveData(driver);
-      const reviews = result.reviews;
-      result.reviewCount = reviews.length;
-      delete result.reviews;
+    const list = await Promise.all(
+      drivers.map(async driver => {
+        if (driver.image) {
+          await generateS3DownloadUrl(driver);
+        }
+        const result = filterSensitiveData(driver);
+        const reviews = result.reviews;
+        result.reviewCount = reviews.length;
+        delete result.reviews;
 
-      const career = Math.floor((Date.now() - driver.startAt) / 1000 / 86400 / 365);
-      result.career = career;
+        const career = Math.floor((Date.now() - driver.startAt) / 1000 / 86400 / 365);
+        result.career = career;
 
-      return result;
-    });
+        return result;
+      }),
+    );
 
     return { totalCount, list };
   }
