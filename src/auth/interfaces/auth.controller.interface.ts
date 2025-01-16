@@ -8,5 +8,5 @@ export interface IAuthController {
   getMe: () => Promise<FilteredPerson>;
   refreshToken: (res: Response) => Promise<FilteredPersonWithToken>;
   googleAuth: () => void;
-  googleAuthRedirect: (req: any, res: Response) => Promise<FilteredPersonWithToken>;
+  googleAuthRedirect: (req: any, res: Response) => void;
 }
