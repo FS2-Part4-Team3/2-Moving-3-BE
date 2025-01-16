@@ -1,7 +1,7 @@
 import { generatePresignedUploadUrl } from '#utils/S3/generate-presigned-upload-url.js';
 
 export async function generateS3UploadUrl(id: string, originalFileName: string) {
-  const uniqueFileName = `${Date.now}.${originalFileName}`;
+  const uniqueFileName = `${Date.now()}.${originalFileName}`;
   const s3Key = `image/${id}/${uniqueFileName}`;
   const extension = originalFileName.split('.').at(-1);
   const type = extension === 'jpg' ? 'jpeg' : extension;
