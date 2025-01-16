@@ -31,7 +31,6 @@ export class ReviewRepository implements IReviewRepository {
   }
 
   async findManyMyReviews(userId: string, options: FindOptions) {
-    console.log('findManyMyReviews called with:', userId, options);
     const { page, pageSize, orderBy } = options;
 
     const sort = orderBy === SortOrder.Recent ? { createdAt: 'desc' } : { createdAt: 'asc' };
