@@ -1,5 +1,4 @@
 import { AuthModule } from '#auth/auth.module.js';
-import awsConfig from '#configs/aws.config.js';
 import jwtConfig from '#configs/jwt.config.js';
 import { postgresConfig } from '#configs/postgres.config.js';
 import { DriverModule } from '#drivers/driver.module.js';
@@ -35,7 +34,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
     UserModule,
     SwaggerModule,
     StorageModule,
-    ConfigModule.forRoot({ isGlobal: true, load: [jwtConfig, postgresConfig, awsConfig] }),
+    ConfigModule.forRoot({ isGlobal: true, load: [jwtConfig, postgresConfig] }),
   ],
   controllers: [AppController, DevController],
   providers: [{ provide: APP_INTERCEPTOR, useClass: LogInterceptor }],
