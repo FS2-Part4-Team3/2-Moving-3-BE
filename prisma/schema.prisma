@@ -77,7 +77,7 @@ model MoveInfo {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  type        ServiceType
+  serviceType ServiceType
   date        DateTime
   fromAddress String
   toAddress   String
