@@ -28,7 +28,7 @@ export class DriverEntity extends PersonalInfo {
 
   @ArrayNotEmpty({ message: '하나 이상의 타입을 선택해주세요' })
   @IsIn(Object.values($Enums.ServiceType), { each: true })
-  serviceTypes: $Enums.ServiceType[];
+  serviceType: $Enums.ServiceType[];
 
   @IsDate({ message: '올바르지 않은 날짜입니다.' })
   startAt: Date;

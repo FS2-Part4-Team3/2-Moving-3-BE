@@ -34,7 +34,7 @@ export class DriverRepository implements IDriverRepository {
     }
 
     const areaCondition = area ? { availableAreas: { has: area } } : {};
-    const typeCondition = serviceType ? { serviceTypes: { has: serviceType } } : {};
+    const typeCondition = serviceType ? { serviceType: { has: serviceType } } : {};
 
     const where = {
       OR: [{ name: { contains: keyword } }, { introduce: { contains: keyword } }],

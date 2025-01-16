@@ -143,12 +143,11 @@ export class AuthController implements IAuthController {
   @ApiOperation({ summary: '구글 로그인' })
   @ApiParam({ name: 'userType', enum: UserType })
   @ApiResponse({
-    status: HttpStatus.OK,
-    schema: {
-      type: 'object',
-      properties: {
-        person: { oneOf: [{ $ref: getSchemaPath(FilteredUserOutputDTO) }, { $ref: getSchemaPath(FilteredDriverOutputDTO) }] },
-        accessToken: { type: 'string' },
+    status: HttpStatus.FOUND,
+    headers: {
+      Location: {
+        description: '구글 콜백 페이지에 액세스 토큰과 함께 리다이렉션',
+        schema: { type: 'string', example: 'https://www.moving.wiki/callback/google?accessToken=TokenValue' },
       },
     },
   })
@@ -163,6 +162,7 @@ export class AuthController implements IAuthController {
     const { person, accessToken, refreshToken } = await this.authService.googleAuth(redirectResult);
     response.cookie('refreshToken', refreshToken);
 
-    return { person, accessToken };
+    response.redirect(`http://localhost:3000/callback/google?accessToken=${accessToken}`);
+    // response.redirect(`https://www.moving.wiki/callback/google?accessToken=${accessToken}`);
   }
 }

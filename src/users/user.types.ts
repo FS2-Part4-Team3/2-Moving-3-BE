@@ -19,7 +19,7 @@ export class UserEntity extends PersonalInfo {
   @ArrayNotEmpty({ message: '하나 이상의 타입을 선택해주세요' })
   @IsIn(Object.values($Enums.ServiceType), { each: true, message: '올바른 지역을 선택해주세요.' })
   @ApiProperty({ description: '서비스 타입' })
-  serviceTypes: $Enums.ServiceType[];
+  serviceType: $Enums.ServiceType[];
 }
 
 export class UserPatchDTO extends PartialType(OmitType(UserEntity, ['refreshToken', 'password'])) {}
