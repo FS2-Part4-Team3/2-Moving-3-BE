@@ -20,7 +20,7 @@ async function main() {
     prisma.user.deleteMany(),
   ]);
 
-  const serviceTypes = Object.values(ServiceType);
+  const serviceType = Object.values(ServiceType);
   const areas = Object.values(Area);
   const status = Object.values(Status);
   const progress = Object.values(Progress);
@@ -31,7 +31,7 @@ async function main() {
     const userServiceTypes = [];
     for (let i = 0; i < faker.number.int({ min: 1, max: 3 }); i++) {
       const index = faker.number.int({ min: 0, max: 2 });
-      if (!userServiceTypes.includes(serviceTypes[index])) userServiceTypes.push(serviceTypes[index]);
+      if (!userServiceTypes.includes(serviceType[index])) userServiceTypes.push(serviceType[index]);
     }
     const userAreas = [];
     for (let i = 0; i < faker.number.int({ min: 1, max: 17 }); i++) {
@@ -47,7 +47,7 @@ async function main() {
       image: faker.image.avatar(),
       password: faker.string.hexadecimal({ prefix: '', casing: 'lower', length: 128 }),
       salt: faker.string.hexadecimal({ prefix: '', casing: 'lower', length: 32 }),
-      serviceTypes: userServiceTypes,
+      serviceType: userServiceTypes,
       areas: userAreas,
     };
   });
@@ -56,9 +56,9 @@ async function main() {
   // Generate mock data for Driver
   const drivers = Array.from({ length: 20 }).map(() => {
     const driverServiceTypes = [];
-    for (let i = 0; i < faker.number.int({ min: 1, max: serviceTypes.length }); i++) {
-      const index = faker.number.int({ min: 0, max: serviceTypes.length - 1 });
-      if (!driverServiceTypes.includes(serviceTypes[index])) driverServiceTypes.push(serviceTypes[index]);
+    for (let i = 0; i < faker.number.int({ min: 1, max: serviceType.length }); i++) {
+      const index = faker.number.int({ min: 0, max: serviceType.length - 1 });
+      if (!driverServiceTypes.includes(serviceType[index])) driverServiceTypes.push(serviceType[index]);
     }
     const driverAreas = [];
     for (let i = 0; i < faker.number.int({ min: 1, max: areas.length }); i++) {
@@ -77,7 +77,7 @@ async function main() {
       phoneNumber: faker.phone.number(),
       introduce: fakerEN.lorem.sentence(),
       description: fakerEN.lorem.paragraph(),
-      serviceTypes: driverServiceTypes,
+      serviceType: driverServiceTypes,
       availableAreas: driverAreas,
       applyCount: faker.number.int({ min: 1, max: 100 }),
       likeCount: faker.number.int({ min: 1, max: 50 }),
@@ -89,7 +89,7 @@ async function main() {
   // Generate mock data for MoveInfo
   const moveInfos = Array.from({ length: 50 }).map(() => ({
     id: faker.string.uuid(),
-    type: serviceTypes[faker.number.int({ min: 0, max: 2 })],
+    type: serviceType[faker.number.int({ min: 0, max: 2 })],
     date: faker.date.future(),
     fromAddress: faker.location.streetAddress(),
     toAddress: faker.location.streetAddress(),

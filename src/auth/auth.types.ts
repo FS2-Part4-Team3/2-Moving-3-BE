@@ -78,10 +78,13 @@ export class FilteredUserOutputDTO {
   phoneNumber?: string;
 
   @ApiProperty({ description: '서비스 타입' })
-  serviceTypes: ServiceType[];
+  serviceType: ServiceType[];
 
   @ApiProperty({ description: '이용 지역' })
   areas: Area[];
+
+  @ApiProperty({ description: '유저 타입' })
+  type: string;
 
   @ApiProperty({ description: '소셜 로그인 프로바이더' })
   provider?: string;
@@ -113,7 +116,7 @@ export class FilteredDriverOutputDTO {
   description?: string;
 
   @ApiProperty({ description: '서비스 타입' })
-  serviceTypes: ServiceType[];
+  serviceType: ServiceType[];
 
   @ApiProperty({ description: '서비스 가능 지역' })
   availableAreas: Area[];
@@ -129,6 +132,15 @@ export class FilteredDriverOutputDTO {
 
   @ApiProperty({ description: '경력 년수' })
   career: number;
+
+  @ApiProperty({ description: '유저 타입' })
+  type: string;
+
+  @ApiProperty({ description: '소셜 로그인 프로바이더' })
+  provider?: string;
+
+  @ApiProperty({ description: '프로바이더 아이디' })
+  providerId?: string;
 }
 
 export class UserTypeParamDTO {
