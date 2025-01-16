@@ -18,6 +18,10 @@ export class ReviewService implements IReviewService {
   async getMyReviews(options: FindOptions) {
     const { userId } = this.als.getStore();
 
+    if (!userId) {
+      throw new ForbiddenException();
+    }
+
     const list = await this.reviewRepository.findManyMyReviews(userId, options);
     const totalCount = await this.reviewRepository.totalCount(userId, 'user');
 
