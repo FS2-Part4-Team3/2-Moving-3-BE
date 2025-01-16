@@ -1,4 +1,5 @@
 import { AuthModule } from '#auth/auth.module.js';
+import { nodeEnv } from '#configs/common.config.js';
 import jwtConfig from '#configs/jwt.config.js';
 import { postgresConfig } from '#configs/postgres.config.js';
 import { DriverModule } from '#drivers/driver.module.js';
@@ -20,6 +21,11 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 
+const controllers: Array<any> = [AppController];
+if (nodeEnv === 'development') {
+  controllers.push(DevController);
+}
+
 @Module({
   imports: [
     DBModule,
@@ -34,9 +40,9 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
     UserModule,
     SwaggerModule,
     StorageModule,
-    ConfigModule.forRoot({ isGlobal: true, load: [jwtConfig, postgresConfig] }),
+    ConfigModule.forRoot({ isGlobal: true, load: [jwtConfig, postgresConfig], envFilePath: '.env' }),
   ],
-  controllers: [AppController, DevController],
+  controllers,
   providers: [{ provide: APP_INTERCEPTOR, useClass: LogInterceptor }],
 })
 export class AppModule implements NestModule {
