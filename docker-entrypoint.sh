@@ -12,6 +12,8 @@ if ! npx prisma migrate deploy; then
         echo "Migration failed even after reset. Exiting..."
         exit 1
     fi
+
+    npx prisma db seed
 fi
 
 node dist/main
