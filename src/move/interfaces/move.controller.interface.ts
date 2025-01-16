@@ -4,5 +4,5 @@ import { GetQueries } from '#types/queries.type.js';
 
 export interface IMoveController {
   getMoveInfos: (options: GetQueries & Partial<RequestFilter>) => Promise<{ totalCount: number; list: MoveInfo[] }>;
-  getMoveInfo: () => Promise<MoveInfo[]>;
+  getMoveInfo: (moveInfoId: string) => Promise<MoveInfo>;
 }

@@ -5,6 +5,7 @@ import { GetQueries } from '#types/queries.type.js';
 import { Injectable } from '@nestjs/common';
 import { AsyncLocalStorage } from 'async_hooks';
 import { MoveRepository } from './move.repository.js';
+import { MoveInfoNotFoundException } from './move.exception.js';
 
 @Injectable()
 export class MoveService implements IMoveService {
@@ -21,9 +22,12 @@ export class MoveService implements IMoveService {
     return { totalCount, list };
   }
 
-  async getMoveInfo() {
-    const { userId } = this.als.getStore();
-    const moveInfo = await this.moveRepository.findByUserId(userId);
+  async getMoveInfo(moveInfoId: string) {
+    const moveInfo = await this.moveRepository.findByMoveInfoId(moveInfoId);
+
+    if (!moveInfo) {
+      throw new MoveInfoNotFoundException();
+    }
 
     return moveInfo;
   }

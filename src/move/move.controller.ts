@@ -2,7 +2,7 @@ import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { IMoveController } from '#move/interfaces/move.controller.interface.js';
 import { RequestFilter } from '#types/options.type.js';
 import { GetQueries } from '#types/queries.type.js';
-import { Controller, Get, HttpStatus, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, HttpStatus, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { MoveService } from './move.service.js';
 import { BaseMoveInfoOutputDTO, MoveInfoResponseDTO } from './move.types.js';
@@ -25,16 +25,17 @@ export class MoveController implements IMoveController {
     return request;
   }
 
-  @Get('detail')
+  @Get(':moveInfoId')
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth('accessToken')
   @ApiOperation({ summary: '이사 정보 상세 조회' })
+  @ApiParam({ name: 'moveInfoId', description: '이사정보 ID', type: 'string' })
   @ApiResponse({
     status: HttpStatus.OK,
-    type: [BaseMoveInfoOutputDTO],
+    type: BaseMoveInfoOutputDTO,
   })
-  async getMoveInfo() {
-    const moveInfo = await this.moveService.getMoveInfo();
+  async getMoveInfo(@Param('moveInfoId') moveInfoId: string) {
+    const moveInfo = await this.moveService.getMoveInfo(moveInfoId);
     return moveInfo;
   }
 
