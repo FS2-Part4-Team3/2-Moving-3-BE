@@ -91,6 +91,9 @@ export class FilteredUserOutputDTO {
 
   @ApiProperty({ description: '유저 타입' })
   type: string;
+
+  @ApiProperty({ description: '이미지 업로드 URL' })
+  uploadUrl?: string;
 }
 
 export class FilteredDriverOutputDTO {
@@ -135,6 +138,9 @@ export class FilteredDriverOutputDTO {
 
   @ApiProperty({ description: '유저 타입' })
   type: string;
+
+  @ApiProperty({ description: '이미지 업로드 URL' })
+  uploadUrl?: string;
 }
 
 export class UserTypeParamDTO {
