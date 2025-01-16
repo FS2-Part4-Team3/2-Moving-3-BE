@@ -1,7 +1,4 @@
 import { fakerKO as faker, faker as fakerEN } from '@faker-js/faker';
-<<<<<<< Updated upstream
-import { Area, NotificationType, PrismaClient, Progress, ServiceType, Status } from '@prisma/client';
-=======
 import { PrismaClient } from '@prisma/client';
 import {
   addresses,
@@ -16,7 +13,6 @@ import {
   serviceType,
   status,
 } from './mock/mock.js';
->>>>>>> Stashed changes
 
 if (!process.env.DATABASE_URL) {
   throw new Error('DATABASE_URL 환경변수가 설정되지 않았습니다.');
@@ -36,12 +32,6 @@ async function main() {
     prisma.driver.deleteMany(),
     prisma.user.deleteMany(),
   ]);
-
-  const serviceType = Object.values(ServiceType);
-  const areas = Object.values(Area);
-  const status = Object.values(Status);
-  const progress = Object.values(Progress);
-  const notificationTypes = Object.values(NotificationType);
 
   // Generate mock data for User
   const users = Array.from({ length: 20 }).map(() => {
@@ -104,15 +94,23 @@ async function main() {
   await prisma.driver.createMany({ data: drivers });
 
   // Generate mock data for MoveInfo
-  const moveInfos = Array.from({ length: 50 }).map(() => ({
-    id: faker.string.uuid(),
-    serviceType: serviceType[faker.number.int({ min: 0, max: serviceType.length - 1 })],
-    date: faker.date.future(),
-    fromAddress: faker.location.streetAddress(),
-    toAddress: faker.location.streetAddress(),
-    progress: progress[faker.number.int({ min: 0, max: progress.length - 1 })],
-    ownerId: users[faker.number.int({ min: 0, max: users.length - 1 })].id,
-  }));
+  const moveInfos = Array.from({ length: 50 }).map(() => {
+    const fromIndex = faker.number.int({ min: 0, max: addresses.length - 1 });
+    let toIndex = faker.number.int({ min: 0, max: addresses.length - 1 });
+    while (fromIndex === toIndex) {
+      toIndex = faker.number.int({ min: 0, max: addresses.length - 1 });
+    }
+
+    return {
+      id: faker.string.uuid(),
+      serviceType: serviceType[faker.number.int({ min: 0, max: serviceType.length - 1 })],
+      date: faker.date.future(),
+      fromAddress: addresses[fromIndex],
+      toAddress: addresses[toIndex],
+      progress: progress[faker.number.int({ min: 0, max: progress.length - 1 })],
+      ownerId: users[faker.number.int({ min: 0, max: users.length - 1 })].id,
+    };
+  });
   await prisma.moveInfo.createMany({ data: moveInfos });
 
   // Generate mock data for Request

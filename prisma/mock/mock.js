@@ -1,5 +1,3 @@
-<<<<<<< Updated upstream
-=======
 import { Area, NotificationType, Progress, ServiceType, Status } from '@prisma/client';
 
 export const serviceType = Object.values(ServiceType);
@@ -189,4 +187,3 @@ export const reviewContents = [
   '전반적으로 만족스러운 서비스였고, 추가로 필요한 부분도 잘 해결되었습니다.',
   '친절하고 능숙한 기사님 덕분에 이사 후에도 기분이 좋았습니다.',
 ];
->>>>>>> Stashed changes
