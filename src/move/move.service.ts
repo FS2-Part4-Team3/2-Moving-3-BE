@@ -1,7 +1,6 @@
 import { IMoveService } from '#move/interfaces/move.service.interface.js';
 import { IStorage } from '#types/common.types.js';
-import { RequestFilter } from '#types/options.type.js';
-import { GetQueries } from '#types/queries.type.js';
+import { MoveInfoGetQueries } from '#types/queries.type.js';
 import { Injectable } from '@nestjs/common';
 import { AsyncLocalStorage } from 'async_hooks';
 import { MoveRepository } from './move.repository.js';
@@ -14,7 +13,7 @@ export class MoveService implements IMoveService {
     private readonly als: AsyncLocalStorage<IStorage>,
   ) {}
 
-  async getMoveInfos(options: GetQueries & Partial<RequestFilter>) {
+  async getMoveInfos(options: MoveInfoGetQueries) {
     const { driverId, driver: driverInfo } = this.als.getStore();
 
     const { list, totalCount } = await this.moveRepository.findMany(options, driverId, driverInfo.availableAreas);

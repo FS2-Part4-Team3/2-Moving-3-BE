@@ -1,8 +1,7 @@
 import { MoveInfo } from '#move/move.types.js';
-import { FindOptions, RequestFilter } from '#types/options.type.js';
-import { GetQueries } from '#types/queries.type.js';
+import { MoveInfoGetQueries } from '#types/queries.type.js';
 
 export interface IMoveController {
-  getMoveInfos: (options: GetQueries & Partial<RequestFilter>) => Promise<{ totalCount: number; list: MoveInfo[] }>;
+  getMoveInfos: (query: MoveInfoGetQueries) => Promise<{ totalCount: number; list: MoveInfo[] }>;
   getMoveInfo: (moveInfoId: string) => Promise<MoveInfo>;
 }

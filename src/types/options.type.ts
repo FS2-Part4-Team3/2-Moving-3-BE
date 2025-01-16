@@ -23,6 +23,9 @@ export enum SortOrder {
   Latest = 'Latest',
   Oldest = 'Oldest',
   Recent = 'Recent',
+}
+
+export enum MoveInfoSortOrder {
   UpcomingMoveDate = 'UpcomingMoveDate',
   RecentRequest = 'RecentRequest',
 }
@@ -32,6 +35,11 @@ export enum DriverSortOrder {
   HighestRating = 'HighestRating',
   MostApplied = 'MostApplied',
   HighestCareer = 'HighestCareer',
+}
+
+export enum IsActivate {
+  Active = 'Active',
+  Inactive = 'Inactive',
 }
 
 export class FindOptions extends OffsetPaginationOptions {
@@ -63,8 +71,24 @@ export class DriversFindOptions extends OmitType(FindOptions, ['orderBy']) {
   serviceType: ServiceType;
 }
 
-export interface RequestFilter {
-  moveType?: string;
-  serviceArea?: boolean;
-  designated?: boolean;
+export class MoveInfoFilter extends OmitType(FindOptions, ['orderBy']) {
+  @IsOptional()
+  @IsEnum(MoveInfoSortOrder, { message: '올바른 정렬 기준을 골라주세요' })
+  @ApiProperty({ description: '정렬 기준' })
+  orderBy: MoveInfoSortOrder;
+
+  @IsOptional()
+  @IsEnum(ServiceType, { each: true, message: '올바른 서비스 타입을 골라주세요.' })
+  @ApiProperty({ description: '서비스 타입' })
+  serviceType: ServiceType[];
+
+  @IsOptional()
+  @IsString({ message: 'Active, Inactive 보내주세요' })
+  @ApiProperty({ description: '서비스 가능 지역' })
+  serviceArea: string;
+
+  @IsOptional()
+  @IsString({ message: 'Active, Inactive로 보내주세요' })
+  @ApiProperty({ description: '지정 견적 요청' })
+  designatedRequest: string;
 }

@@ -1,10 +1,10 @@
 import { MoveInfo, MoveInfoInputDTO } from '#move/move.types.js';
-import { FindOptions, RequestFilter } from '#types/options.type.js';
+import { MoveInfoGetQueries } from '#types/queries.type.js';
 import { Area } from '@prisma/client';
 
 export interface IMoveRepository {
   findMany: (
-    options: FindOptions & RequestFilter,
+    options: MoveInfoGetQueries,
     driverId: string,
     driverAvailableAreas: Area[],
   ) => Promise<{ totalCount: number; list: MoveInfo[] }>;
