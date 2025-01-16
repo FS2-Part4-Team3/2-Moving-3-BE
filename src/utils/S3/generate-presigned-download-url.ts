@@ -1,18 +1,12 @@
-import { awsAccessKeyId, awsRegion, awsSecretAccessKey, bucketName } from '#configs/aws.config.js';
-import { InternalServerError } from '#types/http-error.types.js';
-import MESSAGES from '#utils/constants/messages.js';
+import awsConfig from '#configs/aws.config.js';
 import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
-if (!awsRegion || !bucketName) {
-  throw new InternalServerError(MESSAGES.NO_ENV_VARIABLE);
-}
-
 const s3 = new S3Client({
-  region: awsRegion,
+  region: awsConfig.awsRegion,
   credentials: {
-    accessKeyId: awsAccessKeyId,
-    secretAccessKey: awsSecretAccessKey,
+    accessKeyId: awsConfig.awsAccessKeyId,
+    secretAccessKey: awsConfig.awsSecretAccessKey,
   },
 });
 
@@ -25,7 +19,7 @@ const s3 = new S3Client({
  */
 export async function generatePresignedDownloadUrl(s3Key: string, expiresIn: number = 3600): Promise<string> {
   const command = new GetObjectCommand({
-    Bucket: bucketName,
+    Bucket: awsConfig.bucketName,
     Key: s3Key,
   });
 

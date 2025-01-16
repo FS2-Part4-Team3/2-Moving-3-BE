@@ -1,18 +1,12 @@
+import awsConfig from '#configs/aws.config.js';
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { awsAccessKeyId, awsRegion, awsSecretAccessKey, bucketName } from '#configs/aws.config.js';
-import { InternalServerError } from '#types/http-error.types.js';
-import MESSAGES from '#utils/constants/messages.js';
-
-if (!awsRegion || !bucketName) {
-  throw new InternalServerError(MESSAGES.NO_ENV_VARIABLE);
-}
 
 const s3 = new S3Client({
-  region: awsRegion,
+  region: awsConfig.awsRegion,
   credentials: {
-    accessKeyId: awsAccessKeyId,
-    secretAccessKey: awsSecretAccessKey,
+    accessKeyId: awsConfig.awsAccessKeyId,
+    secretAccessKey: awsConfig.awsSecretAccessKey,
   },
 });
 
@@ -30,7 +24,7 @@ export async function generatePresignedUploadUrl(
   expiresIn: number = 3600,
 ): Promise<string> {
   const command = new PutObjectCommand({
-    Bucket: bucketName,
+    Bucket: awsConfig.bucketName,
     Key: s3Key,
     ContentType: contentType,
   });
