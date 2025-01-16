@@ -5,7 +5,7 @@ import { FilteredPersonalInfo } from '#types/personal.type.js';
 import { User } from '#users/user.types.js';
 import { ApiProperty } from '@nestjs/swagger';
 import { Area, ServiceType } from '@prisma/client';
-import { IsEmail, IsEnum, IsNotEmpty, IsString, Matches } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, IsString, Matches } from 'class-validator';
 
 export interface TokenPayload {
   id: string;
@@ -19,8 +19,11 @@ export class Tokens {
 
 export class SignInDTO {
   @ApiProperty({ description: '이메일' })
+  @IsEmail({}, { message: '이메일 형식 입력이 필요합니다.' })
   email: string;
+
   @ApiProperty({ description: '비밀번호' })
+  @IsString()
   password: string;
 }
 
@@ -39,7 +42,11 @@ export class SignUpDTO {
   name: string;
 
   @ApiProperty({ description: '비밀번호' })
+  @IsString()
   password: string;
+
+  @IsOptional()
+  @IsString()
   salt?: string;
 
   @ApiProperty({ description: '전화번호' })
@@ -51,10 +58,17 @@ export class UpdatePasswordDTO {
   @ApiProperty({ description: '기존 비밀번호' })
   @Matches(passwordRegex, { message: `oldPw: ${ExceptionMessages.INVALID_PASSWORD_TYPE}` })
   oldPw: string;
+
+  @IsOptional()
+  @IsString()
   oldSalt?: string;
 
   @ApiProperty({ description: '새 비밀번호' })
+  @IsString()
   newPw: string;
+
+  @IsOptional()
+  @IsString()
   newSalt?: string;
 }
 
@@ -147,11 +161,6 @@ export class FilteredDriverOutputDTO {
 
   @ApiProperty({ description: '이미지 업로드 URL' })
   uploadUrl?: string;
-}
-
-export class UserTypeParamDTO {
-  @IsEnum(UserType, { message: '사용자 형식은 user 혹은 driver 중 하나입니다.' })
-  type: UserType;
 }
 
 export interface GoogleAuthType {
