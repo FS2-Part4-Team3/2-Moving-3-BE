@@ -3,6 +3,7 @@ import { PrismaService } from '#global/prisma.service.js';
 import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { IStorage, UserType } from '#types/common.types.js';
 import { UserService } from '#users/user.service.js';
+import { generateS3ImageArray } from '#utils/S3/generate-s3-upload-url.js';
 import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { ApiExcludeController } from '@nestjs/swagger';
 import { AsyncLocalStorage } from 'async_hooks';
@@ -56,5 +57,12 @@ export class DevController {
     const storage = this.als.getStore();
 
     return storage;
+  }
+
+  @Get('upload')
+  async upload(@Query('image') image: string) {
+    const url = await generateS3ImageArray('id', image);
+
+    return url;
   }
 }
