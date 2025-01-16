@@ -27,9 +27,7 @@ export class DriverService implements IDriverService {
     const drivers = await this.driverRepository.findMany(options);
     const list = await Promise.all(
       drivers.map(async driver => {
-        if (driver.image) {
-          await generateS3DownloadUrl(driver);
-        }
+        await generateS3DownloadUrl(driver);
         const result = filterSensitiveData(driver);
         const reviews = result.reviews;
         result.reviewCount = reviews.length;
@@ -50,6 +48,8 @@ export class DriverService implements IDriverService {
     if (!driver) {
       throw new DriverNotFoundException();
     }
+
+    await generateS3DownloadUrl(driver);
 
     return filterSensitiveData(driver);
   }
