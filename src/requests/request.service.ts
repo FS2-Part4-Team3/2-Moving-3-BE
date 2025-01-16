@@ -19,6 +19,10 @@ export class RequestService implements IRequestService {
   async getRequest(requestId: string) {
     const request = await this.requestRepository.findById(requestId);
 
+    if (!request) {
+      throw new MoveInfoNotFoundException();
+    }
+
     return request;
   }
 
@@ -27,12 +31,12 @@ export class RequestService implements IRequestService {
 
     const moveInfo = await this.moveRepository.findByUserId(userId);
 
-    if (moveInfo.ownerId !== userId) {
-      throw new ForbiddenException();
+    if (!moveInfo || moveInfo[0].length === 0) {
+      throw new MoveInfoNotFoundException();
     }
 
-    if (!moveInfo || moveInfo.length === 0) {
-      throw new MoveInfoNotFoundException();
+    if (moveInfo[0].ownerId !== userId) {
+      throw new ForbiddenException();
     }
 
     const data = { moveInfoId: moveInfo[0].id, status: Status.PENDING, driverId: driverId };
