@@ -67,7 +67,7 @@ export class AuthService implements IAuthService {
     const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: person.id, type });
     person.type = type;
 
-    return { person: filterSensitiveData(person), accessToken, refreshToken };
+    return { person: await filterSensitiveData(person), accessToken, refreshToken };
   }
 
   async signIn(body: SignInDTO, type: UserType) {
