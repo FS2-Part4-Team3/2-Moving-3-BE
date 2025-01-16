@@ -10,6 +10,7 @@ import { IDriverService } from '#drivers/interfaces/driver.service.interface.js'
 import { IStorage, UserType } from '#types/common.types.js';
 import { DriversFindOptions } from '#types/options.type.js';
 import filterSensitiveData from '#utils/filterSensitiveData.js';
+import { generateS3UploadUrl } from '#utils/S3/generate-s3-upload-url.js';
 import { Injectable } from '@nestjs/common';
 import { AsyncLocalStorage } from 'async_hooks';
 
@@ -55,10 +56,17 @@ export class DriverService implements IDriverService {
 
     const data: DriverUpdateDTO = body;
     const { driverId } = storage;
+    let url;
+    if (data.image) {
+      const { uploadUrl, uniqueFileName } = await generateS3UploadUrl(driverId, data.image);
+      data.image = uniqueFileName;
+      url = uploadUrl;
+    }
 
     const driver = await this.driverRepository.update(driverId, data);
+    driver.uploadUrl = url;
 
-    return driver;
+    return filterSensitiveData(driver);
   }
 
   async likeDriver(driverId: string) {
