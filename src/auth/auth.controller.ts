@@ -162,6 +162,7 @@ export class AuthController implements IAuthController {
     const { person, accessToken, refreshToken } = await this.authService.googleAuth(redirectResult);
     response.cookie('refreshToken', refreshToken);
 
-    response.redirect(`https://www.moving.wiki/callback/google?accessToken=${accessToken}`);
+    response.redirect(`http://localhost:3000/callback/google?accessToken=${accessToken}`);
+    // response.redirect(`https://www.moving.wiki/callback/google?accessToken=${accessToken}`);
   }
 }
