@@ -1,11 +1,11 @@
 import { PrismaService } from '#global/prisma.service.js';
 import { IMoveRepository } from '#move/interfaces/move.repository.interface.js';
 import { MoveInfoInputDTO } from '#move/move.types.js';
-import { RequestFilter, SortOrder } from '#types/options.type.js';
-import { GetQueries } from '#types/queries.type.js';
+import { IsActivate, MoveInfoSortOrder } from '#types/options.type.js';
+import { MoveInfoGetQueries } from '#types/queries.type.js';
 import { areaToKeyword } from '#utils/address-utils.js';
 import { Injectable } from '@nestjs/common';
-import { Area, Progress, ServiceType } from '@prisma/client';
+import { Area, Progress } from '@prisma/client';
 
 @Injectable()
 export class MoveRepository implements IMoveRepository {
@@ -14,49 +14,65 @@ export class MoveRepository implements IMoveRepository {
     this.moveInfo = prisma.moveInfo;
   }
 
-  async findMany(options: GetQueries & Partial<RequestFilter>, driverId: string, driverAvailableAreas: Area[]) {
-    const { page = 1, pageSize = 10, orderBy, keyword, moveType, serviceArea = true, designated } = options;
+  async findMany(options: MoveInfoGetQueries, driverId: string, driverAvailableAreas: Area[]) {
+    const { page = 1, pageSize = 10, orderBy, keyword, serviceType, serviceArea, designatedRequest } = options;
 
     const whereCondition = {
-      ...(keyword && {
-        OR: [
-          { owner: { name: { contains: keyword } } },
-          { fromAddress: { contains: keyword } },
-          { toAddress: { contains: keyword } },
-        ],
-      }),
-      ...(moveType && {
-        type: moveType as ServiceType,
-      }),
-
-      ...(serviceArea && {
-        OR: [
-          ...driverAvailableAreas.map(area => ({
-            fromAddress: { contains: areaToKeyword(area) },
-          })),
-          ...driverAvailableAreas.map(area => ({
-            toAddress: { contains: areaToKeyword(area) },
-          })),
-        ],
-      }),
-
-      ...(designated &&
-        driverId && {
-          requests: {
-            some: {
-              driverId: designated ? driverId : null,
-            },
-          },
-        }),
+      AND: [
+        ...(keyword
+          ? [
+              {
+                OR: [
+                  { owner: { name: { contains: keyword } } },
+                  { fromAddress: { contains: keyword } },
+                  { toAddress: { contains: keyword } },
+                ],
+              },
+            ]
+          : []),
+        ...(serviceType
+          ? [
+              {
+                type: { in: Array.isArray(serviceType) ? serviceType : [serviceType] },
+              },
+            ]
+          : []),
+        ...(serviceArea === IsActivate.Active
+          ? [
+              {
+                OR: [
+                  ...driverAvailableAreas.map(area => ({
+                    fromAddress: { contains: areaToKeyword(area) },
+                  })),
+                  ...driverAvailableAreas.map(area => ({
+                    toAddress: { contains: areaToKeyword(area) },
+                  })),
+                ],
+              },
+            ]
+          : []),
+        ...(designatedRequest === IsActivate.Active && driverId
+          ? [
+              {
+                requests: {
+                  some: {
+                    driverId: designatedRequest ? driverId : null,
+                  },
+                },
+              },
+            ]
+          : []),
+        { progress: Progress.OPEN },
+      ],
     };
 
     let orderByCondition;
-    if (orderBy === SortOrder.UpcomingMoveDate) {
-      orderByCondition = { date: 'asc' };
-    } else if (orderBy === SortOrder.RecentRequest) {
-      orderByCondition = { createdAt: 'desc' };
+    if (orderBy === MoveInfoSortOrder.UpcomingMoveDate) {
+      orderByCondition = { date: 'desc' };
+    } else if (orderBy === MoveInfoSortOrder.RecentRequest) {
+      orderByCondition = { createdAt: 'asc' };
     } else {
-      orderByCondition = { createdAt: 'desc' };
+      orderByCondition = { createdAt: 'asc' };
     }
 
     const list = await this.moveInfo.findMany({

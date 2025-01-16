@@ -4,9 +4,10 @@ import { IStorage } from '#types/common.types.js';
 import { Injectable } from '@nestjs/common';
 import { Status } from '@prisma/client';
 import { AsyncLocalStorage } from 'async_hooks';
-import { MoveInfoNotFoundException } from './request.exception.js';
+import { RequestNotFoundException } from './request.exception.js';
 import { ForbiddenException } from '#exceptions/http.exception.js';
 import { RequestRepository } from './request.repository.js';
+import { MoveInfoNotFoundException } from '#move/move.exception.js';
 
 @Injectable()
 export class RequestService implements IRequestService {
@@ -19,6 +20,10 @@ export class RequestService implements IRequestService {
   async getRequest(requestId: string) {
     const request = await this.requestRepository.findById(requestId);
 
+    if (!request) {
+      throw new RequestNotFoundException();
+    }
+
     return request;
   }
 
@@ -27,12 +32,12 @@ export class RequestService implements IRequestService {
 
     const moveInfo = await this.moveRepository.findByUserId(userId);
 
-    if (moveInfo.ownerId !== userId) {
-      throw new ForbiddenException();
+    if (!moveInfo || moveInfo[0].length === 0) {
+      throw new MoveInfoNotFoundException();
     }
 
-    if (!moveInfo || moveInfo.length === 0) {
-      throw new MoveInfoNotFoundException();
+    if (moveInfo[0].ownerId !== userId) {
+      throw new ForbiddenException();
     }
 
     const data = { moveInfoId: moveInfo[0].id, status: Status.PENDING, driverId: driverId };
