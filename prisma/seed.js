@@ -1,5 +1,18 @@
 import { fakerKO as faker, faker as fakerEN } from '@faker-js/faker';
-import { Area, NotificationType, PrismaClient, Progress, ServiceType, Status } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
+import {
+  addresses,
+  areas,
+  driverDescriptions,
+  estimationComments,
+  introduces,
+  notificationTypes,
+  progress,
+  questionContents,
+  reviewContents,
+  serviceType,
+  status,
+} from './mock/mock.js';
 
 if (!process.env.DATABASE_URL) {
   throw new Error('DATABASE_URL 환경변수가 설정되지 않았습니다.');
@@ -19,12 +32,6 @@ async function main() {
     prisma.driver.deleteMany(),
     prisma.user.deleteMany(),
   ]);
-
-  const serviceType = Object.values(ServiceType);
-  const areas = Object.values(Area);
-  const status = Object.values(Status);
-  const progress = Object.values(Progress);
-  const notificationTypes = Object.values(NotificationType);
 
   // Generate mock data for User
   const users = Array.from({ length: 20 }).map(() => {
@@ -75,8 +82,8 @@ async function main() {
       password: faker.string.hexadecimal({ prefix: '', casing: 'lower', length: 128 }),
       salt: faker.string.hexadecimal({ prefix: '', casing: 'lower', length: 32 }),
       phoneNumber: faker.phone.number(),
-      introduce: fakerEN.lorem.sentence(),
-      description: fakerEN.lorem.paragraph(),
+      introduce: introduces[faker.number.int({ min: 0, max: introduces.length - 1 })],
+      description: driverDescriptions[faker.number.int({ min: 0, max: driverDescriptions.length - 1 })],
       serviceType: driverServiceTypes,
       availableAreas: driverAreas,
       applyCount: faker.number.int({ min: 1, max: 100 }),
@@ -87,15 +94,23 @@ async function main() {
   await prisma.driver.createMany({ data: drivers });
 
   // Generate mock data for MoveInfo
-  const moveInfos = Array.from({ length: 50 }).map(() => ({
-    id: faker.string.uuid(),
-    serviceType: serviceType[faker.number.int({ min: 0, max: serviceType.length - 1 })],
-    date: faker.date.future(),
-    fromAddress: faker.location.streetAddress(),
-    toAddress: faker.location.streetAddress(),
-    progress: progress[faker.number.int({ min: 0, max: progress.length - 1 })],
-    ownerId: users[faker.number.int({ min: 0, max: users.length - 1 })].id,
-  }));
+  const moveInfos = Array.from({ length: 50 }).map(() => {
+    const fromIndex = faker.number.int({ min: 0, max: addresses.length - 1 });
+    let toIndex = faker.number.int({ min: 0, max: addresses.length - 1 });
+    while (fromIndex === toIndex) {
+      toIndex = faker.number.int({ min: 0, max: addresses.length - 1 });
+    }
+
+    return {
+      id: faker.string.uuid(),
+      serviceType: serviceType[faker.number.int({ min: 0, max: serviceType.length - 1 })],
+      date: faker.date.future(),
+      fromAddress: addresses[fromIndex],
+      toAddress: addresses[toIndex],
+      progress: progress[faker.number.int({ min: 0, max: progress.length - 1 })],
+      ownerId: users[faker.number.int({ min: 0, max: users.length - 1 })].id,
+    };
+  });
   await prisma.moveInfo.createMany({ data: moveInfos });
 
   // Generate mock data for Request
@@ -111,7 +126,7 @@ async function main() {
   const estimations = Array.from({ length: 50 }).map(() => ({
     id: faker.string.uuid(),
     price: faker.number.int({ min: 10000, max: 1000000, multipleOf: 1000 }),
-    comment: fakerEN.lorem.sentence(),
+    comment: estimationComments[faker.number.int({ min: 0, max: estimationComments.length - 1 })],
     moveInfoId: moveInfos[faker.number.int({ min: 0, max: moveInfos.length - 1 })].id,
     driverId: drivers[faker.number.int({ min: 0, max: drivers.length - 1 })].id,
   }));
@@ -120,7 +135,7 @@ async function main() {
   // Generate mock data for Question
   const questions = Array.from({ length: 50 }).map(() => ({
     id: faker.string.uuid(),
-    content: fakerEN.lorem.sentence(),
+    content: questionContents[faker.number.int({ min: 0, max: questionContents.length - 1 })],
     estimationId: estimations[faker.number.int({ min: 0, max: estimations.length - 1 })].id,
   }));
   await prisma.question.createMany({ data: questions });
@@ -128,7 +143,7 @@ async function main() {
   // Generate mock data for Review
   const reviews = Array.from({ length: 50 }).map(() => ({
     id: faker.string.uuid(),
-    comment: fakerEN.lorem.sentence(),
+    comment: reviewContents[faker.number.int({ min: 0, max: reviewContents.length - 1 })],
     score: faker.number.int({ min: 1, max: 5 }),
     driverId: drivers[faker.number.int({ min: 0, max: drivers.length - 1 })].id,
     ownerId: users[faker.number.int({ min: 0, max: users.length - 1 })].id,
