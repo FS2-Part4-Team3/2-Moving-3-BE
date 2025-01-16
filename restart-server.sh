@@ -7,15 +7,26 @@
 clear
 
 echo "Checking for processes using port 80..."
-if lsof -i :80 > /dev/null; then
-    echo "Killing process on port 80..."
-    sudo kill -9 $(lsof -t -i:80)
-    sleep 2
-fi
+lsof -i :80
+PORT_PROCESS=$(lsof -t -i:80)
 
-if lsof -i :80 > /dev/null; then
-    echo "Port 80 is still in use. Please check manually with 'sudo lsof -i :80'"
-    exit 1
+if [ ! -z "$PORT_PROCESS" ]; then
+    echo "Found processes using port 80: $PORT_PROCESS"
+    echo "Attempting to kill processes..."
+    for pid in $PORT_PROCESS; do
+        echo "Killing process $pid"
+        sudo kill -9 $pid
+    done
+    sleep 2
+    
+    REMAINING_PROCESS=$(lsof -t -i:80)
+    if [ ! -z "$REMAINING_PROCESS" ]; then
+        echo "Warning: Port 80 is still in use by processes: $REMAINING_PROCESS"
+        echo "Please check manually with: sudo lsof -i :80"
+        exit 1
+    fi
+else
+    echo "No processes found using port 80"
 fi
 
 
