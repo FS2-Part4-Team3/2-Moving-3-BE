@@ -91,6 +91,9 @@ export class FilteredUserOutputDTO {
 
   @ApiProperty({ description: '프로바이더 아이디' })
   providerId?: string;
+
+  @ApiProperty({ description: '이미지 업로드 URL' })
+  uploadUrl?: string;
 }
 
 export class FilteredDriverOutputDTO {
@@ -141,6 +144,9 @@ export class FilteredDriverOutputDTO {
 
   @ApiProperty({ description: '프로바이더 아이디' })
   providerId?: string;
+
+  @ApiProperty({ description: '이미지 업로드 URL' })
+  uploadUrl?: string;
 }
 
 export class UserTypeParamDTO {
