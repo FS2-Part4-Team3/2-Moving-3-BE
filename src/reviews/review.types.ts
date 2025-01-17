@@ -100,6 +100,14 @@ class DriverReviewOutputDTO extends ReviewOutputDTO {
   owner: OwnerNameDTO;
 }
 
+export class statsDTO {
+  @ApiProperty({ description: '평균 점수', type: Number })
+  averageRating: number;
+
+  @ApiProperty({ description: '각 점수 갯수([1, 2, 3, ,4 ,5]순)', type: String })
+  ratingCounts: string;
+}
+
 export class MyReviewResponseDTO {
   @ApiProperty({ description: '전체 리뷰 개수', type: Number })
   totalCount: number;
@@ -111,6 +119,9 @@ export class MyReviewResponseDTO {
 export class DriverReviewResponseDTO {
   @ApiProperty({ description: '전체 리뷰 개수', type: Number })
   totalCount: number;
+
+  @ApiProperty({ description: '통계', type: statsDTO })
+  stats: statsDTO;
 
   @ApiProperty({ description: '리뷰 목록', type: [DriverReviewOutputDTO] })
   list: DriverReviewOutputDTO[];

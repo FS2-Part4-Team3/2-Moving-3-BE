@@ -33,8 +33,9 @@ export class ReviewService implements IReviewService {
   async getDriverReviews(driverId: string, options: FindOptions) {
     const list = await this.reviewRepository.findManyDriverReviews(driverId, options);
     const totalCount = await this.reviewRepository.totalCount(driverId, 'driver');
+    const stats = await this.reviewRepository.getDriverReviewStats(driverId);
 
-    return { totalCount, list };
+    return { totalCount, stats, list };
   }
 
   async postReview(estimationId: string, body: ReviewInputDTO) {

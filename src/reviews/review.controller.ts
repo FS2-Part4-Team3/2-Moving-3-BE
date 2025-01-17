@@ -39,9 +39,9 @@ export class ReviewController implements IReviewController {
     const { page = 1, pageSize = 10, orderBy = SortOrder.Recent, keyword = '' } = query;
     const options = { page, pageSize, orderBy, keyword };
 
-    const { totalCount, list } = await this.reviewService.getDriverReviews(driverId, options);
+    const { totalCount, stats, list } = await this.reviewService.getDriverReviews(driverId, options);
 
-    return { totalCount, list };
+    return { totalCount, stats, list };
   }
 
   @Post(':estimationId')
