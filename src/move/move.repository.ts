@@ -1,6 +1,6 @@
 import { PrismaService } from '#global/prisma.service.js';
 import { IMoveRepository } from '#move/interfaces/move.repository.interface.js';
-import { MoveInfoInputDTO } from '#move/move.types.js';
+import { MoveInfo, MoveInfoInputDTO } from '#move/move.types.js';
 import { IsActivate, MoveInfoSortOrder } from '#types/options.type.js';
 import { MoveInfoGetQueries } from '#types/queries.type.js';
 import { areaToKeyword } from '#utils/address-utils.js';
@@ -104,7 +104,9 @@ export class MoveRepository implements IMoveRepository {
     return moveInfo;
   }
 
-  async create(data: MoveInfoInputDTO) {}
+  async postMoveInfo(moveData: MoveInfoInputDTO & { ownerId : string, progress : Progress } ): Promise<MoveInfo> {
+    return await this.moveInfo.create({ data: moveData });
+  }
 
   async update(id: string, data: Partial<MoveInfoInputDTO>) {}
 
