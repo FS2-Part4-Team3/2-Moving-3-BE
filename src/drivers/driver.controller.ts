@@ -54,11 +54,26 @@ export class DriverController implements IDriverController {
     status: HttpStatus.OK,
     type: FilteredDriverOutputDTO,
   })
-  async patchUser(@Body() body: DriverPatchDTO) {
-    const user = await this.driverService.updateDriver(body);
+  async patchDriver(@Body() body: DriverPatchDTO) {
+    const driver = await this.driverService.updateDriver(body);
 
-    return user;
+    return driver;
   }
+
+  @Get('like')
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth('accessToken')
+  @ApiOperation({ summary: '찜한 기사 조회' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    schema: {
+      type: 'array',
+      items: {
+        $ref: getSchemaPath(FilteredDriverOutputDTO),
+      },
+    },
+  })
+  async getLikedDrivers() {}
 
   @Post(':id/like')
   @UseGuards(AccessTokenGuard)
