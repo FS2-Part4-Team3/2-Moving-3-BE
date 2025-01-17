@@ -1,6 +1,7 @@
 import { ModelBase } from '#types/common.types.js';
 import { ApiProperty } from '@nestjs/swagger';
-import { MoveInfo as PrismaMoveInfo, Progress, ServiceType } from '@prisma/client';
+import { $Enums, MoveInfo as PrismaMoveInfo, Progress, ServiceType } from '@prisma/client';
+import { IsDate, IsEnum, IsNotEmpty, IsString } from 'class-validator';
 
 interface PrismaMoveInfoBase extends Omit<PrismaMoveInfo, keyof ModelBase> {}
 interface MoveInfoBase extends PrismaMoveInfoBase {}
@@ -8,6 +9,26 @@ interface MoveInfoBase extends PrismaMoveInfoBase {}
 export interface MoveInfo extends MoveInfoBase, ModelBase {}
 
 export interface MoveInfoInputDTO extends Omit<MoveInfo, keyof ModelBase> {}
+
+export class MoveInputDTO {
+  @IsEnum($Enums.ServiceType, { message: '서비스 타입이 유효하지 않습니다.'})
+  @IsNotEmpty({ message: '서비스 타입을 선택해주세요.' })
+  @ApiProperty({description: '서비스 타입'})
+  serviceType: $Enums.ServiceType;
+
+  @IsDate({ message: '유효한 날짜를 입력해주세요.' })
+  @IsNotEmpty({ message: '이사 날짜는 필수입니다.' })
+  date: string;
+
+  @IsString({ message: '출발 주소는 문자열이어야 합니다.' })
+  @IsNotEmpty({ message: '출발 주소는 필수입니다.' })
+  fromAddress: string;
+
+  @IsString({ message: '도착 주소는 문자열이어야 합니다.' })
+  @IsNotEmpty({ message: '도착 주소는 필수입니다.' })
+  toAddress: string;
+
+}
 
 export class BaseMoveInfoOutputDTO {
   @ApiProperty({ description: '이사정보 ID', type: String })

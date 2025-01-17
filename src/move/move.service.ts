@@ -5,6 +5,8 @@ import { Injectable } from '@nestjs/common';
 import { AsyncLocalStorage } from 'async_hooks';
 import { MoveRepository } from './move.repository.js';
 import { MoveInfoNotFoundException } from './move.exception.js';
+import { Progress } from '@prisma/client';
+import { MoveInfo, MoveInfoInputDTO } from './move.types.js';
 
 @Injectable()
 export class MoveService implements IMoveService {
@@ -30,4 +32,17 @@ export class MoveService implements IMoveService {
 
     return moveInfo;
   }
+
+  async postMoveInfo(moveData: MoveInfoInputDTO): Promise<MoveInfo> {
+    const { userId } = this.als.getStore();
+    const progress = Progress.OPEN
+    const moveInfo = await this.moveRepository.postMoveInfo({
+      ...moveData,
+      ownerId:userId,
+      progress
+    });
+
+    return moveInfo;
+  }
+
 }
