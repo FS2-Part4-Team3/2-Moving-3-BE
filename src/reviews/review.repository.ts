@@ -41,19 +41,26 @@ export class ReviewRepository implements IReviewRepository {
       skip: (page - 1) * pageSize,
       take: pageSize,
       include: {
-        driver: { select: { name: true, image: true } },
-        owner: {
+        estimation: {
           select: {
-            moveInfos: {
-              where: { progress: 'COMPLETE' },
+            price: true,
+            moveInfo: {
               select: {
-                type: true,
+                serviceType: true,
                 date: true,
-                confirmedEstimation: {
+                requests: {
+                  where: { status: 'APPLY' },
                   select: {
-                    price: true,
+                    status: true,
+                    driverId: true,
                   },
                 },
+              },
+            },
+            driver: {
+              select: {
+                name: true,
+                image: true,
               },
             },
           },
@@ -61,7 +68,18 @@ export class ReviewRepository implements IReviewRepository {
       },
     });
 
-    return list;
+    const addedList = list.map(review => ({
+      ...review,
+      estimation: {
+        ...review.estimation,
+        moveInfo: {
+          ...review.estimation.moveInfo,
+          isSpecificRequest: review.estimation.moveInfo.requests.some(req => req.driverId === review.driverId),
+        },
+      },
+    }));
+
+    return addedList;
   }
 
   async findManyDriverReviews(driverId: string, options: FindOptions) {
