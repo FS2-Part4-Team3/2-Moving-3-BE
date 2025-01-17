@@ -6,7 +6,7 @@ export interface IDriverController {
   getDrivers: (query: DriversGetQueries) => Promise<{ totalCount: number; list: FilteredPersonalInfo<Driver>[] }>;
   getDriver: (id: string) => Promise<FilteredPersonalInfo<Driver>>;
   patchDriver: (body: DriverPatchDTO) => Promise<FilteredPersonalInfo<Driver>>;
-  getLikedDrivers: () => void;
+  getLikedDrivers: (page: number, pageSize: number) => void;
   postLikeDriver: (id: string) => Promise<FilteredPersonalInfo<Driver>>;
   deleteLikeDriver: (id: string) => Promise<FilteredPersonalInfo<Driver>>;
 }

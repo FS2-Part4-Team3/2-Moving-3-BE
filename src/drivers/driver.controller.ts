@@ -5,7 +5,20 @@ import { IDriverController } from '#drivers/interfaces/driver.controller.interfa
 import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { DriverSortOrder } from '#types/options.type.js';
 import { DriversGetQueries } from '#types/queries.type.js';
-import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  DefaultValuePipe,
+  Delete,
+  Get,
+  HttpStatus,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiQuery, ApiResponse, getSchemaPath } from '@nestjs/swagger';
 
 @Controller('drivers')
@@ -29,6 +42,40 @@ export class DriverController implements IDriverController {
     const options = { page, pageSize, orderBy, keyword, area, serviceType };
 
     const drivers = await this.driverService.findDrivers(options);
+
+    return drivers;
+  }
+
+  @Get('like')
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth('accessToken')
+  @ApiOperation({ summary: '찜한 기사 조회' })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+  })
+  @ApiQuery({
+    name: 'pageSize',
+    required: false,
+    type: Number,
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    schema: {
+      type: 'array',
+      items: {
+        $ref: getSchemaPath(FilteredDriverOutputDTO),
+      },
+    },
+  })
+  async getLikedDrivers(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('pageSize', new DefaultValuePipe(3), ParseIntPipe) pageSize: number,
+  ) {
+    const options = { page, pageSize, orderBy: null, keyword: '', area: null, serviceType: null };
+
+    const drivers = await this.driverService.findLikedDrivers(options);
 
     return drivers;
   }
@@ -59,21 +106,6 @@ export class DriverController implements IDriverController {
 
     return driver;
   }
-
-  @Get('like')
-  @UseGuards(AccessTokenGuard)
-  @ApiBearerAuth('accessToken')
-  @ApiOperation({ summary: '찜한 기사 조회' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    schema: {
-      type: 'array',
-      items: {
-        $ref: getSchemaPath(FilteredDriverOutputDTO),
-      },
-    },
-  })
-  async getLikedDrivers() {}
 
   @Post(':id/like')
   @UseGuards(AccessTokenGuard)
