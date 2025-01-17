@@ -5,7 +5,20 @@ import { IDriverController } from '#drivers/interfaces/driver.controller.interfa
 import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { DriverSortOrder } from '#types/options.type.js';
 import { DriversGetQueries } from '#types/queries.type.js';
-import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  DefaultValuePipe,
+  Delete,
+  Get,
+  HttpStatus,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiQuery, ApiResponse, getSchemaPath } from '@nestjs/swagger';
 
 @Controller('drivers')
@@ -33,6 +46,40 @@ export class DriverController implements IDriverController {
     return drivers;
   }
 
+  @Get('like')
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth('accessToken')
+  @ApiOperation({ summary: '찜한 기사 조회' })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+  })
+  @ApiQuery({
+    name: 'pageSize',
+    required: false,
+    type: Number,
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    schema: {
+      type: 'array',
+      items: {
+        $ref: getSchemaPath(FilteredDriverOutputDTO),
+      },
+    },
+  })
+  async getLikedDrivers(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('pageSize', new DefaultValuePipe(3), ParseIntPipe) pageSize: number,
+  ) {
+    const options = { page, pageSize, orderBy: null, keyword: '', area: null, serviceType: null };
+
+    const drivers = await this.driverService.findLikedDrivers(options);
+
+    return drivers;
+  }
+
   @Get(':id')
   @ApiOperation({ summary: '기사 상세 조회' })
   @ApiParam({ name: 'id', description: '기사 ID', type: 'string' })
@@ -54,10 +101,10 @@ export class DriverController implements IDriverController {
     status: HttpStatus.OK,
     type: FilteredDriverOutputDTO,
   })
-  async patchUser(@Body() body: DriverPatchDTO) {
-    const user = await this.driverService.updateDriver(body);
+  async patchDriver(@Body() body: DriverPatchDTO) {
+    const driver = await this.driverService.updateDriver(body);
 
-    return user;
+    return driver;
   }
 
   @Post(':id/like')

@@ -69,6 +69,9 @@ export class DriversFindOptions extends OmitType(FindOptions, ['orderBy']) {
   @IsEnum(ServiceType, { message: '올바른 서비스 타입을 골라주세요.' })
   @ApiProperty({ description: '서비스 타입' })
   serviceType: ServiceType;
+
+  @IsOptional()
+  likedUserId?: string;
 }
 
 export class MoveInfoFilter extends OmitType(FindOptions, ['orderBy']) {
