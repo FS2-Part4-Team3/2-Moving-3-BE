@@ -128,7 +128,7 @@ model Estimation {
   questions           Question[]
   userNotifications   UserNotification[]
   driverNotifications DriverNotification[]
-  Review              Review?
+  reviews             Review[]
 
   @@index([createdAt])
 }
@@ -158,12 +158,12 @@ model Review {
   comment String
   score   Int
 
-  driver       Driver      @relation(fields: [driverId], references: [id])
+  driver       Driver     @relation(fields: [driverId], references: [id])
   driverId     String
-  owner        User        @relation(fields: [ownerId], references: [id])
+  owner        User       @relation(fields: [ownerId], references: [id])
   ownerId      String
-  estimation   Estimation? @relation(fields: [estimationId], references: [id])
-  estimationId String?     @unique
+  estimation   Estimation @relation(fields: [estimationId], references: [id])
+  estimationId String
 
   @@index([createdAt])
 }

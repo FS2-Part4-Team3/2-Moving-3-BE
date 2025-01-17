@@ -6,11 +6,13 @@ import { AsyncLocalStorage } from 'async_hooks';
 import { ReviewRepository } from './review.repository.js';
 import { ReviewInputDTO } from './review.types.js';
 import { ForbiddenException } from '#exceptions/http.exception.js';
-import { ReviewNotFoundException } from './review.exception.js';
+import { ReviewAlreadyExistsException, ReviewNotFoundException } from './review.exception.js';
+import { EstimationRepository } from '#estimations/estimation.repository.js';
 
 @Injectable()
 export class ReviewService implements IReviewService {
   constructor(
+    private readonly estimationRepository: EstimationRepository,
     private readonly reviewRepository: ReviewRepository,
     private readonly als: AsyncLocalStorage<IStorage>,
   ) {}
@@ -35,11 +37,18 @@ export class ReviewService implements IReviewService {
     return { totalCount, list };
   }
 
-  async postReview(driverId: string, body: ReviewInputDTO) {
+  async postReview(estimationId: string, body: ReviewInputDTO) {
     const { userId } = this.als.getStore();
     const { comment, score } = body;
 
-    const reviewData = { comment, score, ownerId: userId, driverId };
+    const { driverId, reviews } = await this.estimationRepository.findById(estimationId);
+    const existingReview = reviews.find(review => review.estimationId === estimationId && review.ownerId === userId);
+
+    if (existingReview) {
+      throw new ReviewAlreadyExistsException();
+    }
+
+    const reviewData = { comment, score, ownerId: userId, driverId, estimationId };
 
     const review = await this.reviewRepository.create(reviewData);
 

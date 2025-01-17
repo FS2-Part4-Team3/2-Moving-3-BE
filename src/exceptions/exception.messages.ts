@@ -22,6 +22,7 @@ enum ExceptionMessages {
   QUESTION_NOT_FOUND = '찾을 수 없는 문의입니다.',
 
   REVIEW_NOT_FOUND = '찾을 수 없는 리뷰입니다.',
+  REVIEW_ALREADY_SUBMITTED = '이미 리뷰를 작성하였습니다.',
 
   REQUEST_NOT_FOUND = '찾을 수 없는 지정견적요청입니다.',
 
