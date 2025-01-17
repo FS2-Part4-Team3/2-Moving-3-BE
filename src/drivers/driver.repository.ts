@@ -13,7 +13,8 @@ export class DriverRepository implements IDriverRepository {
   }
 
   private generateFindCondition(options: DriversFindOptions) {
-    const { orderBy, keyword, area, serviceType } = options;
+    const { orderBy, keyword, area, serviceType, likedUserId } = options;
+    console.log('🚀 ~ DriverRepository ~ generateFindCondition ~ likedUserId:', likedUserId);
 
     let sort = {};
     switch (orderBy) {
@@ -33,11 +34,13 @@ export class DriverRepository implements IDriverRepository {
         sort = { createdAt: 'desc' };
     }
 
+    const likedCondition = likedUserId ? { likedUsers: { some: { id: likedUserId } } } : {};
     const areaCondition = area ? { availableAreas: { has: area } } : {};
     const typeCondition = serviceType ? { serviceType: { has: serviceType } } : {};
 
     const where = {
       OR: [{ name: { contains: keyword } }, { introduce: { contains: keyword } }],
+      ...likedCondition,
       ...areaCondition,
       ...typeCondition,
     };

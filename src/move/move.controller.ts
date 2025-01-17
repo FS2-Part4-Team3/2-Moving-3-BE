@@ -1,10 +1,10 @@
 import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { IMoveController } from '#move/interfaces/move.controller.interface.js';
 import { MoveInfoGetQueries } from '#types/queries.type.js';
-import { Controller, Get, HttpStatus, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiParam, ApiQuery, ApiResponse } from '@nestjs/swagger';
+import { Body, Controller, Get, HttpStatus, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { MoveService } from './move.service.js';
-import { BaseMoveInfoOutputDTO, MoveInfoResponseDTO } from './move.types.js';
+import { BaseMoveInfoOutputDTO, MoveInfo, MoveInfoInputDTO, MoveInfoResponseDTO, MoveInputDTO } from './move.types.js';
 
 @Controller('moves')
 export class MoveController implements IMoveController {
@@ -58,8 +58,17 @@ export class MoveController implements IMoveController {
   }
 
   @Post()
+  @UseGuards(AccessTokenGuard)
   @ApiOperation({ summary: '이사 정보 생성' })
-  async postMoveInfo() {}
+  @ApiBody({ type: MoveInputDTO })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: BaseMoveInfoOutputDTO
+  })
+  async postMoveInfo(@Body() moveData: MoveInfoInputDTO): Promise<MoveInfo> {
+    const moveInfo = await this.moveService.postMoveInfo(moveData);
+    return moveInfo;
+  }
 
   @Patch(':id')
   @ApiOperation({ summary: '이사 정보 수정' })
