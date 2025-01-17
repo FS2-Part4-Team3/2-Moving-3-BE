@@ -1,4 +1,4 @@
-import { EstimationInputDTO } from '#estimations/estimation.types.js';
+import { EstimationInputDTO, Estimation } from '#estimations/estimation.types.js';
 import { IEstimationRepository } from '#estimations/interfaces/estimation.repository.interface.js';
 import { PrismaService } from '#global/prisma.service.js';
 import { FindOptions } from '#types/options.type.js';
@@ -19,7 +19,9 @@ export class EstimationRepository implements IEstimationRepository {
     return estimation;
   }
 
-  async create(data: EstimationInputDTO) {}
+  async create(data: EstimationInputDTO): Promise<Estimation> {
+    return this.estimation.create({ data });
+  }
 
   async update(id: string, data: Partial<EstimationInputDTO>) {}
 

@@ -6,10 +6,15 @@ import { SortOrder } from '#types/options.type.js';
 import { GetQueries } from '#types/queries.type.js';
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, getSchemaPath } from '@nestjs/swagger';
+import { EstimationService } from '#estimations/estimation.service.js';
+import { EstimationEntity, EstimationInputDTO } from '#estimations/estimation.types.js';
 
 @Controller('estimations')
 export class EstimationController implements IEstimationController {
-  constructor(private readonly questionService: QuestionService) {}
+  constructor(
+    private readonly questionService: QuestionService,
+    private readonly estimationService: EstimationService
+  ) {}
 
   @Get()
   @ApiOperation({ summary: '견적 목록 조회' })
@@ -20,8 +25,21 @@ export class EstimationController implements IEstimationController {
   async getEstimation() {}
 
   @Post(':moveInfoId')
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth('accessToken')
+  @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: '견적 생성' })
-  async postEstimation() {}
+  @ApiResponse({ 
+    status: HttpStatus.CREATED,
+    type: EstimationEntity })
+  async postEstimation(
+    @Param('moveInfoId') moveInfoId: string,
+    @Body() body: EstimationInputDTO
+  ) {
+    const estimation = await this.estimationService.createEstimation(moveInfoId, body);
+
+    return estimation;
+  }
 
   @Post(':id')
   @ApiOperation({ summary: '견적 수정' })
