@@ -5,7 +5,7 @@
 # docker image prune -a -f
 # docker compose up --build -d
 
-#version 2
+# version 2
 # clear
 
 # echo "Checking for processes using port 80..."
