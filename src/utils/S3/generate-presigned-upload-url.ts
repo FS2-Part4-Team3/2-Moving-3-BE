@@ -20,13 +20,13 @@ const s3 = new S3Client({
  */
 export async function generatePresignedUploadUrl(
   s3Key: string,
-  contentType: string = 'image/jpeg',
+  // contentType: string = 'image/jpeg',
   expiresIn: number = 3600,
 ): Promise<string> {
   const command = new PutObjectCommand({
     Bucket: awsConfig.bucketName,
     Key: s3Key,
-    ContentType: contentType,
+    // ContentType: contentType,
   });
 
   return await getSignedUrl(s3, command, { expiresIn });
