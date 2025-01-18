@@ -38,9 +38,9 @@ export class MoveController implements IMoveController {
     type: MoveInfoResponseDTO,
   })
   async getMoveInfos(@Query() query: MoveInfoGetQueries) {
-    const request = await this.moveService.getMoveInfos(query);
+    const moveInfo = await this.moveService.getMoveInfos(query);
 
-    return request;
+    return moveInfo;
   }
 
   @Get(':moveInfoId')

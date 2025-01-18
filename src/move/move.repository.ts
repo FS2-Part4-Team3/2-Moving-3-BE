@@ -16,9 +16,14 @@ export class MoveRepository implements IMoveRepository {
 
   async findMany(options: MoveInfoGetQueries, driverId: string, driverAvailableAreas: Area[]) {
     const { page = 1, pageSize = 10, orderBy, keyword, serviceType, serviceArea, designatedRequest } = options;
-    const serviceTypes = options.serviceType ? options.serviceType.split(',') : undefined;
+    const serviceTypes = serviceType
+      ? serviceType
+          .split(/[,+\s]/)
+          .map(type => type.trim())
+          .filter(type => type)
+      : undefined;
 
-    const whereCondition = {
+    const baseWhereCondition = {
       AND: [
         ...(keyword
           ? [
@@ -31,7 +36,7 @@ export class MoveRepository implements IMoveRepository {
               },
             ]
           : []),
-        ...(serviceType
+        ...(serviceTypes?.length
           ? [
               {
                 serviceType: { in: serviceTypes },
@@ -70,26 +75,92 @@ export class MoveRepository implements IMoveRepository {
 
     let orderByCondition;
     if (orderBy === MoveInfoSortOrder.UpcomingMoveDate) {
-      orderByCondition = { date: 'desc' };
+      orderByCondition = { date: 'asc' };
     } else if (orderBy === MoveInfoSortOrder.RecentRequest) {
-      orderByCondition = { createdAt: 'asc' };
+      orderByCondition = { createdAt: 'desc' };
     } else {
-      orderByCondition = { createdAt: 'asc' };
+      orderByCondition = { createdAt: 'desc' };
     }
 
     const list = await this.moveInfo.findMany({
-      where: whereCondition,
+      where: baseWhereCondition,
       skip: (page - 1) * pageSize,
       take: pageSize,
       orderBy: orderByCondition,
       include: {
         owner: { select: { name: true } },
+        requests: { select: { driverId: true } },
       },
     });
 
-    const totalCount = await this.moveInfo.count({ where: whereCondition });
+    const totalCount = await this.moveInfo.count({ where: baseWhereCondition });
 
-    return { totalCount, list };
+    const serviceTypeCounts = await Promise.all(
+      ['SMALL', 'HOME', 'OFFICE'].map(async type => ({
+        type,
+        count: await this.moveInfo.count({
+          where: {
+            ...baseWhereCondition,
+            AND: [
+              ...baseWhereCondition.AND,
+              {
+                serviceType: type,
+              },
+            ],
+          },
+        }),
+      })),
+    );
+
+    const serviceAreaCount = await this.moveInfo.count({
+      where: {
+        ...baseWhereCondition,
+        AND: [
+          ...baseWhereCondition.AND,
+          {
+            OR: [
+              ...driverAvailableAreas.map(area => ({
+                fromAddress: { contains: areaToKeyword(area) },
+              })),
+              ...driverAvailableAreas.map(area => ({
+                toAddress: { contains: areaToKeyword(area) },
+              })),
+            ],
+          },
+        ],
+      },
+    });
+
+    const designatedRequestCount = await this.moveInfo.count({
+      where: {
+        ...baseWhereCondition,
+        AND: [
+          ...baseWhereCondition.AND,
+          {
+            requests: {
+              some: {
+                driverId,
+              },
+            },
+          },
+        ],
+      },
+    });
+
+    const addedList = list.map(moveInfo => ({
+      ...moveInfo,
+      isSpecificRequest: moveInfo.requests.some(req => req.driverId === driverId),
+    }));
+
+    return {
+      totalCount,
+      counts: {
+        serviceTypeCounts,
+        serviceAreaCount,
+        designatedRequestCount,
+      },
+      list: addedList,
+    };
   }
 
   async findByUserId(userId: string) {

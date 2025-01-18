@@ -70,6 +70,25 @@ class OwnerNameDTO {
   name: String;
 }
 
+class serviceTypeCountsDTO {
+  @ApiProperty({ description: '타입(SMALL, HOME, OFFICE)', type: String })
+  type: string;
+
+  @ApiProperty({ description: '해당 타입 개수', type: Number })
+  count: Number;
+}
+
+class filterCountDTO {
+  @ApiProperty({ description: '서비스타입 개수', type: [serviceTypeCountsDTO] })
+  serviceTypeCounts: serviceTypeCountsDTO[];
+
+  @ApiProperty({ description: '서비스가능지역 개수', type: Number })
+  serviceAreaCount: Number;
+
+  @ApiProperty({ description: '지정견적요청 개수', type: Number })
+  designatedRequestCount: Number;
+}
+
 class MoveInfoOutputDTO extends BaseMoveInfoOutputDTO {
   @ApiProperty({ description: '이사 정보 목록', type: OwnerNameDTO })
   owner: OwnerNameDTO;
@@ -78,6 +97,9 @@ class MoveInfoOutputDTO extends BaseMoveInfoOutputDTO {
 export class MoveInfoResponseDTO {
   @ApiProperty({ description: '전체 이사정보 개수', type: Number })
   totalCount: number;
+
+  @ApiProperty({ description: '필터 개수', type: filterCountDTO })
+  counts: filterCountDTO;
 
   @ApiProperty({ description: '리뷰 목록', type: [MoveInfoOutputDTO] })
   list: MoveInfoOutputDTO[];
