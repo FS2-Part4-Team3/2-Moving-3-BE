@@ -16,9 +16,9 @@ export class MoveService implements IMoveService {
   async getMoveInfos(options: MoveInfoGetQueries) {
     const { driverId, driver: driverInfo } = this.als.getStore();
 
-    const { list, totalCount } = await this.moveRepository.findMany(options, driverId, driverInfo.availableAreas);
+    const moveInfo = await this.moveRepository.findMany(options, driverId, driverInfo.availableAreas);
 
-    return { totalCount, list };
+    return moveInfo;
   }
 
   async getMoveInfo(moveInfoId: string) {
