@@ -31,6 +31,15 @@ import { Response } from 'express';
 export class AuthController implements IAuthController {
   constructor(private readonly authService: AuthService) {}
 
+  private setRefreshToken(res: Response, token: string) {
+    res.cookie('refreshToken', token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+      maxAge: 1000 * 60 * 60 * 24 * 14,
+    });
+  }
+
   @Post('signUp/:userType')
   @UseGuards(HashPasswordGuard)
   @ApiOperation({ summary: '회원가입' })
@@ -51,7 +60,7 @@ export class AuthController implements IAuthController {
     @Res({ passthrough: true }) response: Response,
   ) {
     const { person, accessToken, refreshToken } = await this.authService.createPerson(body, type);
-    response.cookie('refreshToken', refreshToken);
+    this.setRefreshToken(response, refreshToken);
 
     return { person, accessToken };
   }
@@ -71,7 +80,7 @@ export class AuthController implements IAuthController {
   })
   async updatePassword(@Body() body: UpdatePasswordDTO, @Res({ passthrough: true }) response: Response) {
     const { person, accessToken, refreshToken } = await this.authService.updatePassword(body);
-    response.cookie('refreshToken', refreshToken);
+    this.setRefreshToken(response, refreshToken);
 
     return { person, accessToken };
   }
@@ -96,7 +105,7 @@ export class AuthController implements IAuthController {
     const type = userType === 'user' ? UserType.User : UserType.Driver;
 
     const { person, accessToken, refreshToken } = await this.authService.signIn(body, type);
-    response.cookie('refreshToken', refreshToken);
+    this.setRefreshToken(response, refreshToken);
 
     return { person, accessToken };
   }
@@ -133,7 +142,7 @@ export class AuthController implements IAuthController {
   })
   async refreshToken(@Res({ passthrough: true }) response: Response) {
     const { person, accessToken, refreshToken, type } = await this.authService.getNewToken();
-    response.cookie('refreshToken', refreshToken);
+    this.setRefreshToken(response, refreshToken);
 
     return { person, accessToken };
   }
@@ -160,7 +169,7 @@ export class AuthController implements IAuthController {
     const redirectResult: GoogleAuthType = req.user;
 
     const { person, accessToken, refreshToken } = await this.authService.googleAuth(redirectResult);
-    response.cookie('refreshToken', refreshToken);
+    this.setRefreshToken(response, refreshToken);
 
     response.redirect(`http://localhost:3000/callback/google?accessToken=${accessToken}`);
     // response.redirect(`https://www.moving.wiki/callback/google?accessToken=${accessToken}`);
