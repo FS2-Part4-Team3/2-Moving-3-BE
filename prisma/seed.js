@@ -147,6 +147,7 @@ async function main() {
     score: faker.number.int({ min: 1, max: 5 }),
     driverId: drivers[faker.number.int({ min: 0, max: drivers.length - 1 })].id,
     ownerId: users[faker.number.int({ min: 0, max: users.length - 1 })].id,
+    estimationId: estimations[faker.number.int({ min: 0, max: estimations.length - 1 })].id,
   }));
   // await prisma.review.createMany({ data: reviews });
   for (const review of reviews) {
