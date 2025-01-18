@@ -69,7 +69,7 @@ export class MoveRepository implements IMoveRepository {
               },
             ]
           : []),
-        // { progress: Progress.OPEN },
+        { progress: Progress.OPEN },
       ],
     };
 
