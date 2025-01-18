@@ -16,7 +16,12 @@ export class MoveRepository implements IMoveRepository {
 
   async findMany(options: MoveInfoGetQueries, driverId: string, driverAvailableAreas: Area[]) {
     const { page = 1, pageSize = 10, orderBy, keyword, serviceType, serviceArea, designatedRequest } = options;
-    const serviceTypes = options.serviceType ? options.serviceType.split(',') : undefined;
+    const serviceTypes = serviceType
+      ? serviceType
+          .split(/[,+\s]/)
+          .map(type => type.trim())
+          .filter(type => type)
+      : undefined;
 
     const whereCondition = {
       AND: [
@@ -31,7 +36,7 @@ export class MoveRepository implements IMoveRepository {
               },
             ]
           : []),
-        ...(serviceType
+        ...(serviceTypes?.length
           ? [
               {
                 serviceType: { in: serviceTypes },
@@ -70,11 +75,11 @@ export class MoveRepository implements IMoveRepository {
 
     let orderByCondition;
     if (orderBy === MoveInfoSortOrder.UpcomingMoveDate) {
-      orderByCondition = { date: 'desc' };
+      orderByCondition = { date: 'asc' };
     } else if (orderBy === MoveInfoSortOrder.RecentRequest) {
-      orderByCondition = { createdAt: 'asc' };
+      orderByCondition = { createdAt: 'desc' };
     } else {
-      orderByCondition = { createdAt: 'asc' };
+      orderByCondition = { createdAt: 'desc' };
     }
 
     const list = await this.moveInfo.findMany({
