@@ -14,7 +14,6 @@ export class DriverRepository implements IDriverRepository {
 
   private generateFindCondition(options: DriversFindOptions) {
     const { orderBy, keyword, area, serviceType, likedUserId } = options;
-    console.log('🚀 ~ DriverRepository ~ generateFindCondition ~ likedUserId:', likedUserId);
 
     let sort = {};
     switch (orderBy) {
