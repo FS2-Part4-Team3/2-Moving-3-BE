@@ -32,11 +32,14 @@ export class AuthController implements IAuthController {
   constructor(private readonly authService: AuthService) {}
 
   private setRefreshToken(res: Response, token: string) {
+    const domain = 'localhost';
+
     res.cookie('refreshToken', token, {
       httpOnly: true,
       secure: true,
-      // sameSite: 'strict',
+      sameSite: 'lax',
       maxAge: 1000 * 60 * 60 * 24 * 14,
+      domain,
     });
   }
 
