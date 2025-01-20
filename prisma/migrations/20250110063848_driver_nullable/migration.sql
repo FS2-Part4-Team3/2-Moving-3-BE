@@ -1,4 +1,0 @@
--- AlterTable
-ALTER TABLE "Driver" ALTER COLUMN "nickname" DROP NOT NULL,
-ALTER COLUMN "introduce" DROP NOT NULL,
-ALTER COLUMN "description" DROP NOT NULL;
