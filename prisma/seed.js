@@ -1,4 +1,4 @@
-import { fakerKO as faker, faker as fakerEN } from '@faker-js/faker';
+import { fakerKO as faker } from '@faker-js/faker';
 import { PrismaClient } from '@prisma/client';
 import {
   addresses,
@@ -6,6 +6,7 @@ import {
   driverDescriptions,
   estimationComments,
   introduces,
+  notificationMessages,
   notificationTypes,
   progress,
   questionContents,
@@ -22,8 +23,7 @@ const prisma = new PrismaClient({ datasourceUrl: process.env.DATABASE_URL });
 
 async function main() {
   await prisma.$transaction([
-    prisma.driverNotification.deleteMany(),
-    prisma.userNotification.deleteMany(),
+    prisma.notification.deleteMany(),
     prisma.review.deleteMany(),
     prisma.question.deleteMany(),
     prisma.estimation.deleteMany(),
@@ -166,25 +166,33 @@ async function main() {
     });
   }
 
-  // Generate mock data for UserNotification
-  const userNotifications = Array.from({ length: 20 }).map(() => ({
-    id: faker.string.uuid(),
-    type: notificationTypes[faker.number.int({ min: 0, max: notificationTypes.length - 1 })],
-    message: fakerEN.lorem.sentence(),
-    isRead: faker.datatype.boolean(),
-    userId: users[faker.number.int({ min: 0, max: users.length - 1 })].id,
-  }));
-  await prisma.userNotification.createMany({ data: userNotifications });
+  // Generate mock data for notification to user
+  const userNotifications = Array.from({ length: 20 }).map(() => {
+    const type = notificationTypes[faker.number.int({ min: 0, max: notificationTypes.length - 1 })];
 
-  // Generate mock data for DriverNotification
-  const driverNotifications = Array.from({ length: 20 }).map(() => ({
-    id: faker.string.uuid(),
-    type: notificationTypes[faker.number.int({ min: 0, max: notificationTypes.length - 1 })],
-    message: fakerEN.lorem.sentence(),
-    isRead: faker.datatype.boolean(),
-    driverId: drivers[faker.number.int({ min: 0, max: drivers.length - 1 })].id,
-  }));
-  await prisma.driverNotification.createMany({ data: driverNotifications });
+    return {
+      id: faker.string.uuid(),
+      type,
+      message: notificationMessages[type],
+      isRead: faker.datatype.boolean(),
+      targetUserId: users[faker.number.int({ min: 0, max: users.length - 1 })].id,
+    };
+  });
+  await prisma.notification.createMany({ data: userNotifications });
+
+  // Generate mock data for notification to driver
+  const driverNotifications = Array.from({ length: 20 }).map(() => {
+    const type = notificationTypes[faker.number.int({ min: 0, max: notificationTypes.length - 1 })];
+
+    return {
+      id: faker.string.uuid(),
+      type,
+      message: notificationMessages[type],
+      isRead: faker.datatype.boolean(),
+      targetDriverId: users[faker.number.int({ min: 0, max: drivers.length - 1 })].id,
+    };
+  });
+  await prisma.notification.createMany({ data: driverNotifications });
 }
 
 main()

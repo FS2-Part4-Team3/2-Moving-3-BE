@@ -7,7 +7,7 @@ interface RequestBase extends PrismaRequestBase {}
 
 export interface Request extends RequestBase, ModelBase {}
 
-export interface RequestInputDTO extends Omit<Request, keyof ModelBase> {}
+export interface RequestInputDTO extends Omit<Omit<Request, keyof ModelBase>, 'notificationId'> {}
 
 export class BaseRequestOutputDTO {
   @ApiProperty({ description: '지정견적요청 ID', type: String })
