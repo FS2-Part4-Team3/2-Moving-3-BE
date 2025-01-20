@@ -35,7 +35,7 @@ export class AuthController implements IAuthController {
     res.cookie('refreshToken', token, {
       httpOnly: true,
       secure: true,
-      sameSite: 'strict',
+      // sameSite: 'strict',
       maxAge: 1000 * 60 * 60 * 24 * 14,
     });
   }
