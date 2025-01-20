@@ -170,16 +170,20 @@ export class MoveRepository implements IMoveRepository {
   }
 
   async findByMoveInfoId(moveInfoId: string) {
-    const moveInfo = await this.moveInfo.findUnique({ where: { id: moveInfoId } });
+    const moveInfo = await this.moveInfo.findUnique({ where: { id: moveInfoId }, include: { estimations: true } });
 
     return moveInfo;
   }
 
-  async postMoveInfo(moveData: MoveInfoInputDTO & { ownerId : string, progress : Progress } ): Promise<MoveInfo> {
+  async postMoveInfo(moveData: MoveInfoInputDTO & { ownerId: string; progress: Progress }): Promise<MoveInfo> {
     return await this.moveInfo.create({ data: moveData });
   }
 
-  async update(id: string, data: Partial<MoveInfoInputDTO>) {}
+  async update(id: string, data: Partial<MoveInfoInputDTO>) {
+    const moveInfo = await this.moveInfo.update({ where: { id }, data });
+
+    return moveInfo;
+  }
 
   async delete(id: string) {}
 }

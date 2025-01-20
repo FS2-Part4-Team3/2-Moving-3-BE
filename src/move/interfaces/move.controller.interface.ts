@@ -5,4 +5,5 @@ export interface IMoveController {
   getMoveInfos: (query: MoveInfoGetQueries) => Promise<{ totalCount: number; list: MoveInfo[] }>;
   getMoveInfo: (moveInfoId: string) => Promise<MoveInfo>;
   postMoveInfo: (moveData: MoveInfoInputDTO) => Promise<MoveInfo>;
+  patchMoveInfo: (moveId: string, body: Partial<MoveInfoInputDTO>) => Promise<MoveInfo>;
 }
