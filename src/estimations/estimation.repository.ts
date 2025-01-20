@@ -10,6 +10,8 @@ export class EstimationRepository implements IEstimationRepository {
   constructor(private readonly prisma: PrismaService) {
     this.estimation = prisma.estimation;
   }
+  update: (id: string, data: Partial<EstimationInputDTO>) => void;
+  delete: (id: string) => void;
 
   async findMany(options: FindOptions) {}
 
@@ -20,10 +22,13 @@ export class EstimationRepository implements IEstimationRepository {
   }
 
   async create(data: EstimationInputDTO): Promise<Estimation> {
-    return this.estimation.create({ data });
+    return this.estimation.create({
+      data: {
+        moveInfoId: data.moveInfoId,
+        driverId: data.driverId,
+        price: data.price,
+        comment: data.comment,
+      },
+    });
   }
-
-  async update(id: string, data: Partial<EstimationInputDTO>) {}
-
-  async delete(id: string) {}
 }

@@ -34,7 +34,7 @@ export class RequestController implements IRequestController {
   @Post(':driverId')
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth('accessToken')
-  @ApiOperation({ summary: '요청 생성' })
+  @ApiOperation({ summary: '이사 정보 생성 - 지정요청' })
   @ApiParam({ name: 'driverId', description: '기사 ID', type: 'string' })
   @ApiResponse({
     status: HttpStatus.CREATED,

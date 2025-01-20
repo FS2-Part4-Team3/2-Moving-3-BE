@@ -103,8 +103,8 @@ model Request {
   moveInfoId String
   status     Status
 
-  driver              Driver               @relation(fields: [driverId], references: [id])
-  driverId            String
+  driver              Driver?               @relation(fields: [driverId], references: [id])
+  driverId            String?
   driverNotifications DriverNotification[]
 
   @@index([createdAt])

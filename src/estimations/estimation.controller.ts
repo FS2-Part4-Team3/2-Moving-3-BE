@@ -13,7 +13,7 @@ import { EstimationEntity, EstimationInputDTO } from '#estimations/estimation.ty
 export class EstimationController implements IEstimationController {
   constructor(
     private readonly questionService: QuestionService,
-    private readonly estimationService: EstimationService
+    private readonly estimationService: EstimationService,
   ) {}
 
   @Get()
@@ -28,26 +28,26 @@ export class EstimationController implements IEstimationController {
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth('accessToken')
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: '견적 생성' })
-  @ApiResponse({ 
-    status: HttpStatus.CREATED,
-    type: EstimationEntity })
-  async postEstimation(
-    @Param('moveInfoId') moveInfoId: string,
-    @Body() body: EstimationInputDTO
-  ) {
+  @ApiOperation({ summary: '견적 생성 및 반려' })
+  // TODO: swagger type
+  // @ApiResponse({
+  //   status: HttpStatus.CREATED,
+  //   type: EstimationResponseDTO,
+  // })
+  // TODO: body type
+  async createEstimation(@Param('moveInfoId') moveInfoId: string, @Body() body: EstimationInputDTO) {
     const estimation = await this.estimationService.createEstimation(moveInfoId, body);
 
     return estimation;
   }
 
-  @Post(':id')
-  @ApiOperation({ summary: '견적 수정' })
-  async patchEstimation() {}
+  //@Post(':id')
+  // @ApiOperation({ summary: '견적 수정' })
+  // async patchEstimation() {}
 
-  @Delete(':id')
-  @ApiOperation({ summary: '견적 삭제' })
-  async deleteEstimation() {}
+  // @Delete(':id')
+  // @ApiOperation({ summary: '견적 삭제' })
+  // async deleteEstimation() {}
 
   @ApiTags('Question')
   @Get(':id/questions')

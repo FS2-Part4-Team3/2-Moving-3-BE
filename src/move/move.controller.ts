@@ -63,7 +63,7 @@ export class MoveController implements IMoveController {
   @ApiBody({ type: MoveInputDTO })
   @ApiResponse({
     status: HttpStatus.OK,
-    type: BaseMoveInfoOutputDTO
+    type: BaseMoveInfoOutputDTO,
   })
   async postMoveInfo(@Body() moveData: MoveInfoInputDTO): Promise<MoveInfo> {
     const moveInfo = await this.moveService.postMoveInfo(moveData);

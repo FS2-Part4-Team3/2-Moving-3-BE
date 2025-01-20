@@ -1,4 +1,5 @@
 import { MoveInfo, MoveInfoInputDTO } from '#move/move.types.js';
+import { IMoveInfo } from '#move/types/move.types.js';
 import { MoveInfoGetQueries } from '#types/queries.type.js';
 import { Area } from '@prisma/client';
 
@@ -9,8 +10,8 @@ export interface IMoveRepository {
     driverAvailableAreas: Area[],
   ) => Promise<{ totalCount: number; list: MoveInfo[] }>;
   findByUserId: (userId: string) => Promise<MoveInfo[]>;
-  findByMoveInfoId: (moveInfoId: string) => Promise<MoveInfo> | null;
-  postMoveInfo: (moveData: MoveInfoInputDTO) => Promise<MoveInfo>; 
+  findByMoveInfoId: (moveInfoId: string) => Promise<IMoveInfo>;
+  postMoveInfo: (moveData: MoveInfoInputDTO) => Promise<MoveInfo>;
   update: (id: string, data: Partial<MoveInfoInputDTO>) => void;
   delete: (id: string) => void;
 }

@@ -11,9 +11,9 @@ export interface MoveInfo extends MoveInfoBase, ModelBase {}
 export interface MoveInfoInputDTO extends Omit<MoveInfo, keyof ModelBase> {}
 
 export class MoveInputDTO {
-  @IsEnum($Enums.ServiceType, { message: '서비스 타입이 유효하지 않습니다.'})
+  @IsEnum($Enums.ServiceType, { message: '서비스 타입이 유효하지 않습니다.' })
   @IsNotEmpty({ message: '서비스 타입을 선택해주세요.' })
-  @ApiProperty({description: '서비스 타입'})
+  @ApiProperty({ description: '서비스 타입' })
   serviceType: $Enums.ServiceType;
 
   @IsDate({ message: '유효한 날짜를 입력해주세요.' })
@@ -27,7 +27,6 @@ export class MoveInputDTO {
   @IsString({ message: '도착 주소는 문자열이어야 합니다.' })
   @IsNotEmpty({ message: '도착 주소는 필수입니다.' })
   toAddress: string;
-
 }
 
 export class BaseMoveInfoOutputDTO {

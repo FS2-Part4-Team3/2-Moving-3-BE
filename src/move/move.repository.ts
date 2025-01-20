@@ -6,6 +6,7 @@ import { MoveInfoGetQueries } from '#types/queries.type.js';
 import { areaToKeyword } from '#utils/address-utils.js';
 import { Injectable } from '@nestjs/common';
 import { Area, Progress } from '@prisma/client';
+import { IMoveInfo } from './types/move.types.js';
 
 @Injectable()
 export class MoveRepository implements IMoveRepository {
@@ -98,13 +99,24 @@ export class MoveRepository implements IMoveRepository {
     return moveInfo;
   }
 
-  async findByMoveInfoId(moveInfoId: string) {
-    const moveInfo = await this.moveInfo.findUnique({ where: { id: moveInfoId } });
+  /**
+   * 동기 함수: 다 완료해야 다음코드가 실행
+   * 비동기 함수: 지금 실행 안하고 다음코드 먼저 실행 완료되면 실행
+   * -> Promise 객체를 반환
+   * 반대로말하면 Promise 객체를 반환한다면 비동기함수임
+   */
+  async findByMoveInfoId(moveInfoId: string): Promise<IMoveInfo> {
+    const moveInfo = await this.moveInfo.findUnique({
+      where: { id: moveInfoId },
+      include: {
+        requests: true,
+      },
+    });
 
     return moveInfo;
   }
 
-  async postMoveInfo(moveData: MoveInfoInputDTO & { ownerId : string, progress : Progress } ): Promise<MoveInfo> {
+  async postMoveInfo(moveData: MoveInfoInputDTO): Promise<MoveInfo> {
     return await this.moveInfo.create({ data: moveData });
   }
 
