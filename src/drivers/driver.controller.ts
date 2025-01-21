@@ -112,7 +112,10 @@ export class DriverController implements IDriverController {
   @ApiBearerAuth('accessToken')
   @ApiOperation({ summary: '기사 찜 여부' })
   @ApiParam({ name: 'id', type: 'string' })
-  @ApiResponse({})
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: Boolean,
+  })
   async getIsLiked(@Param('id') id: string) {
     const isLiked = await this.driverService.isLikedDriver(id);
 
