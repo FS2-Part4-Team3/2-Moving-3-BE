@@ -5,9 +5,9 @@ import { QuestionEntity, QuestionPostDTO } from '#questions/question.types.js';
 import { SortOrder } from '#types/options.type.js';
 import { GetQueries } from '#types/queries.type.js';
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, getSchemaPath } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags, getSchemaPath } from '@nestjs/swagger';
 import { EstimationService } from '#estimations/estimation.service.js';
-import { EstimationEntity, EstimationInputDTO } from '#estimations/estimation.types.js';
+import { EstimationOutputDTO, EstimationInputDTO } from '#estimations/estimation.types.js';
 
 @Controller('estimations')
 export class EstimationController implements IEstimationController {
@@ -27,16 +27,18 @@ export class EstimationController implements IEstimationController {
   @Post(':moveInfoId')
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth('accessToken')
-  @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: '견적 생성 및 반려' })
-  // TODO: swagger type
-  // @ApiResponse({
-  //   status: HttpStatus.CREATED,
-  //   type: EstimationResponseDTO,
-  // })
-  async createEstimation(@Param('moveInfoId') moveInfoId: string, @Body() body: EstimationInputDTO) {
-    const estimation = await this.estimationService.createEstimation(moveInfoId, body);
-
+  @ApiParam({ name: 'moveInfoId', description: '이사 정보 ID', type: 'string' })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    type: EstimationOutputDTO,
+  })
+  async createEstimation(
+    @Param('moveInfoId') moveInfoId: string,
+    @Body() body: EstimationInputDTO,
+    @Query('reject') reject: boolean = false, //반려하는거 쿼리파라미터
+  ) {
+    const estimation = await this.estimationService.createEstimation(moveInfoId, body, reject);
     return estimation;
   }
 

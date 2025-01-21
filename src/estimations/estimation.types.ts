@@ -1,7 +1,7 @@
 import { ModelBase } from '#types/common.types.js';
 import { Estimation as PrismaEstimation } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsDate, IsNotEmpty, IsNumber, IsString, IsUUID } from 'class-validator';
+import { IsBoolean, IsDate, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID } from 'class-validator';
 
 interface PrismaEstimationBase extends Omit<PrismaEstimation, keyof ModelBase> {}
 interface EstimationBase extends PrismaEstimationBase {}
@@ -25,21 +25,25 @@ export class EstimationInputDTO {
   @ApiProperty({ description: '견적 코멘트', type: String })
   comment: string;
 
-  @IsNumber()
-  @IsNotEmpty()
-  @ApiProperty({ description: '견적 가격', type: Number })
-  price: number;
-
-  @IsString()
-  @ApiProperty({ description: '견적 상태', type: String })
-  status: 'Approve' | 'Reject';
-
-  // @IsBoolean()
-  // @ApiProperty({ description: '견적 반려 여부', type: Boolean })
-  // isRejected: boolean;
+  @IsOptional()
+  @IsNumber({}, { each: true })
+  @ApiProperty({ description: '견적 가격', type: Number, nullable: true })
+  price: number | null = null;
 }
 
-export class EstimationEntity {
+// @IsEnum(['Approve', 'Reject'], { message: '견적 상태는 "Approve" 또는 "Reject"여야 합니다.' })
+// @ApiProperty({ description: '견적 상태', enum: ['Approve', 'Reject'], type: String })
+// status: 'Approve' | 'Reject';
+
+// @IsString()
+// @ApiProperty({ description: '견적 상태', type: String })
+// status: 'Approve' | 'Reject';
+
+// @IsBoolean()
+// @ApiProperty({ description: '견적 반려 여부', type: Boolean })
+// isRejected: boolean;
+
+export class EstimationOutputDTO {
   @ApiProperty({ description: '견적 ID', type: String })
   id: string;
 

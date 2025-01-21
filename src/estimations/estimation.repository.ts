@@ -24,10 +24,10 @@ export class EstimationRepository implements IEstimationRepository {
   async create(data: EstimationInputDTO): Promise<Estimation> {
     return this.estimation.create({
       data: {
-        moveInfoId: data.moveInfoId,
-        driverId: data.driverId,
-        price: data.price,
-        comment: data.comment,
+        moveInfoId: data.moveInfoId, //이사정보아이디
+        driverId: data.driverId, //드라이버아이디
+        price: data.price, //견적가격
+        comment: data.comment, //견적코멘트
       },
     });
   }
