@@ -81,7 +81,7 @@ export class QuestionService implements IQuestionService {
 
     const { userId, driverId } = this.als.getStore();
 
-    const data: QuestionCreateDTO = { ...body, estimationId, ownerId: userId, driverId };
+    const data: QuestionCreateDTO = { ...body, estimationId, userId, driverId };
     const question = await this.questionRepository.create(data);
 
     return question;
@@ -94,7 +94,7 @@ export class QuestionService implements IQuestionService {
     }
 
     const { userId, driverId } = this.als.getStore();
-    if (userId && userId !== target.ownerId) {
+    if (userId && userId !== target.userId) {
       throw new ForbiddenException();
     }
     if (driverId && driverId !== target.driverId) {
@@ -114,7 +114,7 @@ export class QuestionService implements IQuestionService {
     }
 
     const { userId, driverId } = this.als.getStore();
-    if (userId && userId !== target.ownerId) {
+    if (userId && userId !== target.userId) {
       throw new ForbiddenException();
     }
     if (driverId && driverId !== target.driverId) {

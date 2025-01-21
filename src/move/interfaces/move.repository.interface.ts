@@ -10,8 +10,10 @@ export interface IMoveRepository {
     driverAvailableAreas: Area[],
   ) => Promise<{ totalCount: number; list: MoveInfo[] }>;
   findByUserId: (userId: string) => Promise<MoveInfo[]>;
-  findByMoveInfoId: (moveInfoId: string) => Promise<IMoveInfo>;
+
+  findByMoveInfoId: (moveInfoId: string) => Promise<MoveInfo> | null;
   postMoveInfo: (moveData: MoveInfoInputDTO) => Promise<MoveInfo>;
-  update: (id: string, data: Partial<MoveInfoInputDTO>) => void;
+  update: (id: string, data: Partial<MoveInfoInputDTO>) => Promise<MoveInfo>;
+
   delete: (id: string) => void;
 }

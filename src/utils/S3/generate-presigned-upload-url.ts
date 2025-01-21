@@ -18,11 +18,7 @@ const s3 = new S3Client({
  * @param {number} expiresIn - URL 유효 시간(초) (기본값: 3600초 = 1시간)
  * @returns {Promise<string>} 서명된 URL
  */
-export async function generatePresignedUploadUrl(
-  s3Key: string,
-  contentType: string = 'image/jpeg',
-  expiresIn: number = 3600,
-): Promise<string> {
+export async function generatePresignedUploadUrl(s3Key: string, contentType?: string, expiresIn: number = 3600): Promise<string> {
   const command = new PutObjectCommand({
     Bucket: awsConfig.bucketName,
     Key: s3Key,

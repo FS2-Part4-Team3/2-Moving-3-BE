@@ -153,6 +153,12 @@ export class FilteredDriverOutputDTO {
   @ApiProperty({ description: '유저 타입' })
   type: string;
 
+  @ApiProperty({ description: '기사 점수' })
+  rating: number;
+
+  @ApiProperty({ description: '리뷰 개수' })
+  reviewCount: number;
+
   @ApiProperty({ description: '소셜 로그인 프로바이더' })
   provider?: string;
 

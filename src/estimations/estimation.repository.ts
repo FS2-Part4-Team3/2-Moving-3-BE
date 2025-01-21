@@ -16,7 +16,7 @@ export class EstimationRepository implements IEstimationRepository {
   async findMany(options: FindOptions) {}
 
   async findById(id: string) {
-    const estimation = await this.estimation.findUnique({ where: { id } });
+    const estimation = await this.estimation.findUnique({ where: { id }, include: { reviews: true } });
 
     return estimation;
   }

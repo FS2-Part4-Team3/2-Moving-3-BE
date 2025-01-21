@@ -20,13 +20,14 @@ export class QuestionEntity {
 }
 
 interface PersonInfo {
-  ownerId: string;
+  userId: string;
   driverId: string;
 }
 
-export interface QuestionCreateDTO extends Omit<Omit<Question, keyof ModelBase>, keyof PersonInfo> {
-  ownerId?: string;
+export interface QuestionCreateDTO extends Omit<Omit<Question, keyof (ModelBase & PersonInfo)>, 'notificationId'> {
+  userId?: string;
   driverId?: string;
+  notificationId?: string;
 }
 export class QuestionPostDTO extends OmitType(QuestionEntity, ['estimationId']) {}
 

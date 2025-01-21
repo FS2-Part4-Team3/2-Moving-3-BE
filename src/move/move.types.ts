@@ -1,5 +1,5 @@
 import { ModelBase } from '#types/common.types.js';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { $Enums, MoveInfo as PrismaMoveInfo, Progress, ServiceType } from '@prisma/client';
 import { IsDate, IsEnum, IsNotEmpty, IsString } from 'class-validator';
 
@@ -18,16 +18,21 @@ export class MoveInputDTO {
 
   @IsDate({ message: '유효한 날짜를 입력해주세요.' })
   @IsNotEmpty({ message: '이사 날짜는 필수입니다.' })
+  @ApiProperty({ description: '이사 날짜' })
   date: string;
 
   @IsString({ message: '출발 주소는 문자열이어야 합니다.' })
   @IsNotEmpty({ message: '출발 주소는 필수입니다.' })
+  @ApiProperty({ description: '출발 주소' })
   fromAddress: string;
 
   @IsString({ message: '도착 주소는 문자열이어야 합니다.' })
   @IsNotEmpty({ message: '도착 주소는 필수입니다.' })
+  @ApiProperty({ description: '도착 주소' })
   toAddress: string;
 }
+
+export class MovePatchInputDTO extends PartialType(MoveInputDTO) {}
 
 export class BaseMoveInfoOutputDTO {
   @ApiProperty({ description: '이사정보 ID', type: String })
@@ -66,6 +71,25 @@ class OwnerNameDTO {
   name: String;
 }
 
+class serviceTypeCountsDTO {
+  @ApiProperty({ description: '타입(SMALL, HOME, OFFICE)', type: String })
+  type: string;
+
+  @ApiProperty({ description: '해당 타입 개수', type: Number })
+  count: Number;
+}
+
+class filterCountDTO {
+  @ApiProperty({ description: '서비스타입 개수', type: [serviceTypeCountsDTO] })
+  serviceTypeCounts: serviceTypeCountsDTO[];
+
+  @ApiProperty({ description: '서비스가능지역 개수', type: Number })
+  serviceAreaCount: Number;
+
+  @ApiProperty({ description: '지정견적요청 개수', type: Number })
+  designatedRequestCount: Number;
+}
+
 class MoveInfoOutputDTO extends BaseMoveInfoOutputDTO {
   @ApiProperty({ description: '이사 정보 목록', type: OwnerNameDTO })
   owner: OwnerNameDTO;
@@ -74,6 +98,9 @@ class MoveInfoOutputDTO extends BaseMoveInfoOutputDTO {
 export class MoveInfoResponseDTO {
   @ApiProperty({ description: '전체 이사정보 개수', type: Number })
   totalCount: number;
+
+  @ApiProperty({ description: '필터 개수', type: filterCountDTO })
+  counts: filterCountDTO;
 
   @ApiProperty({ description: '리뷰 목록', type: [MoveInfoOutputDTO] })
   list: MoveInfoOutputDTO[];
