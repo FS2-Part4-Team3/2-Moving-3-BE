@@ -34,7 +34,6 @@ export class EstimationController implements IEstimationController {
   //   status: HttpStatus.CREATED,
   //   type: EstimationResponseDTO,
   // })
-  // TODO: body type
   async createEstimation(@Param('moveInfoId') moveInfoId: string, @Body() body: EstimationInputDTO) {
     const estimation = await this.estimationService.createEstimation(moveInfoId, body);
 

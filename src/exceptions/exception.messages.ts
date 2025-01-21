@@ -18,6 +18,8 @@ enum ExceptionMessages {
   MOVEINFO_NOT_FOUND = '이사 정보가 없습니다.',
 
   ESTIMATION_NOT_FOUND = '찾을 수 없는 견적입니다.',
+  ALREADY_ESTIMATION = '작성한 적이 있는 견적입니다.',
+  // TODO-고민해보기
 
   QUESTION_NOT_FOUND = '찾을 수 없는 문의입니다.',
 

@@ -30,13 +30,13 @@ export class EstimationInputDTO {
   @ApiProperty({ description: '견적 가격', type: Number })
   price: number;
 
-  @IsBoolean()
-  @ApiProperty({ description: '견적 반려 여부', type: Boolean })
-  isRejected: boolean;
+  @IsString()
+  @ApiProperty({ description: '견적 상태', type: String })
+  status: 'Approve' | 'Reject';
 
-  // @IsString()
-  // @ApiProperty({ description: '견적 상태', type: String })
-  // status: 'Approve' | 'Reject';
+  // @IsBoolean()
+  // @ApiProperty({ description: '견적 반려 여부', type: Boolean })
+  // isRejected: boolean;
 }
 
 export class EstimationEntity {
