@@ -16,6 +16,7 @@ enum ExceptionMessages {
   ALREADY_UNLIKED = '이미 찜 해제된 기사입니다.',
 
   MOVEINFO_NOT_FOUND = '이사 정보가 없습니다.',
+  RECEIVED_ESTIMATE = '받은 견적이 있습니다',
 
   ESTIMATION_NOT_FOUND = '찾을 수 없는 견적입니다.',
 
