@@ -76,13 +76,23 @@ export class DriverRepository implements IDriverRepository {
   }
 
   async findById(id: string) {
-    const driver = await this.driver.findUnique({ where: { id } });
+    const driver = await this.driver.findUnique({
+      where: { id },
+      include: {
+        reviews: { select: { score: true } },
+      },
+    });
 
     return driver;
   }
 
   async findByEmail(email: string) {
-    const driver = await this.driver.findUnique({ where: { email } });
+    const driver = await this.driver.findUnique({
+      where: { email },
+      include: {
+        reviews: { select: { score: true } },
+      },
+    });
 
     return driver;
   }
