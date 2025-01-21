@@ -30,6 +30,7 @@ enum ExceptionMessages {
   INVALID_USER_TYPE = '사용자 형식이 올바르지 않습니다.',
   ID_FORMAT = 'ID 형식이 올바르지 않습니다.',
   INVALID_TOKEN = '토큰이 잘못되었습니다.',
+  TOKEN_NOT_FOUND = '토큰을 찾을 수 없습니다.',
   UN_CATCHED_EXCEPTION = '오류가 발생했습니다.',
 }
 

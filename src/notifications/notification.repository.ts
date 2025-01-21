@@ -12,4 +12,13 @@ export class NotificationRepository implements INotificationRepository {
   async count() {}
   async findMany() {}
   async findById() {}
+
+  async create(data: any) {
+    const notification = await this.notification.create(data);
+
+    return notification;
+  }
+
+  async update() {}
+  async delete() {}
 }
