@@ -1,7 +1,9 @@
 import { INotificationService } from '#notifications/interfaces/notification.service.interface.js';
 import { NotificationRepository } from '#notifications/notification.repository.js';
 import { Notification } from '#notifications/notification.types.js';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class NotificationService implements INotificationService {
   constructor(private readonly notificationRepository: NotificationRepository) {}
 
