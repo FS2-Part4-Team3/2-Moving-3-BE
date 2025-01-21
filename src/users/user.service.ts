@@ -1,4 +1,4 @@
-import { DriverInvalidTypeException } from '#drivers/driver.exception.js';
+import { DriverInvalidTokenException } from '#drivers/driver.exception.js';
 import { IStorage, UserType } from '#types/common.types.js';
 import { FindOptions } from '#types/options.type.js';
 import { IUserService } from '#users/interfaces/user.service.interface.js';
@@ -26,7 +26,7 @@ export class UserService implements IUserService {
   async updateUser(body: UserPatchDTO) {
     const storage = this.als.getStore();
     if (storage.type !== UserType.User) {
-      throw new DriverInvalidTypeException();
+      throw new DriverInvalidTokenException();
     }
     const data: UserUpdateDTO = body;
     const { userId } = storage;
