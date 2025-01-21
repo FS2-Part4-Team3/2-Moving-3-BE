@@ -1,5 +1,5 @@
 import {
-  DriverInvalidTypeException,
+  DriverInvalidTokenException,
   DriverIsLikedException,
   DriverIsUnLikedException,
   DriverNotFoundException,
@@ -127,7 +127,7 @@ describe('DriverService', () => {
     it('should throw DriverInvalidTypeException when user is not a driver', async () => {
       mockAls.getStore.mockReturnValue({ type: UserType.User });
 
-      await expect(service.updateDriver(mockPatchDTO)).rejects.toThrow(DriverInvalidTypeException);
+      await expect(service.updateDriver(mockPatchDTO)).rejects.toThrow(DriverInvalidTokenException);
     });
 
     it('should update driver with image upload URL', async () => {

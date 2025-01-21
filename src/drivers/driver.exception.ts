@@ -7,7 +7,7 @@ export class DriverNotFoundException extends NotFoundException {
   }
 }
 
-export class DriverInvalidTypeException extends BadRequestException {
+export class DriverInvalidTokenException extends BadRequestException {
   constructor() {
     super(ExceptionMessages.INVALID_TOKEN);
   }
