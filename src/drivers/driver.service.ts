@@ -1,4 +1,5 @@
 import {
+  DriverInvalidEntityException,
   DriverInvalidTokenException,
   DriverIsLikedException,
   DriverIsUnLikedException,
@@ -22,22 +23,25 @@ export class DriverService implements IDriverService {
     private readonly als: AsyncLocalStorage<IStorage>,
   ) {}
 
+  private async processAdditionalData(driver: any) {
+    if (!driver.reviews || !driver.startAt) {
+      throw new DriverInvalidEntityException();
+    }
+
+    const reviews = driver.reviews;
+    driver.reviewCount = reviews.length;
+    delete driver.reviews;
+
+    const career = Math.floor((Date.now() - driver.startAt) / 1000 / 86400 / 365);
+    driver.career = career;
+
+    return await filterSensitiveData(driver);
+  }
+
   async findDrivers(options: DriversFindOptions) {
     const totalCount = await this.driverRepository.count(options);
     const drivers = await this.driverRepository.findMany(options);
-    const list = await Promise.all(
-      drivers.map(async driver => {
-        const result = await filterSensitiveData(driver);
-        const reviews = result.reviews;
-        result.reviewCount = reviews.length;
-        delete result.reviews;
-
-        const career = Math.floor((Date.now() - driver.startAt) / 1000 / 86400 / 365);
-        result.career = career;
-
-        return result;
-      }),
-    );
+    const list = await Promise.all(drivers.map(async driver => await this.processAdditionalData(driver)));
 
     return { totalCount, list };
   }
@@ -48,7 +52,7 @@ export class DriverService implements IDriverService {
       throw new DriverNotFoundException();
     }
 
-    return await filterSensitiveData(driver);
+    return await this.processAdditionalData(driver);
   }
 
   async updateDriver(body: DriverPatchDTO) {
