@@ -189,7 +189,7 @@ async function main() {
       type,
       message: notificationMessages[type],
       isRead: faker.datatype.boolean(),
-      targetDriverId: users[faker.number.int({ min: 0, max: drivers.length - 1 })].id,
+      targetDriverId: drivers[faker.number.int({ min: 0, max: drivers.length - 1 })].id,
     };
   });
   await prisma.notification.createMany({ data: driverNotifications });
