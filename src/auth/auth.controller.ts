@@ -174,4 +174,31 @@ export class AuthController implements IAuthController {
     response.redirect(`http://localhost:3000/callback/google?accessToken=${accessToken}`);
     // response.redirect(`https://www.moving.wiki/callback/google?accessToken=${accessToken}`);
   }
+
+  @Get('kakao/:userType')
+  @UseGuards(AuthGuard('kakao'))
+  @ApiOperation({ summary: '카카오 로그인' })
+  @ApiParam({ name: 'userType', enum: UserType })
+  @ApiResponse({
+    status: HttpStatus.FOUND,
+    headers: {
+      Location: {
+        description: '카카오 콜백 페이지에 액세스 토큰과 함께 리다이렉션',
+        schema: { type: 'string', example: 'https://www.moving.wiki/callback/kakao?accessToken=TokenValue' },
+      },
+    },
+  })
+  async kakakAuth() {}
+
+  @Get('oauth2/redirect/kakao')
+  @UseGuards(AuthGuard('kakao'))
+  async kakaoLoginCallback(@Req() req, @Res({ passthrough: true }) response: Response) {
+    const redirectResult = req.user;
+
+    const { accessToken, refreshToken } = await this.authService.kakaoAuth(redirectResult);
+    this.setRefreshToken(response, refreshToken);
+
+    response.redirect(`http://localhost:3000/callback/kakao?accessToken=${accessToken}`);
+    // 실제 배포 URL로 수정: response.redirect(`https://www.moving.wiki/callback/kakao?accessToken=${accessToken}`);
+  }
 }

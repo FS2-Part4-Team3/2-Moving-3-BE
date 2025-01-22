@@ -143,4 +143,6 @@ export class AuthService implements IAuthService {
 
     return { person: await filterSensitiveData(person), accessToken, refreshToken };
   }
+
+  async kakaoAuth() {}
 }
