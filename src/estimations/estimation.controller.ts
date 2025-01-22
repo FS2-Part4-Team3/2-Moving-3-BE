@@ -4,12 +4,29 @@ import { QuestionService } from '#questions/question.service.js';
 import { QuestionEntity, QuestionPostDTO } from '#questions/question.types.js';
 import { SortOrder } from '#types/options.type.js';
 import { GetQueries } from '#types/queries.type.js';
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, getSchemaPath } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  ParseBoolPipe,
+  Post,
+  Query,
+  UseGuards,
+  ValidationPipe,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags, getSchemaPath } from '@nestjs/swagger';
+import { EstimationService } from '#estimations/estimation.service.js';
+import { EstimationOutputDTO, EstimationInputDTO } from '#estimations/estimation.types.js';
 
 @Controller('estimations')
 export class EstimationController implements IEstimationController {
-  constructor(private readonly questionService: QuestionService) {}
+  constructor(
+    private readonly questionService: QuestionService,
+    private readonly estimationService: EstimationService,
+  ) {}
 
   @Get()
   @ApiOperation({ summary: '견적 목록 조회' })
@@ -20,16 +37,22 @@ export class EstimationController implements IEstimationController {
   async getEstimation() {}
 
   @Post(':moveInfoId')
-  @ApiOperation({ summary: '견적 생성' })
-  async postEstimation() {}
-
-  @Post(':id')
-  @ApiOperation({ summary: '견적 수정' })
-  async patchEstimation() {}
-
-  @Delete(':id')
-  @ApiOperation({ summary: '견적 삭제' })
-  async deleteEstimation() {}
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth('accessToken')
+  @ApiOperation({ summary: '견적 생성 및 반려' })
+  @ApiParam({ name: 'moveInfoId', description: '이사 정보 ID', type: 'string' })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    type: EstimationOutputDTO,
+  })
+  async createEstimation(
+    @Param('moveInfoId') moveInfoId: string,
+    @Body() body: EstimationInputDTO,
+    @Query('reject', new ValidationPipe({ transform: true })) reject: boolean = false,
+  ) {
+    const estimation = await this.estimationService.createEstimation(moveInfoId, body, reject);
+    return estimation;
+  }
 
   @ApiTags('Question')
   @Get(':id/questions')

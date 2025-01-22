@@ -18,7 +18,12 @@ enum ExceptionMessages {
   MOVEINFO_NOT_FOUND = '이사 정보가 없습니다.',
   RECEIVED_ESTIMATE = '받은 견적이 있습니다',
 
+  PENDING_REQUEST_NOT_FOUND = '해당 드라이버에 대한 지정 견적 요청이 존재하지 않습니다.',
   ESTIMATION_NOT_FOUND = '찾을 수 없는 견적입니다.',
+  ALREADY_ESTIMATION = '작성한 적이 있는 견적입니다.',
+  MOVE_INFO_NOT_FOUND = '이사 정보를 찾을 수 없습니다.',
+  ESTIMATION_ALREADY_EXISTS = '이미 견적이 존재합니다.',
+  REQUEST_REJECTED = '요청이 거부되었습니다.',
 
   QUESTION_NOT_FOUND = '찾을 수 없는 문의입니다.',
 
