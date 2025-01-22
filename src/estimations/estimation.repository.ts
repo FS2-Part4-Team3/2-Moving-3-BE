@@ -1,4 +1,4 @@
-import { EstimationInputDTO } from '#estimations/estimation.types.js';
+import { EstimationInputDTO, Estimation } from '#estimations/estimation.types.js';
 import { IEstimationRepository } from '#estimations/interfaces/estimation.repository.interface.js';
 import { PrismaService } from '#global/prisma.service.js';
 import { FindOptions } from '#types/options.type.js';
@@ -19,9 +19,14 @@ export class EstimationRepository implements IEstimationRepository {
     return estimation;
   }
 
-  async create(data: EstimationInputDTO) {}
-
-  async update(id: string, data: Partial<EstimationInputDTO>) {}
-
-  async delete(id: string) {}
+  async create(data: EstimationInputDTO): Promise<Estimation> {
+    return this.estimation.create({
+      data: {
+        moveInfoId: data.moveInfoId, //이사정보아이디
+        driverId: data.driverId, //드라이버아이디
+        price: data.price ?? null, //견적가격(없으면 null로 처리하기)
+        comment: data.comment, //견적코멘트
+      },
+    });
+  }
 }

@@ -10,5 +10,6 @@ import { Module } from '@nestjs/common';
   imports: [DBModule, GuardModule, MoveModule],
   controllers: [RequestController],
   providers: [RequestService, RequestRepository],
+  exports: [RequestRepository],
 })
 export class RequestModule {}
