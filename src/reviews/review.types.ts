@@ -104,8 +104,8 @@ export class statsDTO {
   @ApiProperty({ description: '평균 점수', type: Number })
   averageRating: number;
 
-  @ApiProperty({ description: '각 점수 갯수([1, 2, 3, ,4 ,5]순)', type: String })
-  ratingCounts: string;
+  @ApiProperty({ description: '각 점수 갯수([1, 2, 3, ,4 ,5]순)', type: [Number] })
+  ratingCounts: number[];
 }
 
 export class MyReviewResponseDTO {
