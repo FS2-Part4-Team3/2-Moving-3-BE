@@ -179,10 +179,10 @@ model Notification {
   isRead  Boolean          @default(false)
 
   // target
-  targetUser     User?   @relation(fields: [targetUserId], references: [id])
-  targetUserId   String?
-  targetDriver   Driver? @relation(fields: [targetDriverId], references: [id])
-  targetDriverId String?
+  user     User?   @relation(fields: [userId], references: [id])
+  userId   String?
+  driver   Driver? @relation(fields: [driverId], references: [id])
+  driverId String?
 
   // related
   moveInfo     MoveInfo?   @relation(fields: [moveInfoId], references: [id])

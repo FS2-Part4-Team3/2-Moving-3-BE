@@ -175,7 +175,7 @@ async function main() {
       type,
       message: notificationMessages[type],
       isRead: faker.datatype.boolean(),
-      targetUserId: users[faker.number.int({ min: 0, max: users.length - 1 })].id,
+      userId: users[faker.number.int({ min: 0, max: users.length - 1 })].id,
     };
   });
   await prisma.notification.createMany({ data: userNotifications });
@@ -189,7 +189,7 @@ async function main() {
       type,
       message: notificationMessages[type],
       isRead: faker.datatype.boolean(),
-      targetDriverId: drivers[faker.number.int({ min: 0, max: drivers.length - 1 })].id,
+      driverId: drivers[faker.number.int({ min: 0, max: drivers.length - 1 })].id,
     };
   });
   await prisma.notification.createMany({ data: driverNotifications });
