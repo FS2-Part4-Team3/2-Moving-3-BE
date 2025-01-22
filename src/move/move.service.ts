@@ -34,6 +34,14 @@ export class MoveService implements IMoveService {
     return moveInfo;
   }
 
+  async checkMoveInfoExistence() {
+    const { userId } = this.als.getStore();
+
+    const moveInfo = await this.moveRepository.findByUserId(userId);
+
+    return moveInfo;
+  }
+
   async postMoveInfo(moveData: MoveInfoInputDTO): Promise<MoveInfo> {
     const { userId } = this.als.getStore();
     const progress = Progress.OPEN;
