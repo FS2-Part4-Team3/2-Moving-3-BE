@@ -46,7 +46,7 @@ export class EstimationService implements IEstimationService {
       throw new EstimateAlreadyExistsException();
     }
 
-    // 지정 요청이 있는지 확인 여기 find 여야하나..?
+    // 지정 요청이 있는지 확인
     const isDesignatedRequest = moveInfo.requests.some(request => request.driverId === driverId && request.status === 'PENDING');
 
     if (isDesignatedRequest) {
