@@ -1,5 +1,5 @@
 import { fakerKO as faker } from '@faker-js/faker';
-import { PrismaClient } from '@prisma/client';
+import { NotificationType, PrismaClient } from '@prisma/client';
 import {
   addresses,
   areas,
@@ -166,9 +166,37 @@ async function main() {
     });
   }
 
+  //
+  function getRelation(type) {
+    let relation;
+    switch (type) {
+      case NotificationType.MOVE_INFO_EXPIRED:
+        relation = { moveInfoId: moveInfos[faker.number.int({ min: 0, max: moveInfos.length - 1 })].id };
+        break;
+      case NotificationType.NEW_REQUEST:
+      case NotificationType.REQUEST_REJECTED:
+        relation = { requestId: requests[faker.number.int({ min: 0, max: requests.length - 1 })].id };
+        break;
+      case NotificationType.NEW_ESTIMATION:
+      case NotificationType.ESTIMATION_CONFIRMED:
+        relation = { estimationId: estimations[faker.number.int({ min: 0, max: estimations.length - 1 })].id };
+        break;
+      case NotificationType.NEW_QUESTION:
+        relation = { questionId: questions[faker.number.int({ min: 0, max: questions.length - 1 })].id };
+        break;
+      case NotificationType.D_7:
+      case NotificationType.D_DAY:
+      default:
+        relation = {};
+    }
+
+    return relation;
+  }
+
   // Generate mock data for notification to user
   const userNotifications = Array.from({ length: 20 }).map(() => {
     const type = notificationTypes[faker.number.int({ min: 0, max: notificationTypes.length - 1 })];
+    const relation = getRelation(type);
 
     return {
       id: faker.string.uuid(),
@@ -176,6 +204,7 @@ async function main() {
       message: notificationMessages[type],
       isRead: faker.datatype.boolean(),
       userId: users[faker.number.int({ min: 0, max: users.length - 1 })].id,
+      ...relation,
     };
   });
   await prisma.notification.createMany({ data: userNotifications });
@@ -183,6 +212,7 @@ async function main() {
   // Generate mock data for notification to driver
   const driverNotifications = Array.from({ length: 20 }).map(() => {
     const type = notificationTypes[faker.number.int({ min: 0, max: notificationTypes.length - 1 })];
+    const relation = getRelation(type);
 
     return {
       id: faker.string.uuid(),
@@ -190,6 +220,7 @@ async function main() {
       message: notificationMessages[type],
       isRead: faker.datatype.boolean(),
       driverId: drivers[faker.number.int({ min: 0, max: drivers.length - 1 })].id,
+      ...relation,
     };
   });
   await prisma.notification.createMany({ data: driverNotifications });
