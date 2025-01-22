@@ -1,7 +1,3 @@
-# npx prisma generate
-# npx prisma migrate deploy
-# node dist/main
-
 npx prisma generate
 
 if ! npx prisma migrate deploy; then
@@ -16,4 +12,4 @@ if ! npx prisma migrate deploy; then
     npx prisma db seed
 fi
 
-node dist/main
+npm run start:prod
