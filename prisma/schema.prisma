@@ -176,7 +176,7 @@ model Notification {
 
   type    NotificationType
   message String
-  isRead  Boolean
+  isRead  Boolean          @default(false)
 
   // target
   targetUser     User?   @relation(fields: [targetUserId], references: [id])
