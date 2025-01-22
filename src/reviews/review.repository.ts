@@ -123,7 +123,7 @@ export class ReviewRepository implements IReviewRepository {
 
     return {
       averageRating: Number(averageRating._avg.score?.toFixed(1)) || 0,
-      ratingCounts: `[${ratingCounts.join(', ')}]`,
+      ratingCounts,
     };
   }
 
