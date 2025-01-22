@@ -16,8 +16,9 @@ enum ExceptionMessages {
   ALREADY_UNLIKED = '이미 찜 해제된 기사입니다.',
 
   MOVEINFO_NOT_FOUND = '이사 정보가 없습니다.',
+  RECEIVED_ESTIMATE = '받은 견적이 있습니다',
 
-  MOVE_INFO_NOT_OPEN = '이사 정보가 새로운 견적을 받을 수 없습니다.',
+  PENDING_REQUEST_NOT_FOUND = '해당 드라이버에 대한 지정 견적 요청이 존재하지 않습니다.',
   ESTIMATION_NOT_FOUND = '찾을 수 없는 견적입니다.',
   ALREADY_ESTIMATION = '작성한 적이 있는 견적입니다.',
   MOVE_INFO_NOT_FOUND = '이사 정보를 찾을 수 없습니다.',
@@ -27,6 +28,7 @@ enum ExceptionMessages {
   QUESTION_NOT_FOUND = '찾을 수 없는 문의입니다.',
 
   REVIEW_NOT_FOUND = '찾을 수 없는 리뷰입니다.',
+  REVIEW_ALREADY_SUBMITTED = '이미 리뷰를 작성하였습니다.',
 
   REQUEST_NOT_FOUND = '찾을 수 없는 지정견적요청입니다.',
 

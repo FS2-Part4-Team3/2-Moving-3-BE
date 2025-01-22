@@ -41,19 +41,26 @@ export class ReviewRepository implements IReviewRepository {
       skip: (page - 1) * pageSize,
       take: pageSize,
       include: {
-        driver: { select: { name: true, image: true } },
-        owner: {
+        estimation: {
           select: {
-            moveInfos: {
-              where: { progress: 'COMPLETE' },
+            price: true,
+            moveInfo: {
               select: {
-                type: true,
+                serviceType: true,
                 date: true,
-                confirmedEstimation: {
+                requests: {
+                  where: { status: 'APPLY' },
                   select: {
-                    price: true,
+                    status: true,
+                    driverId: true,
                   },
                 },
+              },
+            },
+            driver: {
+              select: {
+                name: true,
+                image: true,
               },
             },
           },
@@ -61,7 +68,18 @@ export class ReviewRepository implements IReviewRepository {
       },
     });
 
-    return list;
+    const addedList = list.map(review => ({
+      ...review,
+      estimation: {
+        ...review.estimation,
+        moveInfo: {
+          ...review.estimation.moveInfo,
+          isSpecificRequest: review.estimation.moveInfo.requests.some(req => req.driverId === review.driverId),
+        },
+      },
+    }));
+
+    return addedList;
   }
 
   async findManyDriverReviews(driverId: string, options: FindOptions) {
@@ -82,6 +100,31 @@ export class ReviewRepository implements IReviewRepository {
     });
 
     return list;
+  }
+
+  async getDriverReviewStats(driverId: string) {
+    const ratingStats = await this.review.groupBy({
+      by: ['score'],
+      where: { driverId },
+      _count: true,
+    });
+
+    const averageRating = await this.review.aggregate({
+      where: { driverId },
+      _avg: { score: true },
+    });
+
+    const ratingCounts = Array(5)
+      .fill(0)
+      .map((_, index) => {
+        const stat = ratingStats.find(s => s.score === index + 1);
+        return stat ? stat._count : 0;
+      });
+
+    return {
+      averageRating: Number(averageRating._avg.score?.toFixed(1)) || 0,
+      ratingCounts: `[${ratingCounts.join(', ')}]`,
+    };
   }
 
   async findByReviewId(id: string) {

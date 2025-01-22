@@ -10,13 +10,11 @@ export class EstimationRepository implements IEstimationRepository {
   constructor(private readonly prisma: PrismaService) {
     this.estimation = prisma.estimation;
   }
-  update: (id: string, data: Partial<EstimationInputDTO>) => void;
-  delete: (id: string) => void;
 
   async findMany(options: FindOptions) {}
 
   async findById(id: string) {
-    const estimation = await this.estimation.findUnique({ where: { id } });
+    const estimation = await this.estimation.findUnique({ where: { id }, include: { reviews: true } });
 
     return estimation;
   }
@@ -26,7 +24,7 @@ export class EstimationRepository implements IEstimationRepository {
       data: {
         moveInfoId: data.moveInfoId, //이사정보아이디
         driverId: data.driverId, //드라이버아이디
-        price: data.price, //견적가격
+        price: data.price ?? null, //견적가격(없으면 null로 처리하기)
         comment: data.comment, //견적코멘트
       },
     });

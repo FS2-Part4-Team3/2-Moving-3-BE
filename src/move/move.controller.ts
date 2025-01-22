@@ -4,7 +4,14 @@ import { MoveInfoGetQueries } from '#types/queries.type.js';
 import { Body, Controller, Get, HttpStatus, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { MoveService } from './move.service.js';
-import { BaseMoveInfoOutputDTO, MoveInfo, MoveInfoInputDTO, MoveInfoResponseDTO, MoveInputDTO } from './move.types.js';
+import {
+  BaseMoveInfoOutputDTO,
+  MoveInfo,
+  MoveInfoInputDTO,
+  MoveInfoResponseDTO,
+  MoveInputDTO,
+  MovePatchInputDTO,
+} from './move.types.js';
 
 @Controller('moves')
 export class MoveController implements IMoveController {
@@ -38,9 +45,9 @@ export class MoveController implements IMoveController {
     type: MoveInfoResponseDTO,
   })
   async getMoveInfos(@Query() query: MoveInfoGetQueries) {
-    const request = await this.moveService.getMoveInfos(query);
+    const moveInfo = await this.moveService.getMoveInfos(query);
 
-    return request;
+    return moveInfo;
   }
 
   @Get(':moveInfoId')
@@ -70,9 +77,21 @@ export class MoveController implements IMoveController {
     return moveInfo;
   }
 
-  @Patch(':id')
+  @Patch(':moveId')
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth('accessToken')
   @ApiOperation({ summary: '이사 정보 수정' })
-  async patchMoveInfo() {}
+  @ApiParam({ name: 'moveId', description: '이사정보 ID', type: 'string' })
+  @ApiBody({ type: MovePatchInputDTO })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: BaseMoveInfoOutputDTO,
+  })
+  async patchMoveInfo(@Param('moveId') moveId: string, @Body() body: Partial<MoveInfoInputDTO>) {
+    const moveInfo = await this.moveService.patchMoveInfo(moveId, body);
+
+    return moveInfo;
+  }
 
   @Post(':moveId/confirm/:estimationId')
   @ApiOperation({ summary: '이사 견적 확정' })

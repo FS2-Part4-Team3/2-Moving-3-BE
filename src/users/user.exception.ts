@@ -7,7 +7,7 @@ export class UserNotFoundException extends NotFoundException {
   }
 }
 
-export class UserInvalidTypeException extends BadRequestException {
+export class UserInvalidTokenException extends BadRequestException {
   constructor() {
     super(ExceptionMessages.INVALID_TOKEN);
   }

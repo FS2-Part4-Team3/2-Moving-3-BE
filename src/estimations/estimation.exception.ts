@@ -14,17 +14,10 @@ export class EstimateAlreadyExistsException extends BadRequestException {
   }
 }
 
-// moveinfo를 찾을 수 없을 때
-export class MoveInfoNotFoundException extends NotFoundException {
+// 해당 드라이버아이디에 지정요청이 없을 때
+export class PendingRequestNotFoundException extends BadRequestException {
   constructor() {
-    super(ExceptionMessages.MOVEINFO_NOT_FOUND);
-  }
-}
-
-// moveinfo가 새로운 견적을 받을 수 없을 때..
-export class MoveInfoNotOpenException extends BadRequestException {
-  constructor() {
-    super(ExceptionMessages.MOVE_INFO_NOT_OPEN);
+    super(ExceptionMessages.PENDING_REQUEST_NOT_FOUND);
   }
 }
 

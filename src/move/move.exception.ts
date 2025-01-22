@@ -6,3 +6,9 @@ export class MoveInfoNotFoundException extends BadRequestException {
     super(ExceptionMessages.MOVEINFO_NOT_FOUND);
   }
 }
+
+export class ReceivedEstimationException extends BadRequestException {
+  constructor() {
+    super(ExceptionMessages.RECEIVED_ESTIMATE);
+  }
+}

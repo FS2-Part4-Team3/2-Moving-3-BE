@@ -4,7 +4,19 @@ import { QuestionService } from '#questions/question.service.js';
 import { QuestionEntity, QuestionPostDTO } from '#questions/question.types.js';
 import { SortOrder } from '#types/options.type.js';
 import { GetQueries } from '#types/queries.type.js';
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  ParseBoolPipe,
+  Post,
+  Query,
+  UseGuards,
+  ValidationPipe,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags, getSchemaPath } from '@nestjs/swagger';
 import { EstimationService } from '#estimations/estimation.service.js';
 import { EstimationOutputDTO, EstimationInputDTO } from '#estimations/estimation.types.js';
@@ -36,19 +48,11 @@ export class EstimationController implements IEstimationController {
   async createEstimation(
     @Param('moveInfoId') moveInfoId: string,
     @Body() body: EstimationInputDTO,
-    @Query('reject') reject: boolean = false, //반려하는거 쿼리파라미터
+    @Query('reject', new ValidationPipe({ transform: true })) reject: boolean = false,
   ) {
     const estimation = await this.estimationService.createEstimation(moveInfoId, body, reject);
     return estimation;
   }
-
-  //@Post(':id')
-  // @ApiOperation({ summary: '견적 수정' })
-  // async patchEstimation() {}
-
-  // @Delete(':id')
-  // @ApiOperation({ summary: '견적 삭제' })
-  // async deleteEstimation() {}
 
   @ApiTags('Question')
   @Get(':id/questions')

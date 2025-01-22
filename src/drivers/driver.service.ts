@@ -1,5 +1,6 @@
 import {
-  DriverInvalidTypeException,
+  DriverInvalidEntityException,
+  DriverInvalidTokenException,
   DriverIsLikedException,
   DriverIsUnLikedException,
   DriverNotFoundException,
@@ -9,7 +10,7 @@ import { DriverPatchDTO, DriverUpdateDTO } from '#drivers/driver.types.js';
 import { IDriverService } from '#drivers/interfaces/driver.service.interface.js';
 import { IStorage, UserType } from '#types/common.types.js';
 import { DriversFindOptions } from '#types/options.type.js';
-import { UserInvalidTypeException } from '#users/user.exception.js';
+import { UserInvalidTokenException } from '#users/user.exception.js';
 import filterSensitiveData from '#utils/filterSensitiveData.js';
 import { generateS3UploadUrl } from '#utils/S3/generate-s3-upload-url.js';
 import { Injectable } from '@nestjs/common';
@@ -22,22 +23,25 @@ export class DriverService implements IDriverService {
     private readonly als: AsyncLocalStorage<IStorage>,
   ) {}
 
+  private async processAdditionalData(driver: any) {
+    if (!driver.reviews || !driver.startAt) {
+      throw new DriverInvalidEntityException();
+    }
+
+    const reviews = driver.reviews;
+    driver.reviewCount = reviews.length;
+    delete driver.reviews;
+
+    const career = Math.floor((Date.now() - driver.startAt) / 1000 / 86400 / 365);
+    driver.career = career;
+
+    return await filterSensitiveData(driver);
+  }
+
   async findDrivers(options: DriversFindOptions) {
     const totalCount = await this.driverRepository.count(options);
     const drivers = await this.driverRepository.findMany(options);
-    const list = await Promise.all(
-      drivers.map(async driver => {
-        const result = await filterSensitiveData(driver);
-        const reviews = result.reviews;
-        result.reviewCount = reviews.length;
-        delete result.reviews;
-
-        const career = Math.floor((Date.now() - driver.startAt) / 1000 / 86400 / 365);
-        result.career = career;
-
-        return result;
-      }),
-    );
+    const list = await Promise.all(drivers.map(async driver => await this.processAdditionalData(driver)));
 
     return { totalCount, list };
   }
@@ -48,13 +52,13 @@ export class DriverService implements IDriverService {
       throw new DriverNotFoundException();
     }
 
-    return await filterSensitiveData(driver);
+    return await this.processAdditionalData(driver);
   }
 
   async updateDriver(body: DriverPatchDTO) {
     const storage = this.als.getStore();
     if (storage.type !== UserType.Driver) {
-      throw new DriverInvalidTypeException();
+      throw new DriverInvalidTokenException();
     }
 
     const data: DriverUpdateDTO = body;
@@ -75,7 +79,7 @@ export class DriverService implements IDriverService {
   async findLikedDrivers(options: DriversFindOptions) {
     const storage = this.als.getStore();
     if (storage.type !== UserType.User) {
-      throw new UserInvalidTypeException();
+      throw new UserInvalidTokenException();
     }
 
     const { userId } = storage;
@@ -100,6 +104,21 @@ export class DriverService implements IDriverService {
     return { totalCount, list };
   }
 
+  async isLikedDriver(driverId: string) {
+    const target = await this.driverRepository.findById(driverId);
+    if (!target) {
+      throw new DriverNotFoundException();
+    }
+
+    const { userId } = this.als.getStore();
+    if (!userId) {
+      throw new UserInvalidTokenException();
+    }
+
+    const isLiked = await this.driverRepository.isLiked(driverId, userId);
+    return isLiked;
+  }
+
   async likeDriver(driverId: string) {
     const target = await this.driverRepository.findById(driverId);
     if (!target) {
@@ -107,6 +126,9 @@ export class DriverService implements IDriverService {
     }
 
     const { userId } = this.als.getStore();
+    if (!userId) {
+      throw new UserInvalidTokenException();
+    }
 
     const isLiked = await this.driverRepository.isLiked(driverId, userId);
     if (isLiked) {
@@ -124,6 +146,9 @@ export class DriverService implements IDriverService {
     }
 
     const { userId } = this.als.getStore();
+    if (!userId) {
+      throw new UserInvalidTokenException();
+    }
 
     const isLiked = await this.driverRepository.isLiked(driverId, userId);
     if (!isLiked) {
