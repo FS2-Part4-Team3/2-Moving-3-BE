@@ -45,6 +45,7 @@ export class MoveService implements IMoveService {
 
     return moveInfo;
   }
+
   async patchMoveInfo(moveId: string, body: Partial<MoveInfoInputDTO>) {
     const { userId } = this.als.getStore();
     const moveInfo = await this.moveRepository.findByMoveInfoId(moveId);

@@ -14,5 +14,6 @@ export interface IMoveRepository {
   findByMoveInfoId: (moveInfoId: string) => Promise<IMoveInfo>;
   postMoveInfo: (moveData: MoveInfoInputDTO) => Promise<MoveInfo>;
   update: (id: string, data: Partial<MoveInfoInputDTO>) => Promise<MoveInfo>;
+
   delete: (id: string) => void;
 }
