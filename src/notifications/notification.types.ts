@@ -6,8 +6,8 @@ interface NotificationBase extends PrismaNotificationBase {}
 
 export interface Notification extends NotificationBase, ModelBase {}
 
-export interface QuestionCreateDTO {}
-export class QuestionPostDTO {}
+export interface NotificationCreateDTO extends Partial<Omit<Notification, keyof ModelBase>> {}
+export class NotificationPostDTO {}
 
-export class QuestionPatchDTO {}
-export interface QuestionUpdateDTO {}
+export class NotificationPatchDTO {}
+export interface NotificationUpdateDTO {}

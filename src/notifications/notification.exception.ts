@@ -6,3 +6,15 @@ export class NotificationInvalidTargetException extends BadRequestException {
     super(ExceptionMessages.INVALID_USER_TYPE);
   }
 }
+
+export class NotificationInvalidTypeException extends BadRequestException {
+  constructor() {
+    super(ExceptionMessages.INVALID_NOTIFICATION_TYPE);
+  }
+}
+
+export class NotificationInvalidRelationException extends BadRequestException {
+  constructor(message: string = ExceptionMessages.BAD_REQUEST) {
+    super(message);
+  }
+}

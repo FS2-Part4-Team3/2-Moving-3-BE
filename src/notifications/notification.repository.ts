@@ -1,5 +1,6 @@
 import { PrismaService } from '#global/prisma.service.js';
 import { INotificationRepository } from '#notifications/interfaces/notification.repository.interface.js';
+import { NotificationCreateDTO } from '#notifications/notification.types.js';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
@@ -13,8 +14,8 @@ export class NotificationRepository implements INotificationRepository {
   async findMany() {}
   async findById() {}
 
-  async create(data: any) {
-    const notification = await this.notification.create(data);
+  async create(data: NotificationCreateDTO) {
+    const notification = await this.notification.create({ data });
 
     return notification;
   }

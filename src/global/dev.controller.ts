@@ -1,10 +1,11 @@
 import { JwtGenerateService } from '#auth/jwt-generate.service.js';
 import { PrismaService } from '#global/prisma.service.js';
 import { AccessTokenGuard } from '#guards/access-token.guard.js';
+import { NotificationService } from '#notifications/notification.service.js';
 import { IStorage, UserType } from '#types/common.types.js';
 import { UserService } from '#users/user.service.js';
 import { generateS3UploadUrl } from '#utils/S3/generate-s3-upload-url.js';
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiExcludeController } from '@nestjs/swagger';
 import { AsyncLocalStorage } from 'async_hooks';
 
@@ -13,6 +14,7 @@ import { AsyncLocalStorage } from 'async_hooks';
 export class DevController {
   constructor(
     private readonly userService: UserService,
+    private readonly notificationService: NotificationService,
     private readonly prismaService: PrismaService,
     private readonly jwtGenerateService: JwtGenerateService,
     private readonly als: AsyncLocalStorage<IStorage>,
@@ -64,5 +66,12 @@ export class DevController {
     const url = await generateS3UploadUrl('id', image);
 
     return url;
+  }
+
+  @Post('notification')
+  async createNotificationTest(@Body() body: any) {
+    const notification = await this.notificationService.createNotification(body);
+
+    return notification;
   }
 }

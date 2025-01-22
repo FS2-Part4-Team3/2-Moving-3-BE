@@ -1,7 +1,15 @@
+import { BadRequestException } from '#exceptions/http.exception.js';
 import { INotificationService } from '#notifications/interfaces/notification.service.interface.js';
+import {
+  NotificationInvalidRelationException,
+  NotificationInvalidTargetException,
+  NotificationInvalidTypeException,
+} from '#notifications/notification.exception.js';
 import { NotificationGateway } from '#notifications/notification.gateway.js';
 import { NotificationRepository } from '#notifications/notification.repository.js';
+import { NotificationCreateDTO } from '#notifications/notification.types.js';
 import { Injectable } from '@nestjs/common';
+import { NotificationType } from '@prisma/client';
 
 @Injectable()
 export class NotificationService implements INotificationService {
@@ -10,63 +18,96 @@ export class NotificationService implements INotificationService {
     private readonly notificationGateway: NotificationGateway,
   ) {}
 
-  private isValidNotificationData(data: any) {
-    if (data.userId && data.driverId) {
-      return false;
+  private validateNotificationData(data: any) {
+    for (const key in data) {
+      if (data[key] === '') {
+        data[key] = null;
+      }
     }
 
-    return true;
+    const { message, userId, driverId, type, moveInfoId, requestId, estimationId, questionId } = data;
+
+    // NOTE 메세지가 비어있는가
+    if (!message) {
+      throw new BadRequestException('메세지를 입력해주세요.');
+    }
+
+    // NOTE 유저 타입이 하나인가
+    if ((userId && driverId) || (!userId && !driverId)) {
+      throw new NotificationInvalidTargetException();
+    }
+
+    const relationIds = [moveInfoId, requestId, estimationId, questionId];
+    // NOTE relation 객체가 둘 이상 존재하는가
+    if (relationIds.filter(id => id).length >= 2) {
+      throw new NotificationInvalidRelationException();
+    }
+
+    // NOTE 유저 타입 검증
+    switch (type) {
+      case NotificationType.MOVE_INFO_EXPIRED:
+      case NotificationType.NEW_ESTIMATION:
+      case NotificationType.REQUEST_REJECTED:
+        if (!userId) {
+          throw new NotificationInvalidTargetException();
+        }
+        break;
+      case NotificationType.NEW_REQUEST:
+      case NotificationType.ESTIMATION_CONFIRMED:
+        if (!driverId) {
+          throw new NotificationInvalidTargetException();
+        }
+        break;
+      case NotificationType.NEW_QUESTION:
+      case NotificationType.D_7:
+      case NotificationType.D_DAY:
+        break;
+      default:
+        throw new NotificationInvalidTypeException();
+    }
+
+    // NOTE relation 객체 검증
+    switch (type) {
+      case NotificationType.MOVE_INFO_EXPIRED:
+      case NotificationType.NEW_REQUEST:
+        if (!moveInfoId) {
+          throw new NotificationInvalidRelationException('이사 정보를 입력해주세요.');
+        }
+        break;
+      case NotificationType.NEW_ESTIMATION:
+      case NotificationType.ESTIMATION_CONFIRMED:
+        if (!estimationId) {
+          throw new NotificationInvalidRelationException('견적 정보를 입력해주세요.');
+        }
+        break;
+      case NotificationType.REQUEST_REJECTED:
+        if (!requestId) {
+          throw new NotificationInvalidRelationException('지정 요청 정보를 입력해주세요.');
+        }
+        break;
+      case NotificationType.NEW_QUESTION:
+        if (!questionId) {
+          throw new NotificationInvalidRelationException('문의 정보를 입력해주세요.');
+        }
+        break;
+      case NotificationType.D_7:
+      case NotificationType.D_DAY:
+        break;
+      default:
+        throw new NotificationInvalidTypeException();
+    }
   }
 
-  // async createUserNotification(data) {
-  //   if (!this.isValidNotificationData(data)) {
-  //     throw new NotificationInvalidTargetException();
-  //   }
+  async createNotification(body: any) {
+    this.validateNotificationData(body);
 
-  //   const { userId, type, message, estimationId, date } = data;
-  //   const notification = await this.notificationRepository.create({
-  //     data: {
-  //       userId,
-  //       type,
-  //       message,
-  //       estimationId,
-  //       date,
-  //       isRead: false,
-  //     },
-  //   });
+    const data: NotificationCreateDTO = body;
 
-  //   this.notificationGateway.sendToUser(userId, notification);
-  //   return notification;
-  // }
+    const notification = await this.notificationRepository.create(data);
 
-  // async createDriverNotification({
-  //   driverId,
-  //   type,
-  //   message,
-  //   requestId,
-  //   estimationId,
-  //   date,
-  // }: {
-  //   driverId: string;
-  //   type: NotificationType;
-  //   message: string;
-  //   requestId?: string;
-  //   estimationId?: string;
-  //   date?: Date;
-  // }) {
-  //   const notification = await this.prisma.driverNotification.create({
-  //     data: {
-  //       driverId,
-  //       type,
-  //       message,
-  //       requestId,
-  //       estimationId,
-  //       date,
-  //       isRead: false,
-  //     },
-  //   });
+    // const validId = data.userId || data.driverId;
+    // this.notificationGateway.sendNotification(validId, notification);
 
-  //   this.notificationGateway.sendToDriver(driverId, notification);
-  //   return notification;
-  // }
+    return notification;
+  }
 }

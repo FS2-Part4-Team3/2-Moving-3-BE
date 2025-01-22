@@ -27,6 +27,8 @@ enum ExceptionMessages {
 
   REQUEST_NOT_FOUND = '찾을 수 없는 지정견적요청입니다.',
 
+  INVALID_NOTIFICATION_TYPE = '올바르지 않은 알림 형식입니다.',
+
   INVALID_USER_TYPE = '사용자 형식이 올바르지 않습니다.',
   ID_FORMAT = 'ID 형식이 올바르지 않습니다.',
   INVALID_TOKEN = '토큰이 잘못되었습니다.',
