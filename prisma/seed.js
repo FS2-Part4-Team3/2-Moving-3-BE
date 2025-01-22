@@ -34,7 +34,7 @@ async function main() {
   ]);
 
   // Generate mock data for User
-  const users = Array.from({ length: 20 }).map(() => {
+  const users = Array.from({ length: 10 }).map(() => {
     const userServiceTypes = [];
     for (let i = 0; i < faker.number.int({ min: 1, max: serviceType.length }); i++) {
       const index = faker.number.int({ min: 0, max: serviceType.length - 1 });
@@ -61,7 +61,7 @@ async function main() {
   await prisma.user.createMany({ data: users });
 
   // Generate mock data for Driver
-  const drivers = Array.from({ length: 20 }).map(() => {
+  const drivers = Array.from({ length: 10 }).map(() => {
     const driverServiceTypes = [];
     for (let i = 0; i < faker.number.int({ min: 1, max: serviceType.length }); i++) {
       const index = faker.number.int({ min: 0, max: serviceType.length - 1 });
@@ -194,7 +194,7 @@ async function main() {
   }
 
   // Generate mock data for notification to user
-  const userNotifications = Array.from({ length: 20 }).map(() => {
+  const userNotifications = Array.from({ length: 100 }).map(() => {
     const type = notificationTypes[faker.number.int({ min: 0, max: notificationTypes.length - 1 })];
     const relation = getRelation(type);
 
@@ -202,7 +202,7 @@ async function main() {
       id: faker.string.uuid(),
       type,
       message: notificationMessages[type],
-      isRead: faker.datatype.boolean(),
+      // isRead: faker.datatype.boolean(),
       userId: users[faker.number.int({ min: 0, max: users.length - 1 })].id,
       ...relation,
     };
@@ -210,7 +210,7 @@ async function main() {
   await prisma.notification.createMany({ data: userNotifications });
 
   // Generate mock data for notification to driver
-  const driverNotifications = Array.from({ length: 20 }).map(() => {
+  const driverNotifications = Array.from({ length: 100 }).map(() => {
     const type = notificationTypes[faker.number.int({ min: 0, max: notificationTypes.length - 1 })];
     const relation = getRelation(type);
 
@@ -218,7 +218,7 @@ async function main() {
       id: faker.string.uuid(),
       type,
       message: notificationMessages[type],
-      isRead: faker.datatype.boolean(),
+      // isRead: faker.datatype.boolean(),
       driverId: drivers[faker.number.int({ min: 0, max: drivers.length - 1 })].id,
       ...relation,
     };

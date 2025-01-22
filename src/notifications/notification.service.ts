@@ -8,14 +8,17 @@ import {
 import { NotificationGateway } from '#notifications/notification.gateway.js';
 import { NotificationRepository } from '#notifications/notification.repository.js';
 import { NotificationCreateDTO } from '#notifications/notification.types.js';
+import { IStorage, UserType } from '#types/common.types.js';
 import { Injectable } from '@nestjs/common';
 import { NotificationType } from '@prisma/client';
+import { AsyncLocalStorage } from 'async_hooks';
 
 @Injectable()
 export class NotificationService implements INotificationService {
   constructor(
     private readonly notificationRepository: NotificationRepository,
     private readonly notificationGateway: NotificationGateway,
+    private readonly als: AsyncLocalStorage<IStorage>,
   ) {}
 
   private validateNotificationData(data: any) {
@@ -98,6 +101,16 @@ export class NotificationService implements INotificationService {
     }
   }
 
+  async getNotifications(page: number, pageSize: number) {
+    const { type, userId, driverId } = this.als.getStore();
+    const validId = type === UserType.User ? userId : driverId;
+
+    const totalCount = await this.notificationRepository.count(type, validId);
+    const list = await this.notificationRepository.findMany(type, validId, page, pageSize);
+
+    return { totalCount, list };
+  }
+
   async createNotification(body: any) {
     this.validateNotificationData(body);
 
@@ -106,8 +119,19 @@ export class NotificationService implements INotificationService {
     const notification = await this.notificationRepository.create(data);
 
     // const validId = data.userId || data.driverId;
-    // this.notificationGateway.sendNotification(validId, notification);
+    // this.notificationGateway.sendNotification(validId, {type: 'NEW_NOTIFICATION', data: notification});
 
     return notification;
+  }
+
+  async markNotificationAsRead(notificationIds: string[]) {
+    const { type, userId, driverId } = this.als.getStore();
+
+    const validId = type === UserType.User ? userId : driverId;
+    const notifications = await this.notificationRepository.updateManyAsRead(type, validId, notificationIds);
+
+    // this.notificationGateway.sendNotification(validId, { type: 'NOTIFICATIONS_READ', data: notifications });
+
+    return notifications;
   }
 }

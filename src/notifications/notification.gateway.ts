@@ -2,7 +2,6 @@ import { WSPerson } from '#decorators/ws-person.decorator.js';
 import { Driver } from '#drivers/driver.types.js';
 import { WsJwtGuard } from '#guards/ws-jwt.guard.js';
 import { INotificationGateway } from '#notifications/interfaces/notification.gateway.interface.js';
-import { Notification } from '#notifications/notification.types.js';
 import { User } from '#users/user.types.js';
 import { UseGuards } from '@nestjs/common';
 import { SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
@@ -40,7 +39,7 @@ export class NotificationGateway implements INotificationGateway {
     });
   }
 
-  sendNotification(id: string, notification: Notification) {
+  sendNotification(id: string, notification: any) {
     const sockets = this.getSockets(id);
     if (sockets) {
       sockets.forEach(socket => socket.emit('notification', notification));
