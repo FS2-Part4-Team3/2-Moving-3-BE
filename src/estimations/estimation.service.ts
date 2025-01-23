@@ -29,12 +29,10 @@ export class EstimationService implements IEstimationService {
     reject: boolean = false,
   ): Promise<Estimation | { message: string }> {
     const { driverId } = this.als.getStore();
-    console.log('Driver ID:', driverId);
 
     if (!driverId) {
       throw new DriverNotFoundException();
     }
-    console.log('Reject value:', reject); // reject 값 확인
 
     //이사 정보 조회하기
     const moveInfo = await this.moveRepository.findByMoveInfoId(moveInfoId);
@@ -49,35 +47,33 @@ export class EstimationService implements IEstimationService {
     }
 
     // 지정 요청이 있는지 확인
-    const isDesignatedRequest = moveInfo.requests.some(request => request.driverId === driverId);
+    const isDesignatedRequest = moveInfo.requests.some(request => request.driverId === driverId && request.status === 'PENDING');
 
     if (isDesignatedRequest) {
-      return this.handleDesignatedRequest(moveInfo, estimationData, reject, driverId);
+      return this.handleDesignatedRequest(moveInfo, estimationData, driverId);
     } else {
       // 일반 견적 생성
       return this.handleGeneralEstimation(moveInfo, estimationData, driverId);
     }
   }
-  // 드라이버 아이디 있으면 통과,없으면 통과시키지않게
   // 지정 요청 견적 생성
   private async handleDesignatedRequest(
     moveInfo: IMoveInfo,
     estimationData: EstimationInputDTO,
-    reject: boolean,
     driverId: string,
   ): Promise<Estimation | { message: string }> {
     const pendingRequest = moveInfo.requests.find(request => request.status === 'PENDING' && request.driverId === driverId);
 
     if (!pendingRequest) {
-      throw new PendingRequestNotFoundException();
+      return this.handleGeneralEstimation(moveInfo, estimationData, driverId);
     }
 
-    if (reject) {
-      // 반려할 경우: REJECTED 로 상태 변경
+    if (!estimationData.price) {
+      // 코멘트만 있을 경우: 반려
       await this.requestRepository.update(pendingRequest.id, { status: 'REJECTED' });
       throw new RequestRejectedException();
     } else {
-      // 승인할 경우: APPLY 로 상태 변경
+      // 코멘트와 가격이 있을 경우: 승인
       await this.requestRepository.update(pendingRequest.id, { status: 'APPLY' });
     }
 
@@ -93,7 +89,7 @@ export class EstimationService implements IEstimationService {
 
   // 일반 견적 생성
   private async handleGeneralEstimation(
-    moveInfo: any,
+    moveInfo: IMoveInfo,
     estimationData: EstimationInputDTO,
     driverId: string,
   ): Promise<Estimation> {
