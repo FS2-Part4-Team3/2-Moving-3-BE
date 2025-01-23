@@ -27,6 +27,23 @@ export class RequestService implements IRequestService {
     return request;
   }
 
+  async checkRequest(driverId: string) {
+    const { userId } = this.als.getStore();
+
+    const moveInfo = await this.moveRepository.findByUserId(userId);
+    if (!moveInfo) {
+      throw new MoveInfoNotFoundException();
+    }
+
+    const requests = moveInfo[0].requests ? moveInfo[0].requests : [];
+    if (!requests || requests.length === 0) {
+      return { isRequestPossible: true };
+    }
+    const isRequestPossible = requests.some(request => request.driverId === driverId);
+
+    return { isRequestPossible: !isRequestPossible };
+  }
+
   async postRequest(driverId: string) {
     const { userId } = this.als.getStore();
 
