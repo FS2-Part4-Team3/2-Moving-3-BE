@@ -48,7 +48,6 @@ export class RequestService implements IRequestService {
     const { userId } = this.als.getStore();
 
     const moveInfo = await this.moveRepository.findByUserId(userId);
-    console.log('moveInfomoveInfomoveInfo', moveInfo);
     if (!moveInfo || moveInfo.length === 0) {
       throw new MoveInfoNotFoundException();
     }
@@ -58,7 +57,6 @@ export class RequestService implements IRequestService {
     }
 
     const requests = moveInfo[0].requests ? moveInfo[0].requests : [];
-    console.log('requestsrequestsrequestsrequestsrequests', requests);
     const isRequestPossible = requests.some(request => request.driverId === driverId);
     if (isRequestPossible) {
       throw new AlreadyRequestedException();
