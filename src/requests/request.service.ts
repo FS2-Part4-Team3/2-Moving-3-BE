@@ -4,7 +4,7 @@ import { IStorage } from '#types/common.types.js';
 import { Injectable } from '@nestjs/common';
 import { Status } from '@prisma/client';
 import { AsyncLocalStorage } from 'async_hooks';
-import { RequestNotFoundException } from './request.exception.js';
+import { AlreadyRequestedException, RequestNotFoundException } from './request.exception.js';
 import { ForbiddenException } from '#exceptions/http.exception.js';
 import { RequestRepository } from './request.repository.js';
 import { MoveInfoNotFoundException } from '#move/move.exception.js';
@@ -27,17 +27,39 @@ export class RequestService implements IRequestService {
     return request;
   }
 
+  async checkRequest(driverId: string) {
+    const { userId } = this.als.getStore();
+
+    const moveInfo = await this.moveRepository.findByUserId(userId);
+    if (!moveInfo) {
+      throw new MoveInfoNotFoundException();
+    }
+
+    const requests = moveInfo[0].requests ? moveInfo[0].requests : [];
+    if (!requests || requests.length === 0) {
+      return { isRequestPossible: true };
+    }
+    const isRequestPossible = requests.some(request => request.driverId === driverId);
+
+    return { isRequestPossible: !isRequestPossible };
+  }
+
   async postRequest(driverId: string) {
     const { userId } = this.als.getStore();
 
     const moveInfo = await this.moveRepository.findByUserId(userId);
-
-    if (!moveInfo || moveInfo[0].length === 0) {
+    if (!moveInfo || moveInfo.length === 0) {
       throw new MoveInfoNotFoundException();
     }
 
     if (moveInfo[0].ownerId !== userId) {
       throw new ForbiddenException();
+    }
+
+    const requests = moveInfo[0].requests ? moveInfo[0].requests : [];
+    const isRequestPossible = requests.some(request => request.driverId === driverId);
+    if (isRequestPossible) {
+      throw new AlreadyRequestedException();
     }
 
     const data = { moveInfoId: moveInfo[0].id, status: Status.PENDING, driverId: driverId };

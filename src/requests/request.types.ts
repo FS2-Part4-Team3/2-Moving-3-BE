@@ -38,3 +38,8 @@ export class RequestOutputDTO extends BaseRequestOutputDTO {
   @ApiProperty({ description: '이사 정보 목록', type: MoveInfoDTO })
   moveInfo: MoveInfoDTO;
 }
+
+export class checkRequestOutputDTO {
+  @ApiProperty({ description: '지정견적요청 가능여부', type: Boolean })
+  isRequestPossible: boolean;
+}
