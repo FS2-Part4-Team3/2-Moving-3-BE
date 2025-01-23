@@ -118,8 +118,8 @@ export class NotificationService implements INotificationService {
 
     const notification = await this.notificationRepository.create(data);
 
-    // const validId = data.userId || data.driverId;
-    // this.notificationGateway.sendNotification(validId, {type: 'NEW_NOTIFICATION', data: notification});
+    const validId = data.userId || data.driverId;
+    this.notificationGateway.sendNotification(validId, { type: 'NEW_NOTIFICATION', data: notification });
 
     return notification;
   }
@@ -130,7 +130,7 @@ export class NotificationService implements INotificationService {
     const validId = type === UserType.User ? userId : driverId;
     const notifications = await this.notificationRepository.updateManyAsRead(type, validId, notificationIds);
 
-    // this.notificationGateway.sendNotification(validId, { type: 'NOTIFICATIONS_READ', data: notifications });
+    this.notificationGateway.sendNotification(validId, { type: 'NOTIFICATIONS_READ', data: notifications });
 
     return notifications;
   }
