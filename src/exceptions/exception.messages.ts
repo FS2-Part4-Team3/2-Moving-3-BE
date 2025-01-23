@@ -31,6 +31,7 @@ enum ExceptionMessages {
   REVIEW_ALREADY_SUBMITTED = '이미 리뷰를 작성하였습니다.',
 
   REQUEST_NOT_FOUND = '찾을 수 없는 지정견적요청입니다.',
+  ALREADY_REQUESTED = '이미 지정견적요청을 하였습니다.',
 
   INVALID_NOTIFICATION_TYPE = '올바르지 않은 알림 형식입니다.',
 
