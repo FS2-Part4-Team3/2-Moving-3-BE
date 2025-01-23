@@ -72,7 +72,6 @@ export class NotificationService implements INotificationService {
     // NOTE relation 객체 검증
     switch (type) {
       case NotificationType.MOVE_INFO_EXPIRED:
-      case NotificationType.NEW_REQUEST:
         if (!moveInfoId) {
           throw new NotificationInvalidRelationException('이사 정보를 입력해주세요.');
         }
@@ -83,6 +82,7 @@ export class NotificationService implements INotificationService {
           throw new NotificationInvalidRelationException('견적 정보를 입력해주세요.');
         }
         break;
+      case NotificationType.NEW_REQUEST:
       case NotificationType.REQUEST_REJECTED:
         if (!requestId) {
           throw new NotificationInvalidRelationException('지정 요청 정보를 입력해주세요.');
