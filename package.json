@@ -46,7 +46,7 @@
     "@aws-sdk/client-s3": "^3.729.0",
     "@aws-sdk/s3-request-presigner": "^3.729.0",
     "@faker-js/faker": "^9.3.0",
-    "@nestjs/common": "^11.0.3",
+    "@nestjs/common": "^11.0.4",
     "@nestjs/config": "^4.0.0",
     "@nestjs/core": "^11.0.3",
     "@nestjs/jwt": "^11.0.0",
