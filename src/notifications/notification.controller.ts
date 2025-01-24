@@ -1,9 +1,11 @@
 import { PrismaService } from '#global/prisma.service.js';
+import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { NotificationService } from '#notifications/notification.service.js';
-import { Body, Controller, DefaultValuePipe, Get, Param, ParseIntPipe, Post, Query } from '@nestjs/common';
+import { Body, Controller, DefaultValuePipe, Get, Param, ParseIntPipe, Post, Query, UseGuards } from '@nestjs/common';
+import { ApiExcludeEndpoint } from '@nestjs/swagger';
 
 @Controller('notification')
-// @UseGuards(AccessTokenGuard)
+@UseGuards(AccessTokenGuard)
 export class NotificationController {
   constructor(
     private readonly notificationService: NotificationService,
@@ -34,7 +36,8 @@ export class NotificationController {
     return notifications;
   }
 
-  @Post('test')
+  @Post('push')
+  @ApiExcludeEndpoint()
   async createNotificationTest(@Body() body: any) {
     const notification = await this.notificationService.createNotification(body);
 

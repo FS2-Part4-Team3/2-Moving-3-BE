@@ -13,6 +13,7 @@ export class NotificationRepository implements INotificationRepository {
 
   async count(type: UserType, id: string) {
     const where = type === UserType.User ? { userId: id } : { driverId: id };
+    console.log('🚀 ~ NotificationRepository ~ count ~ where:', where);
 
     const totalCount = await this.notification.count({ where });
 
