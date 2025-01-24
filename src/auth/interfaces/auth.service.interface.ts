@@ -2,6 +2,7 @@ import {
   FilteredPerson,
   FilteredPersonWithToken,
   GoogleAuthType,
+  KakaoAuthType,
   SignInDTO,
   SignUpDTO,
   UpdatePasswordDTO,
@@ -15,4 +16,5 @@ export interface IAuthService {
   signIn: (body: SignInDTO, type: UserType) => Promise<FilteredPersonWithToken>;
   getNewToken: () => Promise<FilteredPersonWithToken>;
   googleAuth: (redirectResult: GoogleAuthType) => Promise<FilteredPersonWithToken>;
+  kakaoAuth: (redirectResult: KakaoAuthType) => Promise<FilteredPersonWithToken>;
 }

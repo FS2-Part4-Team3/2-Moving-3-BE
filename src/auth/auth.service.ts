@@ -4,7 +4,15 @@ import {
   AuthWrongCredentialException,
   AuthWrongPasswordException,
 } from '#auth/auth.exception.js';
-import { GoogleAuthType, GoogleCreateDTO, SignInDTO, SignUpDTO, UpdatePasswordDTO } from '#auth/auth.types.js';
+import {
+  GoogleAuthType,
+  GoogleCreateDTO,
+  KakaoAuthType,
+  KakaoCreateDTO,
+  SignInDTO,
+  SignUpDTO,
+  UpdatePasswordDTO,
+} from '#auth/auth.types.js';
 import { IAuthService } from '#auth/interfaces/auth.service.interface.js';
 import { JwtGenerateService } from '#auth/jwt-generate.service.js';
 import { DriverRepository } from '#drivers/driver.repository.js';
@@ -144,5 +152,36 @@ export class AuthService implements IAuthService {
     return { person: await filterSensitiveData(person), accessToken, refreshToken };
   }
 
-  async kakaoAuth() {}
+  async kakaoAuth(redirectResult: KakaoAuthType) {
+    const { email, name, photo, provider, id, userType, phoneNumber } = redirectResult;
+
+    if (!userType || !Object.values(UserType).includes(userType)) {
+      throw new InvalidUserTypeException();
+    }
+
+    const repo = userType === UserType.User ? this.userRepository : this.driverRepository;
+    const target = await repo.findByEmail(email);
+    const providerId = id.toString();
+
+    if (target) {
+      if (target.provider !== provider || target.providerId !== providerId) {
+        throw new UnauthorizedException();
+      }
+
+      const accessToken = await this.jwtGenerateService.generateAccessToken({ id: target.id, type: userType });
+      const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: target.id, type: userType });
+      target.type = userType;
+
+      return { person: await filterSensitiveData(target), accessToken, refreshToken };
+    }
+
+    const data: KakaoCreateDTO = { email, name, image: photo, provider, providerId, phoneNumber };
+    const person = await repo.createByGoogleCreateDTO(data);
+
+    const accessToken = await this.jwtGenerateService.generateAccessToken({ id: person.id, type: userType });
+    const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: person.id, type: userType });
+    person.type = userType;
+
+    return { person: await filterSensitiveData(person), accessToken, refreshToken };
+  }
 }

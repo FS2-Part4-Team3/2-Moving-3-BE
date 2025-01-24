@@ -192,3 +192,24 @@ export interface ProviderInfo {
   provider: string;
   providerId: string;
 }
+
+export interface KakaoAuthType {
+  email: string;
+  name: string;
+  photo: string;
+  provider: string;
+  id: string;
+  userType: UserType;
+  phoneNumber: string;
+  accessToken?: string;
+  refreshToken?: string;
+}
+
+export interface KakaoCreateDTO {
+  email: string;
+  name: string;
+  image: string;
+  provider: string;
+  providerId: string;
+  phoneNumber: string;
+}

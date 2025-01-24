@@ -3,6 +3,7 @@ import {
   FilteredDriverOutputDTO,
   FilteredUserOutputDTO,
   GoogleAuthType,
+  KakaoAuthType,
   SignInDTO,
   SignUpDTO,
   UpdatePasswordDTO,
@@ -188,17 +189,18 @@ export class AuthController implements IAuthController {
       },
     },
   })
-  async kakakAuth() {}
+  async kakaoAuth() {}
 
   @Get('oauth2/redirect/kakao')
+  @ApiExcludeEndpoint()
   @UseGuards(AuthGuard('kakao'))
-  async kakaoLoginCallback(@Req() req, @Res({ passthrough: true }) response: Response) {
-    const redirectResult = req.user;
+  async kakaoAuthRedirect(@Req() req, @Res({ passthrough: true }) response: Response) {
+    const redirectResult: KakaoAuthType = req.user;
 
-    const { accessToken, refreshToken } = await this.authService.kakaoAuth(redirectResult);
+    const { person, accessToken, refreshToken } = await this.authService.kakaoAuth(redirectResult);
     this.setRefreshToken(response, refreshToken);
 
     response.redirect(`http://localhost:3000/callback/kakao?accessToken=${accessToken}`);
-    // 실제 배포 URL로 수정: response.redirect(`https://www.moving.wiki/callback/kakao?accessToken=${accessToken}`);
+    // response.redirect(`https://www.moving.wiki/callback/kakao?accessToken=${accessToken}`);
   }
 }
