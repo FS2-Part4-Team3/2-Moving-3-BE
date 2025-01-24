@@ -15,8 +15,9 @@ export class MoveRepository implements IMoveRepository {
     this.moveInfo = prisma.moveInfo;
   }
 
-  async findMany(options: MoveInfoGetQueries, driverId: string, driverAvailableAreas: Area[]) {
-    const { page = 1, pageSize = 10, orderBy, keyword, serviceType, serviceArea, designatedRequest } = options;
+  private getBaseWhereCondition(options: MoveInfoGetQueries, driverId: string, driverAvailableAreas: Area[]) {
+    const { keyword, serviceType, serviceArea, designatedRequest } = options;
+
     const serviceTypes = serviceType
       ? serviceType
           .split(/[,+\s]/)
@@ -70,9 +71,25 @@ export class MoveRepository implements IMoveRepository {
               },
             ]
           : []),
+        {
+          NOT: {
+            estimations: {
+              some: {
+                driverId: driverId,
+              },
+            },
+          },
+        },
         { progress: Progress.OPEN },
       ],
     };
+
+    return baseWhereCondition;
+  }
+
+  async findMany(options: MoveInfoGetQueries, driverId: string, driverAvailableAreas: Area[]) {
+    const { page = 1, pageSize = 10, orderBy } = options;
+    const baseWhereCondition = this.getBaseWhereCondition(options, driverId, driverAvailableAreas);
 
     let orderByCondition;
     if (orderBy === MoveInfoSortOrder.UpcomingMoveDate) {
@@ -94,20 +111,36 @@ export class MoveRepository implements IMoveRepository {
       },
     });
 
+    const addedList = list.map(moveInfo => ({
+      ...moveInfo,
+      isSpecificRequest: moveInfo.requests.some(req => req.driverId === driverId),
+    }));
+
+    return addedList;
+  }
+
+  async getTotalCount(options: MoveInfoGetQueries, driverId: string, driverAvailableAreas: Area[]) {
+    const baseWhereCondition = this.getBaseWhereCondition(options, driverId, driverAvailableAreas);
     const totalCount = await this.moveInfo.count({ where: baseWhereCondition });
 
+    return totalCount;
+  }
+
+  async getFilteringCounts(driverId: string, driverAvailableAreas: Area[]) {
     const serviceTypeCounts = await Promise.all(
       ['SMALL', 'HOME', 'OFFICE'].map(async type => ({
         type,
         count: await this.moveInfo.count({
           where: {
-            ...baseWhereCondition,
-            AND: [
-              ...baseWhereCondition.AND,
-              {
-                serviceType: type,
+            serviceType: type,
+            NOT: {
+              estimations: {
+                some: {
+                  driverId: driverId,
+                },
               },
-            ],
+            },
+            progress: Progress.OPEN,
           },
         }),
       })),
@@ -115,53 +148,44 @@ export class MoveRepository implements IMoveRepository {
 
     const serviceAreaCount = await this.moveInfo.count({
       where: {
-        ...baseWhereCondition,
-        AND: [
-          ...baseWhereCondition.AND,
-          {
-            OR: [
-              ...driverAvailableAreas.map(area => ({
-                fromAddress: { contains: areaToKeyword(area) },
-              })),
-              ...driverAvailableAreas.map(area => ({
-                toAddress: { contains: areaToKeyword(area) },
-              })),
-            ],
-          },
+        OR: [
+          ...driverAvailableAreas.map(area => ({
+            fromAddress: { contains: areaToKeyword(area) },
+          })),
+          ...driverAvailableAreas.map(area => ({
+            toAddress: { contains: areaToKeyword(area) },
+          })),
         ],
+        NOT: {
+          estimations: {
+            some: {
+              driverId: driverId,
+            },
+          },
+        },
+        progress: Progress.OPEN,
       },
     });
 
     const designatedRequestCount = await this.moveInfo.count({
       where: {
-        ...baseWhereCondition,
-        AND: [
-          ...baseWhereCondition.AND,
-          {
-            requests: {
-              some: {
-                driverId,
-              },
+        requests: {
+          some: {
+            driverId,
+          },
+        },
+        NOT: {
+          estimations: {
+            some: {
+              driverId: driverId,
             },
           },
-        ],
+        },
+        progress: Progress.OPEN,
       },
     });
 
-    const addedList = list.map(moveInfo => ({
-      ...moveInfo,
-      isSpecificRequest: moveInfo.requests.some(req => req.driverId === driverId),
-    }));
-
-    return {
-      totalCount,
-      counts: {
-        serviceTypeCounts,
-        serviceAreaCount,
-        designatedRequestCount,
-      },
-      list: addedList,
-    };
+    return { serviceTypeCounts, serviceAreaCount, designatedRequestCount };
   }
 
   async findByUserId(userId: string) {
