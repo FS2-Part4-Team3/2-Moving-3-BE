@@ -28,7 +28,9 @@ export class RequestRepository implements IRequestRepository {
     return request;
   }
 
-  async update(id: string, data: Partial<RequestInputDTO>) {}
+  async update(id: string, data: Partial<RequestInputDTO>) {
+    return await this.request.update({ where: { id }, data });
+  }
 
   async delete(id: string) {
     const request = await this.request.delete({ where: { id } });

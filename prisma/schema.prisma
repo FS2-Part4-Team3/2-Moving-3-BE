@@ -104,10 +104,9 @@ model Request {
   moveInfoId String
   status     Status
 
-  driver         Driver        @relation(fields: [driverId], references: [id])
-  driverId       String
-  notification   Notification? @relation(fields: [notificationId], references: [id])
-  notificationId String?       @unique
+  driver        Driver         @relation(fields: [driverId], references: [id])
+  driverId      String
+  notifications Notification[]
 
   @@index([createdAt])
 }
@@ -141,14 +140,13 @@ model Question {
 
   content String
 
-  estimation     Estimation    @relation(fields: [estimationId], references: [id])
-  estimationId   String
-  user           User?         @relation(fields: [userId], references: [id])
-  userId         String?
-  driver         Driver?       @relation(fields: [driverId], references: [id])
-  driverId       String?
-  notification   Notification? @relation(fields: [notificationId], references: [id])
-  notificationId String?       @unique
+  estimation    Estimation     @relation(fields: [estimationId], references: [id])
+  estimationId  String
+  user          User?          @relation(fields: [userId], references: [id])
+  userId        String?
+  driver        Driver?        @relation(fields: [driverId], references: [id])
+  driverId      String?
+  notifications Notification[]
 
   @@index([createdAt])
 }
@@ -178,23 +176,23 @@ model Notification {
 
   type    NotificationType
   message String
-  isRead  Boolean
+  isRead  Boolean          @default(false)
 
   // target
-  targetUser     User?   @relation(fields: [userId], references: [id])
-  targetUserId   String?
-  targetDriver   Driver? @relation(fields: [driverId], references: [id])
-  targetDriverId String?
+  user     User?   @relation(fields: [userId], references: [id])
+  userId   String?
+  driver   Driver? @relation(fields: [driverId], references: [id])
+  driverId String?
 
   // related
   moveInfo     MoveInfo?   @relation(fields: [moveInfoId], references: [id])
   moveInfoId   String?
-  request      Request?
+  request      Request?    @relation(fields: [requestId], references: [id])
+  requestId    String?
   estimation   Estimation? @relation(fields: [estimationId], references: [id])
   estimationId String?
-  question     Question?
-  userId       String?
-  driverId     String?
+  question     Question?   @relation(fields: [questionId], references: [id])
+  questionId   String?
 
   @@index([createdAt])
 }

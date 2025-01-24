@@ -12,6 +12,7 @@ import { AlsMiddleware } from '#global/middlewares/als.middleware.js';
 import { StorageModule } from '#global/storage.module.js';
 import { GuardModule } from '#guards/guard.module.js';
 import { MoveModule } from '#move/move.module.js';
+import { NotificationModule } from '#notifications/notification.module.js';
 import { QuestionModule } from '#questions/question.module.js';
 import { RequestModule } from '#requests/request.module.js';
 import { ReviewModule } from '#reviews/review.module.js';
@@ -34,6 +35,7 @@ if (nodeEnv === 'development') {
     DriverModule,
     MoveModule,
     QuestionModule,
+    NotificationModule,
     RequestModule,
     ReviewModule,
     EstimationModule,

@@ -50,6 +50,20 @@ export class MoveController implements IMoveController {
     return moveInfo;
   }
 
+  @Get('check')
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth('accessToken')
+  @ApiOperation({ summary: '이사 정보 등록 가능여부 조회' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: [BaseMoveInfoOutputDTO],
+  })
+  async checkMoveInfoExistence() {
+    const moveInfo = await this.moveService.checkMoveInfoExistence();
+
+    return moveInfo;
+  }
+
   @Get(':moveInfoId')
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth('accessToken')

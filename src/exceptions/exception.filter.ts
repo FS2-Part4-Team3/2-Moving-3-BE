@@ -1,6 +1,7 @@
 import { BaseException } from '#exceptions/base.exception.js';
 import { UncaughtException } from '#exceptions/common.exception.js';
 import formatTimestamp from '#utils/format-timestamp.js';
+import logger from '#utils/logger.js';
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException } from '@nestjs/common';
 import { Request, Response } from 'express';
 

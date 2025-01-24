@@ -3,19 +3,26 @@ import { IRequestController } from '#requests/interfaces/request.controller.inte
 import { Controller, Delete, Get, HttpStatus, Param, Post, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { RequestService } from './request.service.js';
-import { BaseRequestOutputDTO, RequestOutputDTO } from './request.types.js';
+import { BaseRequestOutputDTO, checkRequestOutputDTO, RequestOutputDTO } from './request.types.js';
 
 @Controller('requests')
 export class RequestController implements IRequestController {
   constructor(private readonly requestService: RequestService) {}
 
-  // @Get()
-  // @ApiOperation({ summary: '요청 목록 조회(유저 기준)' })
-  // async getRequests() {}
+  @Get('check/:driverId')
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth('accessToken')
+  @ApiOperation({ summary: '요청 가능여부 조회' })
+  @ApiParam({ name: 'driverId', description: '기사 ID', type: 'string' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: checkRequestOutputDTO,
+  })
+  async checkRequest(@Param('driverId') driverId: string) {
+    const requset = await this.requestService.checkRequest(driverId);
 
-  // @Get('driver/:id')
-  // @ApiOperation({ summary: '요청 목록 조회(기사 기준)' })
-  // async getRequestsForDriver() {}
+    return requset;
+  }
 
   @Get(':requestId')
   @UseGuards(AccessTokenGuard)
@@ -34,7 +41,7 @@ export class RequestController implements IRequestController {
   @Post(':driverId')
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth('accessToken')
-  @ApiOperation({ summary: '요청 생성' })
+  @ApiOperation({ summary: ' 요청 생성 ' })
   @ApiParam({ name: 'driverId', description: '기사 ID', type: 'string' })
   @ApiResponse({
     status: HttpStatus.CREATED,

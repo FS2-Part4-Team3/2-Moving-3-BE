@@ -6,3 +6,9 @@ export class RequestNotFoundException extends BadRequestException {
     super(ExceptionMessages.REQUEST_NOT_FOUND);
   }
 }
+
+export class AlreadyRequestedException extends BadRequestException {
+  constructor() {
+    super(ExceptionMessages.ALREADY_REQUESTED);
+  }
+}
