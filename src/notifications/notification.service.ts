@@ -103,11 +103,7 @@ export class NotificationService implements INotificationService {
 
   async getNotifications(page: number, pageSize: number) {
     const { type, userId, driverId } = this.als.getStore();
-    console.log('🚀 ~ NotificationService ~ getNotifications ~ type:', type);
-    console.log('🚀 ~ NotificationService ~ getNotifications ~ userId:', userId);
-    console.log('🚀 ~ NotificationService ~ getNotifications ~ driverId:', driverId);
     const validId = type === UserType.User ? userId : driverId;
-    console.log('🚀 ~ NotificationService ~ getNotifications ~ validId:', validId);
 
     const totalCount = await this.notificationRepository.count(type, validId);
     const list = await this.notificationRepository.findMany(type, validId, page, pageSize);
