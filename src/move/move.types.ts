@@ -79,7 +79,7 @@ class serviceTypeCountsDTO {
   count: Number;
 }
 
-class filterCountDTO {
+export class filterCountDTO {
   @ApiProperty({ description: '서비스타입 개수', type: [serviceTypeCountsDTO] })
   serviceTypeCounts: serviceTypeCountsDTO[];
 
@@ -90,9 +90,20 @@ class filterCountDTO {
   designatedRequestCount: Number;
 }
 
+class MoveInfoRequestsDTO {
+  @ApiProperty({ description: '지정견적요청 기사 ID', type: String })
+  driverId: string;
+}
+
 class MoveInfoOutputDTO extends BaseMoveInfoOutputDTO {
-  @ApiProperty({ description: '이사 정보 목록', type: OwnerNameDTO })
+  @ApiProperty({ description: '작성자', type: OwnerNameDTO })
   owner: OwnerNameDTO;
+
+  @ApiProperty({ description: '이사정보의 지정견적요청', type: [MoveInfoRequestsDTO] })
+  requests: MoveInfoRequestsDTO[];
+
+  @ApiProperty({ description: '이사정보에 대한 지정견적요청 여부', type: Boolean })
+  isSpecificRequest: boolean;
 }
 
 export class MoveInfoResponseDTO {
@@ -102,6 +113,6 @@ export class MoveInfoResponseDTO {
   @ApiProperty({ description: '필터 개수', type: filterCountDTO })
   counts: filterCountDTO;
 
-  @ApiProperty({ description: '리뷰 목록', type: [MoveInfoOutputDTO] })
+  @ApiProperty({ description: '이사 정보 목록', type: [MoveInfoOutputDTO] })
   list: MoveInfoOutputDTO[];
 }
