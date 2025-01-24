@@ -42,8 +42,10 @@ export class NotificationGateway implements INotificationGateway {
 
   sendNotification(id: string, notification: any) {
     const sockets = this.getSockets(id);
+    console.log('🚀 ~ NotificationGateway ~ sendNotification ~ sockets:', sockets);
     if (sockets) {
       sockets.forEach(socket => socket.emit('notification', notification));
+      console.log('🚀 ~ NotificationGateway ~ sendNotification ~ notification:', notification);
     }
   }
 }
