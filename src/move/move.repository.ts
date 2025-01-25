@@ -4,6 +4,7 @@ import { MoveInfo, MoveInfoInputDTO } from '#move/move.types.js';
 import { IsActivate, MoveInfoSortOrder } from '#types/options.type.js';
 import { MoveInfoGetQueries } from '#types/queries.type.js';
 import { areaToKeyword } from '#utils/address-utils.js';
+import { getDayEnd, getDayStart } from '#utils/dateUtils.js';
 import { Injectable } from '@nestjs/common';
 import { Area, Progress } from '@prisma/client';
 import { IMoveInfo } from './types/move.types.js';
@@ -85,6 +86,24 @@ export class MoveRepository implements IMoveRepository {
     };
 
     return baseWhereCondition;
+  }
+
+  async findManyByDate(date: Date) {
+    const moveInfos = await this.moveInfo.findMany({
+      where: {
+        progress: Progress.CONFIRMED,
+        date: {
+          gte: getDayStart(date),
+          lt: getDayEnd(date),
+        },
+      },
+      include: {
+        owner: true,
+        confirmedEstimation: { include: { driver: true } },
+      },
+    });
+
+    return moveInfos;
   }
 
   async findMany(options: MoveInfoGetQueries, driverId: string, driverAvailableAreas: Area[]) {
