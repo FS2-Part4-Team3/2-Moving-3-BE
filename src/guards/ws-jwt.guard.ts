@@ -21,16 +21,19 @@ export class WsJwtGuard implements CanActivate {
       const token = client.handshake.auth.token;
 
       if (!token) {
+        console.log('No Token');
         throw new WSTokenNotFoundException();
       }
 
       const payload = await this.jwtService.verifyAsync(token, { secret: jwtSecret });
       if (!payload.id || !payload.type) {
+        console.log('Invalid Payload');
         throw new WSInvalidTokenException();
       }
 
       const person = await this.guardService.validatePerson(payload.id, payload.type);
       if (!person) {
+        console.log('Invalid Personal Info');
         throw new WSInvalidTokenException();
       }
 
@@ -48,6 +51,7 @@ export class WsJwtGuard implements CanActivate {
           throw new WSInvalidTokenException();
       }
 
+      console.log('WebSocket OK');
       return true;
     } catch (err) {
       throw new WSInvalidTokenException();

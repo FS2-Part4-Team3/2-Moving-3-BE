@@ -72,7 +72,6 @@ export class NotificationService implements INotificationService {
     // NOTE relation 객체 검증
     switch (type) {
       case NotificationType.MOVE_INFO_EXPIRED:
-      case NotificationType.NEW_REQUEST:
         if (!moveInfoId) {
           throw new NotificationInvalidRelationException('이사 정보를 입력해주세요.');
         }
@@ -83,6 +82,7 @@ export class NotificationService implements INotificationService {
           throw new NotificationInvalidRelationException('견적 정보를 입력해주세요.');
         }
         break;
+      case NotificationType.NEW_REQUEST:
       case NotificationType.REQUEST_REJECTED:
         if (!requestId) {
           throw new NotificationInvalidRelationException('지정 요청 정보를 입력해주세요.');
@@ -118,8 +118,8 @@ export class NotificationService implements INotificationService {
 
     const notification = await this.notificationRepository.create(data);
 
-    // const validId = data.userId || data.driverId;
-    // this.notificationGateway.sendNotification(validId, {type: 'NEW_NOTIFICATION', data: notification});
+    const validId = data.userId || data.driverId;
+    this.notificationGateway.sendNotification(validId, { type: 'NEW_NOTIFICATION', data: notification });
 
     return notification;
   }
@@ -130,7 +130,7 @@ export class NotificationService implements INotificationService {
     const validId = type === UserType.User ? userId : driverId;
     const notifications = await this.notificationRepository.updateManyAsRead(type, validId, notificationIds);
 
-    // this.notificationGateway.sendNotification(validId, { type: 'NOTIFICATIONS_READ', data: notifications });
+    this.notificationGateway.sendNotification(validId, { type: 'NOTIFICATIONS_READ', data: notifications });
 
     return notifications;
   }

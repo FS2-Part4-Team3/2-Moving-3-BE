@@ -1,13 +1,17 @@
 import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { NotificationService } from '#notifications/notification.service.js';
-import { Body, Controller, DefaultValuePipe, Get, Param, ParseIntPipe, Post, Query, UseGuards } from '@nestjs/common';
+import { NotificationEntity } from '#notifications/notification.types.js';
+import { Body, Controller, DefaultValuePipe, Get, HttpStatus, Param, ParseIntPipe, Post, Query, UseGuards } from '@nestjs/common';
+import { ApiExcludeEndpoint, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @Controller('notification')
 @UseGuards(AccessTokenGuard)
 export class NotificationController {
   constructor(private readonly notificationService: NotificationService) {}
 
-  @Get('')
+  @Get()
+  @ApiOperation({ summary: '알림 조회' })
+  @ApiResponse({ status: HttpStatus.OK, type: [NotificationEntity] })
   async getNotifications(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('pageSize', new DefaultValuePipe(10), ParseIntPipe) pageSize: number,
@@ -18,6 +22,8 @@ export class NotificationController {
   }
 
   @Post('read')
+  @ApiOperation({ summary: '알림 읽음 처리(목록)' })
+  @ApiResponse({ status: HttpStatus.OK, type: [NotificationEntity] })
   async readNotifications(@Body() ids: string[]) {
     const notifications = await this.notificationService.markNotificationAsRead(ids);
 
@@ -25,9 +31,19 @@ export class NotificationController {
   }
 
   @Post(':id/read')
+  @ApiOperation({ summary: '알림 읽음 처리(단일)' })
+  @ApiResponse({ status: HttpStatus.OK, type: NotificationEntity })
   async readNotification(@Param('id') id: string) {
     const notifications = await this.notificationService.markNotificationAsRead([id]);
 
     return notifications;
+  }
+
+  @Post('push')
+  @ApiExcludeEndpoint()
+  async createNotificationTest(@Body() body: any) {
+    const notification = await this.notificationService.createNotification(body);
+
+    return notification;
   }
 }

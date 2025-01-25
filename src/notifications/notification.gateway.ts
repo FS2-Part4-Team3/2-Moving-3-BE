@@ -4,12 +4,13 @@ import { WsJwtGuard } from '#guards/ws-jwt.guard.js';
 import { INotificationGateway } from '#notifications/interfaces/notification.gateway.interface.js';
 import { User } from '#users/user.types.js';
 import { UseGuards } from '@nestjs/common';
-import { SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { ConnectedSocket, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
 @WebSocketGateway({
   cors: {
     origin: '*',
+    credentials: true,
   },
 })
 export class NotificationGateway implements INotificationGateway {
@@ -24,7 +25,7 @@ export class NotificationGateway implements INotificationGateway {
 
   @UseGuards(WsJwtGuard)
   @SubscribeMessage('subscribe')
-  handleSubscribe(client: Socket, @WSPerson() person: User | Driver) {
+  handleSubscribe(@ConnectedSocket() client: Socket, @WSPerson() person: User | Driver) {
     const { id } = person;
 
     const sockets = this.getSockets(id);

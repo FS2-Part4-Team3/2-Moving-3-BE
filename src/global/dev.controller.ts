@@ -15,7 +15,7 @@ export class DevController {
   constructor(
     private readonly userService: UserService,
     private readonly notificationService: NotificationService,
-    private readonly prismaService: PrismaService,
+    private readonly prisma: PrismaService,
     private readonly jwtGenerateService: JwtGenerateService,
     private readonly als: AsyncLocalStorage<IStorage>,
   ) {}
@@ -31,7 +31,7 @@ export class DevController {
 
   @Get('login/user')
   async userLogin() {
-    const [user] = await this.prismaService.user.findMany({
+    const [user] = await this.prisma.user.findMany({
       orderBy: { createdAt: 'desc' },
       take: 1,
     });
@@ -43,7 +43,7 @@ export class DevController {
 
   @Get('login/driver')
   async driverLogin() {
-    const [driver] = await this.prismaService.driver.findMany({
+    const [driver] = await this.prisma.driver.findMany({
       orderBy: { createdAt: 'desc' },
       take: 1,
     });
