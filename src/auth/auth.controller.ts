@@ -14,7 +14,7 @@ import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { HashPasswordGuard } from '#guards/hash-password.guard.js';
 import { RefreshTokenGuard } from '#guards/refresh-token.guard.js';
 import { UserType } from '#types/common.types.js';
-import { Body, Controller, Get, HttpStatus, Param, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import {
   ApiBearerAuth,
@@ -32,11 +32,13 @@ export class AuthController implements IAuthController {
   constructor(private readonly authService: AuthService) {}
 
   private setRefreshToken(res: Response, token: string) {
+    const maxAge = token ? 1000 * 60 * 60 * 24 * 14 : 0;
+
     res.cookie('refreshToken', token, {
       httpOnly: true,
       secure: true,
       sameSite: 'none',
-      maxAge: 1000 * 60 * 60 * 24 * 14,
+      maxAge,
     });
   }
 
@@ -108,6 +110,16 @@ export class AuthController implements IAuthController {
     this.setRefreshToken(response, refreshToken);
 
     return { person, accessToken };
+  }
+
+  @Delete('signOut')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: '로그아웃' })
+  @ApiResponse({
+    status: HttpStatus.NO_CONTENT,
+  })
+  async signOut(@Res({ passthrough: true }) response: Response) {
+    this.setRefreshToken(response, '');
   }
 
   @Get('me')
