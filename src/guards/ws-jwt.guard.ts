@@ -51,7 +51,7 @@ export class WsJwtGuard implements CanActivate {
           throw new WSInvalidTokenException();
       }
 
-      console.log('WebSocket OK');
+      console.log(`WebSocket OK: ${person.id}`);
       return true;
     } catch (err) {
       throw new WSInvalidTokenException();

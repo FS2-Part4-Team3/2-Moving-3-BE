@@ -4,6 +4,7 @@ import { MoveInfoGetQueries } from '#types/queries.type.js';
 import { Area } from '@prisma/client';
 
 export interface IMoveRepository {
+  findManyByDate: (date: Date) => Promise<MoveInfo[]>;
   findMany: (options: MoveInfoGetQueries, driverId: string, driverAvailableAreas: Area[]) => Promise<MoveInfo[]>;
   getTotalCount: (options: MoveInfoGetQueries, driverId: string, driverAvailableAreas: Area[]) => Promise<number>;
   getFilteringCounts: (driverId: string, driverAvailableAreas: Area[]) => Promise<filterCountDTO>;

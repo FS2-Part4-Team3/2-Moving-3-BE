@@ -21,6 +21,7 @@ import { UserModule } from '#users/user.module.js';
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_INTERCEPTOR } from '@nestjs/core';
+import { ScheduleModule } from '@nestjs/schedule';
 
 const controllers: Array<any> = [AppController];
 if (nodeEnv === 'development') {
@@ -43,6 +44,7 @@ if (nodeEnv === 'development') {
     SwaggerModule,
     StorageModule,
     ConfigModule.forRoot({ isGlobal: true, load: [jwtConfig, postgresConfig], envFilePath: '.env' }),
+    ScheduleModule.forRoot(),
   ],
   controllers,
   providers: [{ provide: APP_INTERCEPTOR, useClass: LogInterceptor }],

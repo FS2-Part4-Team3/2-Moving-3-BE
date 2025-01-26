@@ -2,10 +2,11 @@ import winston from 'winston';
 import DailyRotateFile from 'winston-daily-rotate-file';
 
 const logDir = `${process.cwd()}/logs`;
-const { combine, timestamp, label, printf, colorize, simple } = winston.format;
+const { combine, timestamp, label, printf, colorize } = winston.format;
 
-const logFormat = printf(({ level, message, label, timestamp }) => {
-  return `${timestamp} [${label}] ${level}: ${message}`;
+const logFormat = printf(({ level, message, label, timestamp, ...meta }) => {
+  const metaFormat = Object.keys(meta).length ? ` ${JSON.stringify(meta)}` : '';
+  return `${timestamp} [${label}] ${level}: ${message}${metaFormat}`;
 });
 
 const dateFormat = 'YYYY-MM-DD';
