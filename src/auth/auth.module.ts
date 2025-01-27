@@ -7,8 +7,9 @@ import { GuardModule } from '#guards/guard.module.js';
 import { UserModule } from '#users/user.module.js';
 import { Module } from '@nestjs/common';
 import { KakaoStrategy } from './strategies/kakao.strategy.js';
+import { NaverStrategy } from './strategies/naver.strategy.js';
 
-const strategies = [GoogleStrategy, KakaoStrategy];
+const strategies = [GoogleStrategy, KakaoStrategy, NaverStrategy];
 
 @Module({
   imports: [UserModule, DriverModule, GuardModule],

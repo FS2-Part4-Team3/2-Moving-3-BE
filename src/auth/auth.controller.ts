@@ -4,6 +4,7 @@ import {
   FilteredUserOutputDTO,
   GoogleAuthType,
   KakaoAuthType,
+  NaverAuthType,
   SignInDTO,
   SignUpDTO,
   UpdatePasswordDTO,
@@ -198,6 +199,34 @@ export class AuthController implements IAuthController {
     const redirectResult: KakaoAuthType = req.user;
 
     const { person, accessToken, refreshToken } = await this.authService.kakaoAuth(redirectResult);
+    this.setRefreshToken(response, refreshToken);
+
+    // response.redirect(`http://localhost:3000/callback/kakao?accessToken=${accessToken}`);
+    response.redirect(`https://www.moving.wiki/callback/kakao?accessToken=${accessToken}`);
+  }
+
+  @Get('naver/:userType')
+  @UseGuards(AuthGuard('naver'))
+  @ApiOperation({ summary: '네이버 로그인' })
+  @ApiParam({ name: 'userType', enum: UserType })
+  @ApiResponse({
+    status: HttpStatus.FOUND,
+    headers: {
+      Location: {
+        description: '네이버 콜백 페이지에 액세스 토큰과 함께 리다이렉션',
+        schema: { type: 'string', example: 'https://www.moving.wiki/callback/naver?accessToken=TokenValue' },
+      },
+    },
+  })
+  async naverAuth() {}
+
+  @Get('oauth2/redirect/naver')
+  @ApiExcludeEndpoint()
+  @UseGuards(AuthGuard('naver'))
+  async naverAuthRedirect(@Req() req, @Res({ passthrough: true }) response: Response) {
+    const redirectResult: NaverAuthType = req.user;
+
+    const { person, accessToken, refreshToken } = await this.authService.naverAuth(redirectResult);
     this.setRefreshToken(response, refreshToken);
 
     response.redirect(`http://localhost:3000/callback/kakao?accessToken=${accessToken}`);
