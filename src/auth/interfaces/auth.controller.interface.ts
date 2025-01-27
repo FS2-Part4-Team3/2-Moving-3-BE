@@ -9,4 +9,6 @@ export interface IAuthController {
   refreshToken: (res: Response) => Promise<FilteredPersonWithToken>;
   googleAuth: () => void;
   googleAuthRedirect: (req: any, res: Response) => void;
+  kakaoAuth: (userType: UserType) => void;
+  kakaoAuthRedirect: (req: any, res: Response) => void;
 }
