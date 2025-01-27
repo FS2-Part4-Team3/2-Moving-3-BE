@@ -1,11 +1,11 @@
 if (!process.env.KAKAO_CLIENT_ID) {
-  throw new Error('GOOGLE_CLIENT_ID 환경변수가 설정되지 않았습니다.');
+  throw new Error('KAKAO_CLIENT_ID 환경변수가 설정되지 않았습니다.');
 }
 if (!process.env.KAKAO_CLIENT_SECRET) {
-  throw new Error('GOOGLE_CLIENT_SECRET 환경변수가 설정되지 않았습니다.');
+  throw new Error('KAKAO_CLIENT_SECRET 환경변수가 설정되지 않았습니다.');
 }
 if (!process.env.KAKAO_REDIRECT_URL) {
-  throw new Error('GOOGLE_CLIENT_SECRET 환경변수가 설정되지 않았습니다.');
+  throw new Error('KAKAO_REDIRECT_URL 환경변수가 설정되지 않았습니다.');
 }
 
 export const kakaoConfig = {
