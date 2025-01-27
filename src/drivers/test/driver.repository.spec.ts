@@ -107,6 +107,13 @@ describe('DriverRepository', () => {
       expect(result).toBe(mockDriver);
       expect(mockPrismaService.driver.findUnique).toHaveBeenCalledWith({
         where: { id: '1' },
+        include: {
+          reviews: {
+            select: {
+              score: true,
+            },
+          },
+        },
       });
     });
   });
