@@ -1,7 +1,7 @@
 import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { IMoveController } from '#move/interfaces/move.controller.interface.js';
 import { MoveInfoGetQueries } from '#types/queries.type.js';
-import { Body, Controller, Get, HttpStatus, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { MoveService } from './move.service.js';
 import {
@@ -103,6 +103,17 @@ export class MoveController implements IMoveController {
   })
   async patchMoveInfo(@Param('moveId') moveId: string, @Body() body: Partial<MoveInfoInputDTO>) {
     const moveInfo = await this.moveService.patchMoveInfo(moveId, body);
+
+    return moveInfo;
+  }
+
+  @Delete(':moveId')
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth('accessToken')
+  @ApiOperation({ summary: '이사 정보 삭제' })
+  @ApiParam({ name: 'moveId', description: '이사정보 ID', type: 'string' })
+  async deleteMoveInfo(@Param('moveId') moveId: string) {
+    const moveInfo = await this.moveService.softDeleteMoveInfo(moveId);
 
     return moveInfo;
   }

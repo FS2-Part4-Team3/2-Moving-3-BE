@@ -240,5 +240,9 @@ export class MoveRepository implements IMoveRepository {
     return moveInfo;
   }
 
-  async delete(id: string) {}
+  async softDeleteMoveInfo(id: string) {
+    const moveInfo = await this.moveInfo.delete({ where: { id } });
+
+    return moveInfo;
+  }
 }
