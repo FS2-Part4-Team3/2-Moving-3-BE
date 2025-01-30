@@ -55,7 +55,7 @@ jobs:
 
       - name: Download previous notification history
         continue-on-error: true
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: notification-history
           path: ./history
@@ -232,8 +232,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: Upload notification history
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: notification-history
           path: ./history/notifications.json
           retention-days: 1
+          overwrite: true
