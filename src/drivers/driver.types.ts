@@ -1,5 +1,5 @@
+import { PersonalInfo } from '#auth/types/filtered.types.js';
 import { ModelBase } from '#types/common.types.js';
-import { PersonalInfo } from '#types/personal.type.js';
 import { OmitType, PartialType } from '@nestjs/swagger';
 import { $Enums, Driver as PrismaDriver } from '@prisma/client';
 import { ArrayNotEmpty, IsDate, IsIn, IsNotEmpty, IsString } from 'class-validator';
@@ -34,5 +34,5 @@ export class DriverEntity extends PersonalInfo {
   startAt: Date;
 }
 
-export class DriverPatchDTO extends PartialType(OmitType(DriverEntity, ['refreshToken', 'password'])) {}
+export class DriverPatchDTO extends PartialType(OmitType(DriverEntity, ['refreshToken'])) {}
 export interface DriverUpdateDTO extends Partial<Omit<Driver, keyof ModelBase>> {}

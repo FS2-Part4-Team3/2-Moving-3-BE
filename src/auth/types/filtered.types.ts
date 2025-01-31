@@ -1,7 +1,6 @@
-import { Tokens } from '#auth/types/auth.types.js';
+import { imageRegex, Tokens } from '#auth/types/auth.types.js';
 import { SignUpDTO } from '#auth/types/sign.dto.js';
 import { Driver } from '#drivers/driver.types.js';
-import { imageRegex } from '#types/personal.type.js';
 import { User } from '#users/user.types.js';
 import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { IsJWT, IsOptional, Matches } from 'class-validator';

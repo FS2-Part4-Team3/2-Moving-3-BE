@@ -1,6 +1,6 @@
+import { PersonalInfo } from '#auth/types/filtered.types.js';
 import { ProviderInfo } from '#auth/types/provider.types.js';
 import { UserType } from '#types/common.types.js';
-import { PersonalInfo } from '#types/personal.type.js';
 import { ApiProperty } from '@nestjs/swagger';
 import { Area, ServiceType } from '@prisma/client';
 
