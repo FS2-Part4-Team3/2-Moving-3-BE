@@ -3,12 +3,12 @@ import { EstimationInputDTO, EstimationOutputDTO } from '#estimations/estimation
 import { IEstimationController } from '#estimations/interfaces/estimation.controller.interface.js';
 import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { QuestionService } from '#questions/question.service.js';
-import { QuestionPostDTO } from '#questions/types/question.dto.js';
+import { QuestionListDTO, QuestionPostDTO } from '#questions/types/question.dto.js';
 import { QuestionEntity } from '#questions/types/question.types.js';
 import { SortOrder } from '#types/options.type.js';
 import { GetQueries } from '#types/queries.type.js';
 import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards, ValidationPipe } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags, getSchemaPath } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @Controller('estimations')
 export class EstimationController implements IEstimationController {
@@ -50,10 +50,7 @@ export class EstimationController implements IEstimationController {
   @ApiOperation({ summary: '문의 목록 조회' })
   @ApiResponse({
     status: HttpStatus.CREATED,
-    schema: {
-      type: 'array',
-      items: { $ref: getSchemaPath(QuestionEntity) },
-    },
+    type: QuestionListDTO,
   })
   async getQuestions(@Param('id') id: string, @Query() query: GetQueries) {
     const { page = 1, pageSize = 10 } = query;
