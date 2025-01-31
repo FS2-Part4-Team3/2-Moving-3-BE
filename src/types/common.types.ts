@@ -6,6 +6,7 @@ export class ModelBase {
   id?: string;
   createdAt?: Date;
   updatedAt?: Date;
+  deletedAt?: Date;
 }
 
 export const modelBaseKeys = Object.keys(new ModelBase());

@@ -17,8 +17,14 @@ export class NotificationOutputDTO {
   @ApiProperty({ description: '유저 ID' })
   userId?: string;
 
+  @ApiProperty({ description: '유저 이름' })
+  user?: { name: string } | null;
+
   @ApiProperty({ description: '기사 ID' })
   driverId?: string;
+
+  @ApiProperty({ description: '기사 이름' })
+  driver?: { name: string } | null;
 
   @ApiProperty({ description: '이사 정보 ID' })
   moveInfoId?: string;
