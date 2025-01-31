@@ -1,4 +1,3 @@
-import { BadRequestException } from '#exceptions/http.exception.js';
 import { INotificationService } from '#notifications/interfaces/notification.service.interface.js';
 import {
   NotificationInvalidRelationException,
@@ -7,6 +6,7 @@ import {
 } from '#notifications/notification.exception.js';
 import { NotificationGateway } from '#notifications/notification.gateway.js';
 import { NotificationRepository } from '#notifications/notification.repository.js';
+import { notificationMessages } from '#notifications/notifications.messages.js';
 import { NotificationCreateDTO } from '#notifications/types/notification.dto.js';
 import { IStorage, UserType } from '#types/common.types.js';
 import { Injectable } from '@nestjs/common';
@@ -28,12 +28,7 @@ export class NotificationService implements INotificationService {
       }
     }
 
-    const { message, userId, driverId, type, moveInfoId, requestId, estimationId, questionId } = data;
-
-    // NOTE 메세지가 비어있는가
-    if (!message) {
-      throw new BadRequestException('메세지를 입력해주세요.');
-    }
+    const { userId, driverId, type, moveInfoId, requestId, estimationId, questionId } = data;
 
     // NOTE 유저 타입이 하나인가
     if ((userId && driverId) || (!userId && !driverId)) {
@@ -63,6 +58,7 @@ export class NotificationService implements INotificationService {
         break;
       case NotificationType.NEW_QUESTION:
       case NotificationType.D_7:
+      case NotificationType.D_1:
       case NotificationType.D_DAY:
         break;
       default:
@@ -94,6 +90,7 @@ export class NotificationService implements INotificationService {
         }
         break;
       case NotificationType.D_7:
+      case NotificationType.D_1:
       case NotificationType.D_DAY:
         break;
       default:
@@ -115,6 +112,7 @@ export class NotificationService implements INotificationService {
     this.validateNotificationData(body);
 
     const data: NotificationCreateDTO = body;
+    data.message = notificationMessages[data.type];
 
     const notification = await this.notificationRepository.create(data);
 

@@ -27,6 +27,14 @@ export class NotificationRepository implements INotificationRepository {
       orderBy: [{ isRead: 'asc' }, { createdAt: 'desc' }],
       skip: (page - 1) * pageSize,
       take: pageSize,
+      include: {
+        user: {
+          select: { name: true },
+        },
+        driver: {
+          select: { name: true },
+        },
+      },
     });
 
     return notifications;
@@ -35,7 +43,17 @@ export class NotificationRepository implements INotificationRepository {
   async findById() {}
 
   async create(data: NotificationCreateDTO) {
-    const notification = await this.notification.create({ data });
+    const notification = await this.notification.create({
+      data,
+      include: {
+        user: {
+          select: { name: true },
+        },
+        driver: {
+          select: { name: true },
+        },
+      },
+    });
 
     return notification;
   }
@@ -55,6 +73,14 @@ export class NotificationRepository implements INotificationRepository {
     const notifications = this.notification.updateManyAndReturn({
       where,
       data: { isRead: true },
+      include: {
+        user: {
+          select: { name: true },
+        },
+        driver: {
+          select: { name: true },
+        },
+      },
     });
 
     return notifications;

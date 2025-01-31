@@ -1,3 +1,4 @@
+import { notificationMessages } from '#notifications/notifications.messages.js';
 import { fakerKO as faker } from '@faker-js/faker';
 import { NotificationType, PrismaClient } from '@prisma/client';
 import {
@@ -6,7 +7,6 @@ import {
   driverDescriptions,
   estimationComments,
   introduces,
-  notificationMessages,
   notificationTypes,
   progress,
   questionContents,
