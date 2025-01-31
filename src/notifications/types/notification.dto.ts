@@ -47,3 +47,11 @@ export class NotificationOutputDTO {
   @ApiProperty({ description: '알림 타입' })
   type: string;
 }
+
+export class NotificationListDTO {
+  @ApiProperty({ description: '알림 갯수' })
+  totalCount: number;
+
+  @ApiProperty({ description: '알림 내용', type: [NotificationDTO] })
+  list: NotificationDTO[];
+}
