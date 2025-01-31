@@ -1,6 +1,6 @@
 import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { NotificationService } from '#notifications/notification.service.js';
-import { NotificationOutputDTO } from '#notifications/types/notification.dto.js';
+import { NotificationListDTO, NotificationOutputDTO } from '#notifications/types/notification.dto.js';
 import { Body, Controller, DefaultValuePipe, Get, HttpStatus, Param, ParseIntPipe, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiExcludeEndpoint, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
@@ -11,7 +11,7 @@ export class NotificationController {
 
   @Get()
   @ApiOperation({ summary: '알림 조회' })
-  @ApiResponse({ status: HttpStatus.OK, type: [NotificationOutputDTO] })
+  @ApiResponse({ status: HttpStatus.OK, type: NotificationListDTO })
   async getNotifications(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('pageSize', new DefaultValuePipe(10), ParseIntPipe) pageSize: number,
