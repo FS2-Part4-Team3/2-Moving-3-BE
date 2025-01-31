@@ -260,5 +260,6 @@ enum NotificationType {
   ESTIMATION_CONFIRMED
   NEW_QUESTION
   D_7
+  D_1
   D_DAY
 }
