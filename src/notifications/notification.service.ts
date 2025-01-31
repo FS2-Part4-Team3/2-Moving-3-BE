@@ -6,8 +6,8 @@ import {
 } from '#notifications/notification.exception.js';
 import { NotificationGateway } from '#notifications/notification.gateway.js';
 import { NotificationRepository } from '#notifications/notification.repository.js';
-import { NotificationCreateDTO } from '#notifications/notification.types.js';
 import { notificationMessages } from '#notifications/notifications.messages.js';
+import { NotificationCreateDTO } from '#notifications/types/notification.dto.js';
 import { IStorage, UserType } from '#types/common.types.js';
 import { Injectable } from '@nestjs/common';
 import { NotificationType } from '@prisma/client';
@@ -116,7 +116,7 @@ export class NotificationService implements INotificationService {
 
     const notification = await this.notificationRepository.create(data);
 
-    const validId = data.userId || data.driverId;
+    const validId = notification.userId || notification.driverId;
     this.notificationGateway.sendNotification(validId, { type: 'NEW_NOTIFICATION', data: notification });
 
     return notification;

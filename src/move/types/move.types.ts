@@ -3,6 +3,7 @@ export interface IMoveInfo {
   id: string;
   createdAt: Date;
   updatedAt: Date;
+  deletedAt?: Date;
 
   serviceType: ServiceType;
   date: Date;

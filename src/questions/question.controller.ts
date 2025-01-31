@@ -1,7 +1,8 @@
 import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { IQuestionController } from '#questions/interfaces/question.controller.interface.js';
 import { QuestionService } from '#questions/question.service.js';
-import { QuestionEntity, QuestionPatchDTO } from '#questions/question.types.js';
+import { QuestionPatchDTO } from '#questions/types/question.dto.js';
+import { QuestionEntity } from '#questions/types/question.types.js';
 import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
