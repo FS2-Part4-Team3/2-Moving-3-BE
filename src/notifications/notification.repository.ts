@@ -1,6 +1,6 @@
 import { PrismaService } from '#global/prisma.service.js';
 import { INotificationRepository } from '#notifications/interfaces/notification.repository.interface.js';
-import { NotificationCreateDTO } from '#notifications/notification.types.js';
+import { NotificationCreateDTO } from '#notifications/types/notification.dto.js';
 import { UserType } from '#types/common.types.js';
 import { Injectable } from '@nestjs/common';
 

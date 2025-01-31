@@ -1,13 +1,10 @@
 import { ModelBase } from '#types/common.types.js';
 import { ApiProperty } from '@nestjs/swagger';
-import { NotificationType, Notification as PrismaNotification } from '@prisma/client';
+import { NotificationType } from '@prisma/client';
 
-interface PrismaNotificationBase extends Omit<PrismaNotification, keyof ModelBase> {}
-interface NotificationBase extends PrismaNotificationBase {}
+export interface NotificationCreateDTO extends Omit<Notification, keyof ModelBase> {}
 
-export interface Notification extends NotificationBase, ModelBase {}
-
-export class NotificationEntity {
+export class NotificationOutputDTO {
   @ApiProperty({ description: '알림 타입' })
   type: NotificationType;
 
@@ -35,9 +32,3 @@ export class NotificationEntity {
   @ApiProperty({ description: '문의 ID' })
   questionId?: string;
 }
-
-export interface NotificationCreateDTO extends Partial<Omit<Notification, keyof ModelBase>> {}
-export class NotificationPostDTO {}
-
-export class NotificationPatchDTO {}
-export interface NotificationUpdateDTO {}
