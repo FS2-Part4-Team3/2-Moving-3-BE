@@ -3,7 +3,10 @@ import { ModelBase } from '#types/common.types.js';
 import { ApiProperty } from '@nestjs/swagger';
 import { NotificationType } from '@prisma/client';
 
-export interface NotificationCreateDTO extends Omit<Notification, keyof ModelBase> {}
+export interface NotificationCreateDTO extends Partial<Omit<Notification, keyof ModelBase>> {
+  type: NotificationType;
+  message: string;
+}
 
 export class NotificationDTO {
   @ApiProperty({ description: '알림 타입' })

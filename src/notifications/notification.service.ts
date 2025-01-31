@@ -21,7 +21,7 @@ export class NotificationService implements INotificationService {
     private readonly als: AsyncLocalStorage<IStorage>,
   ) {}
 
-  private validateNotificationData(data: any) {
+  private validateNotificationData(data: NotificationCreateDTO) {
     for (const key in data) {
       if (data[key] === '') {
         data[key] = null;
@@ -68,6 +68,9 @@ export class NotificationService implements INotificationService {
     // NOTE relation 객체 검증
     switch (type) {
       case NotificationType.MOVE_INFO_EXPIRED:
+      case NotificationType.D_7:
+      case NotificationType.D_1:
+      case NotificationType.D_DAY:
         if (!moveInfoId) {
           throw new NotificationInvalidRelationException('이사 정보를 입력해주세요.');
         }
@@ -89,10 +92,6 @@ export class NotificationService implements INotificationService {
           throw new NotificationInvalidRelationException('문의 정보를 입력해주세요.');
         }
         break;
-      case NotificationType.D_7:
-      case NotificationType.D_1:
-      case NotificationType.D_DAY:
-        break;
       default:
         throw new NotificationInvalidTypeException();
     }
@@ -108,10 +107,8 @@ export class NotificationService implements INotificationService {
     return { totalCount, list };
   }
 
-  async createNotification(body: any) {
-    this.validateNotificationData(body);
-
-    const data: NotificationCreateDTO = body;
+  async createNotification(data: NotificationCreateDTO) {
+    this.validateNotificationData(data);
     data.message = notificationMessages[data.type];
 
     const notification = await this.notificationRepository.create(data);
