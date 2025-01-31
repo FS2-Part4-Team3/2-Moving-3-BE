@@ -1,5 +1,5 @@
 import { WSPerson } from '#decorators/ws-person.decorator.js';
-import { DriverModel } from '#drivers/types/driver.types.js';
+import { Driver } from '#drivers/types/driver.types.js';
 import { WsJwtGuard } from '#guards/ws-jwt.guard.js';
 import { INotificationGateway } from '#notifications/interfaces/notification.gateway.interface.js';
 import { User } from '#users/user.types.js';
@@ -25,7 +25,7 @@ export class NotificationGateway implements INotificationGateway {
 
   @UseGuards(WsJwtGuard)
   @SubscribeMessage('subscribe')
-  handleSubscribe(@ConnectedSocket() client: Socket, @WSPerson() person: User | DriverModel) {
+  handleSubscribe(@ConnectedSocket() client: Socket, @WSPerson() person: User | Driver) {
     const { id } = person;
 
     const sockets = this.getSockets(id);

@@ -1,4 +1,5 @@
 import { PersonalInfo } from '#auth/types/filtered.types.js';
+import { Review } from '#reviews/review.types.js';
 import { ModelBase } from '#types/common.types.js';
 import { $Enums, Driver as PrismaDriver } from '@prisma/client';
 import { ArrayNotEmpty, IsDate, IsIn, IsNotEmpty, IsString } from 'class-validator';
@@ -6,7 +7,9 @@ import { ArrayNotEmpty, IsDate, IsIn, IsNotEmpty, IsString } from 'class-validat
 interface PrismaDriverBase extends Omit<PrismaDriver, keyof ModelBase> {}
 interface DriverBase extends PrismaDriverBase {}
 
-export interface DriverModel extends DriverBase, ModelBase {}
+export interface Driver extends DriverBase, ModelBase {
+  reviews?: Review[];
+}
 
 export class DriverEntity extends PersonalInfo {
   @IsString({ message: '별명은 문자열 형식입니다.' })
