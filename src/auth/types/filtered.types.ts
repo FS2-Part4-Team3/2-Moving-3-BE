@@ -1,13 +1,13 @@
 import { imageRegex, Tokens } from '#auth/types/auth.types.js';
 import { SignUpDTO } from '#auth/types/sign.dto.js';
-import { Driver } from '#drivers/driver.types.js';
+import { DriverModel } from '#drivers/types/driver.types.js';
 import { User } from '#users/user.types.js';
 import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { IsJWT, IsOptional, Matches } from 'class-validator';
 
-export type FilteredPersonalInfo<T> = T extends User | Driver ? Omit<T, 'password' | 'salt' | 'refreshToken'> : never;
+export type FilteredPersonalInfo<T> = T extends User | DriverModel ? Omit<T, 'password' | 'salt' | 'refreshToken'> : never;
 
-export type FilteredPerson = FilteredPersonalInfo<User> | FilteredPersonalInfo<Driver>;
+export type FilteredPerson = FilteredPersonalInfo<User> | FilteredPersonalInfo<DriverModel>;
 export interface FilteredPersonWithToken extends Tokens {
   person: FilteredPerson;
 }

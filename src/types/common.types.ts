@@ -8,7 +8,17 @@ export class ModelBase {
   updatedAt?: Date;
 }
 
+export const modelBaseKeys = Object.keys(new ModelBase());
+
 export enum UserType {
   User = 'user',
   Driver = 'driver',
 }
+
+export class SensitiveData {
+  password: string;
+  salt: string;
+  refreshToken: string;
+}
+
+export const sensitiveKeys = Object.keys(new SensitiveData());

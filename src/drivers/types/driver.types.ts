@@ -1,13 +1,12 @@
 import { PersonalInfo } from '#auth/types/filtered.types.js';
 import { ModelBase } from '#types/common.types.js';
-import { OmitType, PartialType } from '@nestjs/swagger';
 import { $Enums, Driver as PrismaDriver } from '@prisma/client';
 import { ArrayNotEmpty, IsDate, IsIn, IsNotEmpty, IsString } from 'class-validator';
 
 interface PrismaDriverBase extends Omit<PrismaDriver, keyof ModelBase> {}
 interface DriverBase extends PrismaDriverBase {}
 
-export interface Driver extends DriverBase, ModelBase {}
+export interface DriverModel extends DriverBase, ModelBase {}
 
 export class DriverEntity extends PersonalInfo {
   @IsString({ message: '별명은 문자열 형식입니다.' })
@@ -33,6 +32,3 @@ export class DriverEntity extends PersonalInfo {
   @IsDate({ message: '올바르지 않은 날짜입니다.' })
   startAt: Date;
 }
-
-export class DriverPatchDTO extends PartialType(OmitType(DriverEntity, ['refreshToken'])) {}
-export interface DriverUpdateDTO extends Partial<Omit<Driver, keyof ModelBase>> {}
