@@ -6,7 +6,7 @@ import { MoveRepository } from '#move/move.repository.js';
 import { IQuestionService } from '#questions/interfaces/question.service.interface.js';
 import { QuestionNotFoundException } from '#questions/question.exception.js';
 import { QuestionRepository } from '#questions/question.repository.js';
-import { QuestionCreateDTO, QuestionPatchDTO, QuestionPostDTO, QuestionUpdateDTO } from '#questions/question.types.js';
+import { QuestionCreateDTO, QuestionPatchDTO, QuestionPostDTO, QuestionUpdateDTO } from '#questions/types/question.dto.js';
 import { IStorage, UserType } from '#types/common.types.js';
 import { FindOptions } from '#types/options.type.js';
 import { Injectable } from '@nestjs/common';

@@ -1,5 +1,5 @@
 import { ModelBase } from '#types/common.types.js';
-import { ApiProperty, OmitType, PartialType } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import { Question as PrismaQuestion } from '@prisma/client';
 import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
 
@@ -18,18 +18,3 @@ export class QuestionEntity {
   @ApiProperty({ description: '견적 ID' })
   estimationId: string;
 }
-
-interface PersonInfo {
-  userId: string;
-  driverId: string;
-}
-
-export interface QuestionCreateDTO extends Omit<Omit<Question, keyof (ModelBase & PersonInfo)>, 'notificationId'> {
-  userId?: string;
-  driverId?: string;
-  notificationId?: string;
-}
-export class QuestionPostDTO extends OmitType(QuestionEntity, ['estimationId']) {}
-
-export class QuestionPatchDTO extends PartialType(OmitType(QuestionEntity, ['estimationId'])) {}
-export interface QuestionUpdateDTO extends Partial<Omit<Question, keyof (ModelBase & PersonInfo)>> {}

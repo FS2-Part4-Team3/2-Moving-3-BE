@@ -1,6 +1,6 @@
 import { PrismaService } from '#global/prisma.service.js';
 import { IQuestionRepository } from '#questions/interfaces/question.repository.interface.js';
-import { QuestionCreateDTO, QuestionUpdateDTO } from '#questions/question.types.js';
+import { QuestionCreateDTO, QuestionUpdateDTO } from '#questions/types/question.dto.js';
 import { FindOptions } from '#types/options.type.js';
 import { Injectable } from '@nestjs/common';
 

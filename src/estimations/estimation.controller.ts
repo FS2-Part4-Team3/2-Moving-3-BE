@@ -1,25 +1,14 @@
+import { EstimationService } from '#estimations/estimation.service.js';
+import { EstimationInputDTO, EstimationOutputDTO } from '#estimations/estimation.types.js';
 import { IEstimationController } from '#estimations/interfaces/estimation.controller.interface.js';
 import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { QuestionService } from '#questions/question.service.js';
-import { QuestionEntity, QuestionPostDTO } from '#questions/question.types.js';
+import { QuestionPostDTO } from '#questions/types/question.dto.js';
+import { QuestionEntity } from '#questions/types/question.types.js';
 import { SortOrder } from '#types/options.type.js';
 import { GetQueries } from '#types/queries.type.js';
-import {
-  Body,
-  Controller,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Param,
-  ParseBoolPipe,
-  Post,
-  Query,
-  UseGuards,
-  ValidationPipe,
-} from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards, ValidationPipe } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags, getSchemaPath } from '@nestjs/swagger';
-import { EstimationService } from '#estimations/estimation.service.js';
-import { EstimationOutputDTO, EstimationInputDTO } from '#estimations/estimation.types.js';
 
 @Controller('estimations')
 export class EstimationController implements IEstimationController {
