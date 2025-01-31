@@ -1,3 +1,4 @@
+import { Notification } from '#notifications/types/notification.types.js';
 import { ModelBase } from '#types/common.types.js';
 import { ApiProperty } from '@nestjs/swagger';
 import { NotificationType } from '@prisma/client';
