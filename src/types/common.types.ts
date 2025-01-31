@@ -6,6 +6,7 @@ export interface ModelBase {
   id?: string;
   createdAt?: Date;
   updatedAt?: Date;
+  deletedAt?: Date;
 }
 
 export enum UserType {

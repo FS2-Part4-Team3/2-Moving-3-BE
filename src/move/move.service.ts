@@ -80,4 +80,20 @@ export class MoveService implements IMoveService {
 
     return updatedMoveInfo;
   }
+
+  async softDeleteMoveInfo(moveId: string) {
+    const { userId } = this.als.getStore();
+    const moveInfo = await this.moveRepository.findByMoveInfoId(moveId);
+
+    if (!moveInfo) {
+      throw new MoveInfoNotFoundException();
+    }
+    if (moveInfo.ownerId !== userId) {
+      throw new ForbiddenException();
+    }
+
+    const softDeleteMoveInfo = await this.moveRepository.softDeleteMoveInfo(moveId);
+
+    return softDeleteMoveInfo;
+  }
 }
