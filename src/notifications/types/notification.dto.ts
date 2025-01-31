@@ -5,7 +5,7 @@ import { NotificationType } from '@prisma/client';
 
 export interface NotificationCreateDTO extends Omit<Notification, keyof ModelBase> {}
 
-export class NotificationOutputDTO {
+export class NotificationDTO {
   @ApiProperty({ description: '알림 타입' })
   type: NotificationType;
 
@@ -38,4 +38,12 @@ export class NotificationOutputDTO {
 
   @ApiProperty({ description: '문의 ID' })
   questionId?: string;
+}
+
+export class NotificationOutputDTO {
+  @ApiProperty({ description: '알림 내용' })
+  data: NotificationDTO;
+
+  @ApiProperty({ description: '알림 타입' })
+  type: string;
 }
