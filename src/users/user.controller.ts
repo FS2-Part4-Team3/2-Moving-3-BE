@@ -1,8 +1,8 @@
-import { FilteredUserOutputDTO } from '#auth/auth.types.js';
+import { FilteredUserOutputDTO } from '#auth/types/filtered.user.dto.js';
 import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { IUserController } from '#users/interfaces/user.controller.interface.js';
+import { UserPatchDTO } from '#users/types/user.dto.js';
 import { UserService } from '#users/user.service.js';
-import { UserPatchDTO } from '#users/user.types.js';
 import { Body, Controller, HttpStatus, Patch, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 

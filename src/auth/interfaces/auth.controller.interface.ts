@@ -1,4 +1,5 @@
-import { FilteredPerson, FilteredPersonWithToken, SignInDTO, SignUpDTO } from '#auth/auth.types.js';
+import { FilteredPerson, FilteredPersonWithToken } from '#auth/types/filtered.types.js';
+import { SignInDTO, SignUpDTO } from '#auth/types/sign.dto.js';
 import { UserType } from '#types/common.types.js';
 import { Response } from 'express';
 
@@ -11,4 +12,6 @@ export interface IAuthController {
   googleAuthRedirect: (req: any, res: Response) => void;
   kakaoAuth: (userType: UserType) => void;
   kakaoAuthRedirect: (req: any, res: Response) => void;
+  naverAuth: (userType: UserType) => void;
+  naverAuthRedirect: (req: any, res: Response) => void;
 }

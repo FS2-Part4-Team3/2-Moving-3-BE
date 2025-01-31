@@ -1,4 +1,4 @@
-import { TokenPayload } from '#auth/auth.types.js';
+import { TokenPayload } from '#auth/types/auth.types.js';
 
 export interface IJwtGenerateService {
   generateAccessToken: (payload: TokenPayload) => string;

@@ -1,4 +1,5 @@
-import { Notification, NotificationCreateDTO } from '#notifications/notification.types.js';
+import { NotificationCreateDTO } from '#notifications/types/notification.dto.js';
+import { Notification } from '#notifications/types/notification.types.js';
 import { UserType } from '#types/common.types.js';
 
 export interface INotificationRepository {

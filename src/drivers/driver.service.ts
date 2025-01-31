@@ -6,8 +6,8 @@ import {
   DriverNotFoundException,
 } from '#drivers/driver.exception.js';
 import { DriverRepository } from '#drivers/driver.repository.js';
-import { DriverPatchDTO, DriverUpdateDTO } from '#drivers/driver.types.js';
 import { IDriverService } from '#drivers/interfaces/driver.service.interface.js';
+import { DriverPatchDTO, DriverUpdateDTO } from '#drivers/types/driver.dto.js';
 import { IStorage, UserType } from '#types/common.types.js';
 import { DriversFindOptions } from '#types/options.type.js';
 import { UserInvalidTokenException } from '#users/user.exception.js';

@@ -1,6 +1,8 @@
-import { GoogleCreateDTO, SignUpDTO } from '#auth/auth.types.js';
+import { ProviderCreateDTO } from '#auth/types/provider.types.js';
+import { SignUpDTO } from '#auth/types/sign.dto.js';
 import { FindOptions } from '#types/options.type.js';
-import { User, UserUpdateDTO } from '#users/user.types.js';
+import { UserUpdateDTO } from '#users/types/user.dto.js';
+import { User } from '#users/types/user.types.js';
 
 export interface IUserRepository {
   count: () => Promise<number>;
@@ -8,6 +10,6 @@ export interface IUserRepository {
   findById: (id: string) => Promise<User> | null;
   findByEmail: (email: string) => Promise<User> | null;
   createBySignUp: (data: SignUpDTO) => Promise<User>;
-  createByGoogleCreateDTO: (data: GoogleCreateDTO) => Promise<User>;
+  createByProviderCreateDTO: (data: ProviderCreateDTO) => Promise<User>;
   update: (id: string, data: UserUpdateDTO) => Promise<User>;
 }

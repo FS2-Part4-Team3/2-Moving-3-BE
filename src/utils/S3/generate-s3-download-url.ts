@@ -1,5 +1,5 @@
-import { Driver } from '#drivers/driver.types.js';
-import { User } from '#users/user.types.js';
+import { Driver } from '#drivers/types/driver.types.js';
+import { User } from '#users/types/user.types.js';
 import { generatePresignedDownloadUrl } from '#utils/S3/generate-presigned-download-url.js';
 
 export async function generateS3DownloadUrl(person: User | Driver) {
