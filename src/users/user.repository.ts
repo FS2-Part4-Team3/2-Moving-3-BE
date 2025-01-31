@@ -1,4 +1,4 @@
-import { GoogleCreateDTO } from '#auth/types/provider.dto.js';
+import { ProviderCreateDTO } from '#auth/types/provider.types.js';
 import { SignUpDTO } from '#auth/types/sign.dto.js';
 import { PrismaService } from '#global/prisma.service.js';
 import { FindOptions, SortOrder } from '#types/options.type.js';
@@ -54,7 +54,7 @@ export class UserRepository implements IUserRepository {
     return user;
   }
 
-  async createByGoogleCreateDTO(data: GoogleCreateDTO) {
+  async createByProviderCreateDTO(data: ProviderCreateDTO) {
     const user = await this.user.create({ data });
 
     return user;

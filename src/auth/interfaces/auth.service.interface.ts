@@ -1,5 +1,5 @@
 import { FilteredPerson, FilteredPersonWithToken } from '#auth/types/filtered.types.js';
-import { GoogleAuthType, KakaoAuthType } from '#auth/types/provider.types.js';
+import { GoogleAuthType, KakaoAuthType, NaverAuthType } from '#auth/types/provider.types.js';
 import { SignInDTO, SignUpDTO } from '#auth/types/sign.dto.js';
 import { UpdatePasswordDTO } from '#auth/types/update-password.dto.js';
 import { UserType } from '#types/common.types.js';
@@ -12,4 +12,5 @@ export interface IAuthService {
   getNewToken: () => Promise<FilteredPersonWithToken>;
   googleAuth: (redirectResult: GoogleAuthType) => Promise<FilteredPersonWithToken>;
   kakaoAuth: (redirectResult: KakaoAuthType) => Promise<FilteredPersonWithToken>;
+  naverAuth: (redirectResult: NaverAuthType) => Promise<FilteredPersonWithToken>;
 }

@@ -1,4 +1,4 @@
-import { GoogleCreateDTO } from '#auth/types/provider.dto.js';
+import { ProviderCreateDTO } from '#auth/types/provider.types.js';
 import { SignUpDTO } from '#auth/types/sign.dto.js';
 import { DriverUpdateDTO } from '#drivers/driver.types.js';
 import { IDriverRepository } from '#drivers/interfaces/driver.repository.interface.js';
@@ -104,7 +104,7 @@ export class DriverRepository implements IDriverRepository {
     return driver;
   }
 
-  async createByGoogleCreateDTO(data: GoogleCreateDTO) {
+  async createByProviderCreateDTO(data: ProviderCreateDTO) {
     const driver = await this.driver.create({ data });
 
     return driver;

@@ -12,4 +12,6 @@ export interface IAuthController {
   googleAuthRedirect: (req: any, res: Response) => void;
   kakaoAuth: (userType: UserType) => void;
   kakaoAuthRedirect: (req: any, res: Response) => void;
+  naverAuth: (userType: UserType) => void;
+  naverAuthRedirect: (req: any, res: Response) => void;
 }

@@ -138,7 +138,7 @@ export class AuthService implements IAuthService {
     }
 
     const data: GoogleCreateDTO = { email, name, image: photo, provider, providerId: id };
-    const person = await repo.createByGoogleCreateDTO(data);
+    const person = await repo.createByProviderCreateDTO(data);
 
     const accessToken = await this.jwtGenerateService.generateAccessToken({ id: person.id, type: userType });
     const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: person.id, type: userType });
@@ -171,7 +171,7 @@ export class AuthService implements IAuthService {
     }
 
     const data: KakaoCreateDTO = { email, name, image: photo, provider, providerId, phoneNumber };
-    const person = await repo.createByGoogleCreateDTO(data);
+    const person = await repo.createByProviderCreateDTO(data);
 
     const accessToken = await this.jwtGenerateService.generateAccessToken({ id: person.id, type: userType });
     const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: person.id, type: userType });
@@ -204,7 +204,7 @@ export class AuthService implements IAuthService {
     }
 
     const data: NaverCreateDTO = { email, name, image: photo, provider, providerId };
-    const person = await repo.createByGoogleCreateDTO(data);
+    const person = await repo.createByProviderCreateDTO(data);
 
     const accessToken = await this.jwtGenerateService.generateAccessToken({ id: person.id, type: userType });
     const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: person.id, type: userType });
