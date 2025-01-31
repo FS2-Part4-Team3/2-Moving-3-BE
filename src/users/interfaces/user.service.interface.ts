@@ -1,5 +1,5 @@
+import { FilteredPersonalInfo } from '#auth/types/filtered.types.js';
 import { FindOptions } from '#types/options.type.js';
-import { FilteredPersonalInfo } from '#types/personal.type.js';
 import { User, UserPatchDTO } from '#users/user.types.js';
 
 export interface IUserService {

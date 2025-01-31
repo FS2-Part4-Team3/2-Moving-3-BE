@@ -1,15 +1,10 @@
 import { AuthService } from '#auth/auth.service.js';
-import {
-  FilteredDriverOutputDTO,
-  FilteredUserOutputDTO,
-  GoogleAuthType,
-  KakaoAuthType,
-  NaverAuthType,
-  SignInDTO,
-  SignUpDTO,
-  UpdatePasswordDTO,
-} from '#auth/auth.types.js';
 import { IAuthController } from '#auth/interfaces/auth.controller.interface.js';
+import { FilteredDriverOutputDTO } from '#auth/types/filtered.driver.dto.js';
+import { FilteredUserOutputDTO } from '#auth/types/filtered.user.dto.js';
+import { GoogleAuthType, KakaoAuthType, NaverAuthType } from '#auth/types/provider.types.js';
+import { SignInDTO, SignUpDTO } from '#auth/types/sign.dto.js';
+import { UpdatePasswordDTO } from '#auth/types/update-password.dto.js';
 import { BadRequestException } from '#exceptions/http.exception.js';
 import { EnumValidationPipe } from '#global/pipes/enum.validation.pipe.js';
 import { AccessTokenGuard } from '#guards/access-token.guard.js';

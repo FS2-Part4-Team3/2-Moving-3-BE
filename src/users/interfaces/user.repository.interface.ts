@@ -1,4 +1,5 @@
-import { GoogleCreateDTO, SignUpDTO } from '#auth/auth.types.js';
+import { GoogleCreateDTO } from '#auth/types/provider.dto.js';
+import { SignUpDTO } from '#auth/types/sign.dto.js';
 import { FindOptions } from '#types/options.type.js';
 import { User, UserUpdateDTO } from '#users/user.types.js';
 

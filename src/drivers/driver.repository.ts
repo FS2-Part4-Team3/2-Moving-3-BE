@@ -1,4 +1,5 @@
-import { GoogleCreateDTO, SignUpDTO } from '#auth/auth.types.js';
+import { GoogleCreateDTO } from '#auth/types/provider.dto.js';
+import { SignUpDTO } from '#auth/types/sign.dto.js';
 import { DriverUpdateDTO } from '#drivers/driver.types.js';
 import { IDriverRepository } from '#drivers/interfaces/driver.repository.interface.js';
 import { PrismaService } from '#global/prisma.service.js';

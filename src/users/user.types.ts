@@ -1,4 +1,4 @@
-import { ProviderInfo } from '#auth/auth.types.js';
+import { ProviderInfo } from '#auth/types/provider.types.js';
 import { ModelBase } from '#types/common.types.js';
 import { PersonalInfo } from '#types/personal.type.js';
 import { ApiProperty, OmitType, PartialType } from '@nestjs/swagger';

@@ -1,4 +1,4 @@
-import { FilteredDriverOutputDTO } from '#auth/auth.types.js';
+import { FilteredDriverOutputDTO } from '#auth/types/filtered.driver.dto.js';
 import { DriverService } from '#drivers/driver.service.js';
 import { DriverPatchDTO } from '#drivers/driver.types.js';
 import { IDriverController } from '#drivers/interfaces/driver.controller.interface.js';

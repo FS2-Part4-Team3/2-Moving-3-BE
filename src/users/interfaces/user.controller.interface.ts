@@ -1,4 +1,4 @@
-import { FilteredPersonalInfo } from '#types/personal.type.js';
+import { FilteredPersonalInfo } from '#auth/types/filtered.types.js';
 import { User, UserPatchDTO } from '#users/user.types.js';
 
 export interface IUserController {

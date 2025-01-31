@@ -1,4 +1,4 @@
-import { FilteredUserOutputDTO } from '#auth/auth.types.js';
+import { FilteredUserOutputDTO } from '#auth/types/filtered.user.dto.js';
 import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { IUserController } from '#users/interfaces/user.controller.interface.js';
 import { UserService } from '#users/user.service.js';

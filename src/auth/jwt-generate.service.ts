@@ -1,5 +1,5 @@
-import { TokenPayload } from '#auth/auth.types.js';
 import { IJwtGenerateService } from '#auth/interfaces/jwt-generate.service.interface.js';
+import { TokenPayload } from '#auth/types/auth.types.js';
 import { DriverRepository } from '#drivers/driver.repository.js';
 import { UserType } from '#types/common.types.js';
 import { UserRepository } from '#users/user.repository.js';

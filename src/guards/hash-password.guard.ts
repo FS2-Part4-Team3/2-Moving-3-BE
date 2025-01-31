@@ -1,5 +1,5 @@
 import { AuthInvalidPasswordException } from '#auth/auth.exception.js';
-import { passwordRegex } from '#auth/auth.types.js';
+import { passwordRegex } from '#auth/types/auth.types.js';
 import { BadRequestException } from '#exceptions/http.exception.js';
 import hashingPassword from '#utils/hashingPassword.js';
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';

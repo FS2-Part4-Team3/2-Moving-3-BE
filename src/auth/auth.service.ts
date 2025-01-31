@@ -4,19 +4,12 @@ import {
   AuthWrongCredentialException,
   AuthWrongPasswordException,
 } from '#auth/auth.exception.js';
-import {
-  GoogleAuthType,
-  GoogleCreateDTO,
-  KakaoAuthType,
-  KakaoCreateDTO,
-  NaverAuthType,
-  NaverCreateDTO,
-  SignInDTO,
-  SignUpDTO,
-  UpdatePasswordDTO,
-} from '#auth/auth.types.js';
 import { IAuthService } from '#auth/interfaces/auth.service.interface.js';
 import { JwtGenerateService } from '#auth/jwt-generate.service.js';
+import { GoogleCreateDTO, KakaoCreateDTO, NaverCreateDTO } from '#auth/types/provider.dto.js';
+import { GoogleAuthType, KakaoAuthType, NaverAuthType } from '#auth/types/provider.types.js';
+import { SignInDTO, SignUpDTO } from '#auth/types/sign.dto.js';
+import { UpdatePasswordDTO } from '#auth/types/update-password.dto.js';
 import { DriverRepository } from '#drivers/driver.repository.js';
 import { InvalidUserTypeException } from '#exceptions/common.exception.js';
 import { UnauthorizedException } from '#exceptions/http.exception.js';

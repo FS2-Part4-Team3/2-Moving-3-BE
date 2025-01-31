@@ -1,4 +1,5 @@
-import { GoogleCreateDTO, SignUpDTO } from '#auth/auth.types.js';
+import { GoogleCreateDTO } from '#auth/types/provider.dto.js';
+import { SignUpDTO } from '#auth/types/sign.dto.js';
 import { PrismaService } from '#global/prisma.service.js';
 import { FindOptions, SortOrder } from '#types/options.type.js';
 import { IUserRepository } from '#users/interfaces/user.repository.interface.js';

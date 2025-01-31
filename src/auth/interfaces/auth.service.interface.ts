@@ -1,12 +1,7 @@
-import {
-  FilteredPerson,
-  FilteredPersonWithToken,
-  GoogleAuthType,
-  KakaoAuthType,
-  SignInDTO,
-  SignUpDTO,
-  UpdatePasswordDTO,
-} from '#auth/auth.types.js';
+import { FilteredPerson, FilteredPersonWithToken } from '#auth/types/filtered.types.js';
+import { GoogleAuthType, KakaoAuthType } from '#auth/types/provider.types.js';
+import { SignInDTO, SignUpDTO } from '#auth/types/sign.dto.js';
+import { UpdatePasswordDTO } from '#auth/types/update-password.dto.js';
 import { UserType } from '#types/common.types.js';
 
 export interface IAuthService {

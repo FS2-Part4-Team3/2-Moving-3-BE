@@ -2,7 +2,7 @@ export interface IStorage {
   [key: string]: any;
 }
 
-export interface ModelBase {
+export class ModelBase {
   id?: string;
   createdAt?: Date;
   updatedAt?: Date;

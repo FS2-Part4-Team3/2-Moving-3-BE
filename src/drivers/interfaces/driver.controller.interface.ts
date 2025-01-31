@@ -1,5 +1,5 @@
+import { FilteredPersonalInfo } from '#auth/types/filtered.types.js';
 import { Driver, DriverPatchDTO } from '#drivers/driver.types.js';
-import { FilteredPersonalInfo } from '#types/personal.type.js';
 import { DriversGetQueries } from '#types/queries.type.js';
 
 export interface IDriverController {

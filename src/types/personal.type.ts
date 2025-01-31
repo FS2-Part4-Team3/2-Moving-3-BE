@@ -1,10 +1,8 @@
-import { SignUpDTO } from '#auth/auth.types.js';
-import { Driver } from '#drivers/driver.types.js';
-import { User } from '#users/user.types.js';
+import { SignUpDTO } from '#auth/types/sign.dto.js';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsJWT, IsOptional, Matches } from 'class-validator';
 
-const imageRegex = /(.*?)\.(jpg|jpeg|png|gif|bmp)$/;
+export const imageRegex = /(.*?)\.(jpg|jpeg|png|gif|bmp)$/;
 
 export class PersonalInfo extends SignUpDTO {
   @IsOptional()
@@ -16,5 +14,3 @@ export class PersonalInfo extends SignUpDTO {
   @IsJWT({ message: 'refreshToken은 JWT 형식이어야 합니다.' })
   refreshToken: string;
 }
-
-export type FilteredPersonalInfo<T> = T extends User | Driver ? Omit<T, 'password' | 'salt' | 'refreshToken'> : never;
