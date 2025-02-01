@@ -31,7 +31,7 @@ export class EstimationRepository implements IEstimationRepository {
     });
   }
 
-  async findEstimationsByUserId(userId: string): Promise<Estimation[]> {
+  async findEstimationsByUserId(userId: string, page: number, pageSize: number): Promise<Estimation[]> {
     const moveInfos = await this.prisma.moveInfo.findMany({
       where: { ownerId: userId },
       select: { id: true },
@@ -53,10 +53,12 @@ export class EstimationRepository implements IEstimationRepository {
         driver: true,
         moveInfo: true,
       },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
     });
   }
 
-  async findSpecificEstimations(userId: string): Promise<Estimation[]> {
+  async findSpecificEstimations(userId: string, page: number, pageSize: number): Promise<Estimation[]> {
     const moveInfos = await this.prisma.moveInfo.findMany({
       where: { ownerId: userId },
       select: { id: true },
@@ -82,6 +84,8 @@ export class EstimationRepository implements IEstimationRepository {
           },
         },
       },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
     });
   }
 }

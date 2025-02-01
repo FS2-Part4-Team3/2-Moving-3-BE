@@ -81,21 +81,27 @@ export class EstimationOutputDTO {
   driverId: string;
 }
 
-class DriverInfoDTO {
-  @ApiProperty({ description: '드라이버 프로필 사진', type: Image })
-  driverImage: string;
+class DriverDTO {
+  @ApiProperty({ description: '드라이버 프로필 사진', type: Boolean })
+  image: Boolean; // 이미지 없으면 "image": null,
 
   @ApiProperty({ description: '드라이버 이름', type: String })
-  driverName: string;
+  name: string;
 
   @ApiProperty({ description: '드라이버 별점', type: Number })
-  driverRating: number;
+  rating: number;
+
+  @ApiProperty({ description: '드라이버 리뷰 개수', type: Number })
+  reviewCount: number;
 
   @ApiProperty({ description: '드라이버 경력(연차)', type: Number })
-  driverExperience: number;
+  career: number;
 
   @ApiProperty({ description: '확정 건수', type: Number })
   applyCount: number;
+
+  @ApiProperty({ description: '드라이버 찜 여부', type: Boolean })
+  likedUsers: boolean; // 유저가 찜했으면 true, 안했으면 false
 
   @ApiProperty({ description: '찜 숫자', type: Number })
   likeCount: number;
@@ -114,18 +120,21 @@ class MoveInfoDTO {
   @ApiProperty({ description: '도착지', type: String })
   toAddress: string;
 
-  @ApiProperty({ description: '이사정보 상태', type: String })
-  progress: Progress;
+  // @ApiProperty({ description: '이사정보 상태', type: String })
+  // progress: Progress;
 }
 
 class EstimationInfoDTO {
+  @ApiProperty({ description: '견적 ID', type: String })
+  estimationId: string;
+
   @ApiProperty({ description: '견적 가격', type: Number, nullable: true })
   price?: number;
 }
 
 export class UserEstimationListDTO {
-  @ApiProperty({ description: '드라이버 정보', type: DriverInfoDTO })
-  driverInfo: DriverInfoDTO;
+  @ApiProperty({ description: '드라이버 정보', type: DriverDTO })
+  driver: DriverDTO;
 
   @ApiProperty({ description: '이사 정보', type: MoveInfoDTO })
   moveInfo: MoveInfoDTO;

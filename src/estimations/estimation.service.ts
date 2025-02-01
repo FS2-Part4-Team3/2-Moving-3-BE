@@ -1,7 +1,7 @@
 import { IEstimationService } from '#estimations/interfaces/estimation.service.interface.js';
 import { EstimationRepository } from '#estimations/estimation.repository.js';
 import { EstimationInputDTO, Estimation, UserEstimationListDTO } from '#estimations/estimation.types.js';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Options } from '@nestjs/common';
 import { IStorage } from '#types/common.types.js';
 import { AsyncLocalStorage } from 'async_hooks';
 import { MoveRepository } from '#move/move.repository.js';
@@ -14,7 +14,7 @@ import { MoveInfoNotFoundException } from '#move/move.exception.js';
 import { DriverService } from '#drivers/driver.service.js';
 import { UnauthorizedException } from '#exceptions/http.exception.js';
 import { serviceType } from '#prisma/mock/mock.js';
-import { IsActivate } from '#types/options.type.js';
+import { IsActivate, OffsetPaginationOptions } from '#types/options.type.js';
 
 @Injectable()
 export class EstimationService implements IEstimationService {
@@ -106,41 +106,45 @@ export class EstimationService implements IEstimationService {
   }
 
   // 견적 목록 조회
-  async getUserEstimationList(): Promise<UserEstimationListDTO[]> {
+  async getUserEstimationList(options: OffsetPaginationOptions): Promise<UserEstimationListDTO[]> {
     const { userId } = this.als.getStore(); //유저 ID 가져오기
     if (!userId) {
       throw new UnauthorizedException();
     }
-
-    const generalEstimations = await this.estimationRepository.findEstimationsByUserId(userId);
+    const { page, pageSize } = options;
+    const generalEstimations = await this.estimationRepository.findEstimationsByUserId(userId, page, pageSize);
 
     if (!generalEstimations.length) {
       throw new MoveRequestNotFoundException();
     }
 
-    const specificEstimations = await this.estimationRepository.findSpecificEstimations(userId);
+    const specificEstimations = await this.estimationRepository.findSpecificEstimations(userId, page, pageSize);
 
     const specificEstimationsWithInfo = await Promise.all(
       specificEstimations.map(async estimation => {
         const driver = await this.driversService.findDriver(estimation.driverId);
+        const isLiked = await this.driversService.isLikedDriver(estimation.driverId);
+        const moveInfo = await this.moveRepository.findByMoveInfoId(estimation.moveInfoId);
 
         return {
-          driverInfo: {
-            driverImage: driver.Image,
-            driverName: driver.name,
-            driverRating: driver.rating,
-            driverExperience: driver.career,
+          driver: {
+            image: driver.image,
+            name: driver.name,
+            rating: driver.rating,
+            reviewCount: driver.reviewCount,
+            career: driver.career,
             applyCount: driver.applyCount,
+            likedUsers: isLiked,
             likeCount: driver.likeCount,
           },
           moveInfo: {
-            date: estimation.moveInfos.date,
-            serviceType: estimation.moveInfos.serviceType,
-            fromAddress: estimation.moveInfos.fromAddress,
-            toAddress: estimation.moveInfos.toAddress,
-            progress: estimation.moveInfos.progress,
+            date: moveInfo?.date ?? null,
+            serviceType: moveInfo?.serviceType,
+            fromAddress: moveInfo.fromAddress,
+            toAddress: moveInfo.toAddress,
           },
           estimationInfo: {
+            estimationId: estimation.id,
             price: estimation.price ?? null,
           },
           designatedRequest: IsActivate.Active, //지정견적
@@ -152,24 +156,28 @@ export class EstimationService implements IEstimationService {
     const generalEstimationsWithInfo = await Promise.all(
       generalEstimations.map(async estimation => {
         const driver = await this.driversService.findDriver(estimation.driverId);
+        const isLiked = await this.driversService.isLikedDriver(estimation.driverId);
+        const moveInfo = await this.moveRepository.findByMoveInfoId(estimation.moveInfoId);
 
         return {
-          driverInfo: {
-            driverImage: driver.Image,
-            driverName: driver.name,
-            driverRating: driver.rating,
-            driverExperience: driver.career,
+          driver: {
+            image: driver.image,
+            name: driver.name,
+            rating: driver.rating,
+            reviewCount: driver.reviewCount,
+            career: driver.career,
             applyCount: driver.applyCount,
+            likedUsers: isLiked,
             likeCount: driver.likeCount,
           },
           moveInfo: {
-            date: estimation.moveInfos.date,
-            serviceType: estimation.moveInfos.serviceType,
-            fromAddress: estimation.moveInfos.fromAddress,
-            toAddress: estimation.moveInfos.toAddress,
-            progress: estimation.moveInfos.progress,
+            date: moveInfo?.date ?? null,
+            serviceType: moveInfo?.serviceType,
+            fromAddress: moveInfo.fromAddress,
+            toAddress: moveInfo.toAddress,
           },
           estimationInfo: {
+            estimationId: estimation.id,
             price: estimation.price ?? null,
           },
           designatedRequest: IsActivate.Inactive, //일반견적

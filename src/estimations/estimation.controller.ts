@@ -1,6 +1,6 @@
 import { DriverService } from '#drivers/driver.service.js';
 import { EstimationService } from '#estimations/estimation.service.js';
-import { EstimationInputDTO, EstimationOutputDTO } from '#estimations/estimation.types.js';
+import { EstimationInputDTO, EstimationOutputDTO, UserEstimationListDTO } from '#estimations/estimation.types.js';
 import { IEstimationController } from '#estimations/interfaces/estimation.controller.interface.js';
 import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { MoveRepository } from '#move/move.repository.js';
@@ -9,8 +9,20 @@ import { QuestionPostDTO } from '#questions/types/question.dto.js';
 import { QuestionEntity } from '#questions/types/question.types.js';
 import { IStorage } from '#types/common.types.js';
 import { SortOrder } from '#types/options.type.js';
-import { GetQueries } from '#types/queries.type.js';
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards, ValidationPipe } from '@nestjs/common';
+import { EstimationGetQueries, GetQueries } from '#types/queries.type.js';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Options,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+  ValidationPipe,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags, getSchemaPath } from '@nestjs/swagger';
 import { AsyncLocalStorage } from 'async_hooks';
 
@@ -28,8 +40,14 @@ export class EstimationController implements IEstimationController {
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth('accessToken')
   @ApiOperation({ summary: '유저 - 견적 대기중 목록 조회' })
-  async getUserEstimations() {
-    const estimations = await this.estimationService.getUserEstimationList();
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: UserEstimationListDTO,
+  })
+  async getUserEstimations(@Query() query: EstimationGetQueries) {
+    const { page = 1, pageSize = 10 } = query;
+    const options = { page, pageSize };
+    const estimations = await this.estimationService.getUserEstimationList(options);
 
     return estimations;
   }
