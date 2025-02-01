@@ -21,7 +21,7 @@ export class NotificationScheduler {
     return `일주일 후인 ${date.toLocaleDateString()}에 이사가 예정되어 있습니다.`;
   }
 
-  @Cron(CronExpression.EVERY_DAY_AT_5AM)
+  @Cron(CronExpression.EVERY_DAY_AT_6PM)
   async createNotificationForTodayAndNextWeek() {
     try {
       const today = new Date();
@@ -53,6 +53,7 @@ export class NotificationScheduler {
       // 사용자 알림
       await this.notificationService.createNotification({
         userId: move.ownerId,
+        moveInfoId: move.id,
         type,
         message,
       });
@@ -60,6 +61,7 @@ export class NotificationScheduler {
       // 기사 알림, 존재 여부는 move 레이어에 맡김
       await this.notificationService.createNotification({
         driverId: move.confirmedEstimation.driverId,
+        moveInfoId: move.id,
         type,
         message,
       });
