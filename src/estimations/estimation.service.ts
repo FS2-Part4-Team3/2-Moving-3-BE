@@ -1,17 +1,20 @@
 import { IEstimationService } from '#estimations/interfaces/estimation.service.interface.js';
 import { EstimationRepository } from '#estimations/estimation.repository.js';
-import { EstimationInputDTO, Estimation } from '#estimations/estimation.types.js';
+import { EstimationInputDTO, Estimation, UserEstimationListDTO } from '#estimations/estimation.types.js';
 import { Injectable } from '@nestjs/common';
 import { IStorage } from '#types/common.types.js';
 import { AsyncLocalStorage } from 'async_hooks';
 import { MoveRepository } from '#move/move.repository.js';
 import { RequestRepository } from '#requests/request.repository.js';
 import { IMoveInfo } from '#move/types/move.types.js';
-import { EstimateAlreadyExistsException, PendingRequestNotFoundException } from './estimation.exception.js';
+import { EstimateAlreadyExistsException, MoveRequestNotFoundException } from './estimation.exception.js';
 import { RequestRejectedException } from './estimation.exception.js';
-import { Prisma } from '@prisma/client';
 import { DriverNotFoundException } from '#drivers/driver.exception.js';
 import { MoveInfoNotFoundException } from '#move/move.exception.js';
+import { DriverService } from '#drivers/driver.service.js';
+import { UnauthorizedException } from '#exceptions/http.exception.js';
+import { serviceType } from '#prisma/mock/mock.js';
+import { IsActivate } from '#types/options.type.js';
 
 @Injectable()
 export class EstimationService implements IEstimationService {
@@ -20,6 +23,7 @@ export class EstimationService implements IEstimationService {
     private readonly moveRepository: MoveRepository,
     private readonly requestRepository: RequestRepository,
     private readonly als: AsyncLocalStorage<IStorage>,
+    private readonly driversService: DriverService,
   ) {}
 
   // 견적 생성 메서드
@@ -99,5 +103,79 @@ export class EstimationService implements IEstimationService {
       driverId: driverId,
     };
     return this.estimationRepository.create(data);
+  }
+
+  // 견적 목록 조회
+  async getUserEstimationList(): Promise<UserEstimationListDTO[]> {
+    const { userId } = this.als.getStore(); //유저 ID 가져오기
+    if (!userId) {
+      throw new UnauthorizedException();
+    }
+
+    const generalEstimations = await this.estimationRepository.findEstimationsByUserId(userId);
+
+    if (!generalEstimations.length) {
+      throw new MoveRequestNotFoundException();
+    }
+
+    const specificEstimations = await this.estimationRepository.findSpecificEstimations(userId);
+
+    const specificEstimationsWithInfo = await Promise.all(
+      specificEstimations.map(async estimation => {
+        const driver = await this.driversService.findDriver(estimation.driverId);
+
+        return {
+          driverInfo: {
+            driverImage: driver.Image,
+            driverName: driver.name,
+            driverRating: driver.rating,
+            driverExperience: driver.career,
+            applyCount: driver.applyCount,
+            likeCount: driver.likeCount,
+          },
+          moveInfo: {
+            date: estimation.moveInfos.date,
+            serviceType: estimation.moveInfos.serviceType,
+            fromAddress: estimation.moveInfos.fromAddress,
+            toAddress: estimation.moveInfos.toAddress,
+            progress: estimation.moveInfos.progress,
+          },
+          estimationInfo: {
+            price: estimation.price ?? null,
+          },
+          designatedRequest: IsActivate.Active, //지정견적
+        };
+      }),
+    );
+
+    //일반 견적
+    const generalEstimationsWithInfo = await Promise.all(
+      generalEstimations.map(async estimation => {
+        const driver = await this.driversService.findDriver(estimation.driverId);
+
+        return {
+          driverInfo: {
+            driverImage: driver.Image,
+            driverName: driver.name,
+            driverRating: driver.rating,
+            driverExperience: driver.career,
+            applyCount: driver.applyCount,
+            likeCount: driver.likeCount,
+          },
+          moveInfo: {
+            date: estimation.moveInfos.date,
+            serviceType: estimation.moveInfos.serviceType,
+            fromAddress: estimation.moveInfos.fromAddress,
+            toAddress: estimation.moveInfos.toAddress,
+            progress: estimation.moveInfos.progress,
+          },
+          estimationInfo: {
+            price: estimation.price ?? null,
+          },
+          designatedRequest: IsActivate.Inactive, //일반견적
+        };
+      }),
+    );
+    return [...generalEstimationsWithInfo, ...specificEstimationsWithInfo];
   }
 }

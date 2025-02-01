@@ -1,29 +1,38 @@
+import { DriverService } from '#drivers/driver.service.js';
 import { EstimationService } from '#estimations/estimation.service.js';
 import { EstimationInputDTO, EstimationOutputDTO } from '#estimations/estimation.types.js';
 import { IEstimationController } from '#estimations/interfaces/estimation.controller.interface.js';
 import { AccessTokenGuard } from '#guards/access-token.guard.js';
+import { MoveRepository } from '#move/move.repository.js';
 import { QuestionService } from '#questions/question.service.js';
 import { QuestionPostDTO } from '#questions/types/question.dto.js';
 import { QuestionEntity } from '#questions/types/question.types.js';
+import { IStorage } from '#types/common.types.js';
 import { SortOrder } from '#types/options.type.js';
 import { GetQueries } from '#types/queries.type.js';
 import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards, ValidationPipe } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags, getSchemaPath } from '@nestjs/swagger';
+import { AsyncLocalStorage } from 'async_hooks';
 
 @Controller('estimations')
 export class EstimationController implements IEstimationController {
   constructor(
     private readonly questionService: QuestionService,
     private readonly estimationService: EstimationService,
+    private readonly moveRepository: MoveRepository,
+    private readonly als: AsyncLocalStorage<IStorage>,
+    private readonly driverService: DriverService,
   ) {}
 
-  @Get()
-  @ApiOperation({ summary: '견적 목록 조회' })
-  async getEstimations() {}
+  @Get('user')
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth('accessToken')
+  @ApiOperation({ summary: '유저 - 견적 대기중 목록 조회' })
+  async getUserEstimations() {
+    const estimations = await this.estimationService.getUserEstimationList();
 
-  @Get(':id')
-  @ApiOperation({ summary: '견적 상세 조회' })
-  async getEstimation() {}
+    return estimations;
+  }
 
   @Post(':moveInfoId')
   @UseGuards(AccessTokenGuard)
