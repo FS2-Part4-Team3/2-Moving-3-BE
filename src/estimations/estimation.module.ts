@@ -1,3 +1,4 @@
+import { DriverModule } from '#drivers/driver.module.js';
 import { EstimationController } from '#estimations/estimation.controller.js';
 import { EstimationRepository } from '#estimations/estimation.repository.js';
 import { EstimationService } from '#estimations/estimation.service.js';
@@ -9,7 +10,7 @@ import { RequestModule } from '#requests/request.module.js';
 import { forwardRef, Module } from '@nestjs/common';
 
 @Module({
-  imports: [DBModule, GuardModule, forwardRef(() => QuestionModule), MoveModule, RequestModule],
+  imports: [DBModule, GuardModule, forwardRef(() => QuestionModule), MoveModule, RequestModule, DriverModule],
   controllers: [EstimationController],
   providers: [EstimationService, EstimationRepository],
   exports: [EstimationRepository],

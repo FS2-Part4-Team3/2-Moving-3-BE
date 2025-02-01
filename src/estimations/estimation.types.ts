@@ -1,14 +1,41 @@
 import { ModelBase } from '#types/common.types.js';
-import { Estimation as PrismaEstimation } from '@prisma/client';
+import { Estimation as PrismaEstimation, ServiceType, Driver, MoveInfo, Progress, Request } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsDate, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID } from 'class-validator';
+import { IsNumber, IsOptional, IsString, IsUUID } from 'class-validator';
 
 interface PrismaEstimationBase extends Omit<PrismaEstimation, keyof ModelBase> {}
 interface EstimationBase extends PrismaEstimationBase {}
 
-export interface Estimation extends EstimationBase, ModelBase {}
+export interface Estimation extends EstimationBase, ModelBase {
+  driver?: Driver;
+  moveInfos?: MoveInfo;
+  request?: Request;
+  designatedRequest?: IsActivate;
+}
 
 export interface EstimationInputDTO extends Omit<Estimation, keyof ModelBase> {}
+
+export enum Status {
+  PENDING = 'PENDING',
+  EXPIRED = 'EXPIRED',
+  APPLY = 'APPLY',
+  REJECTED = 'REJECTED',
+  CANCELED = 'CANCELED',
+}
+
+export enum progress {
+  PENDING = 'PENDING',
+  OPEN = 'OPEN',
+  EXPIRED = 'EXPIRED',
+  CONFIRMED = 'CONFIRMED',
+  CANCELED = 'CONCELED',
+  COMPLETE = 'COMPLETE',
+}
+
+export enum IsActivate {
+  Active = 'Active',
+  Inactive = 'Inactive',
+}
 
 export class BaseEstimationDTO {
   @IsUUID('all', { message: 'ID는 UUID 형식이어야 합니다.' })
@@ -31,18 +58,6 @@ export class EstimationInputDTO {
   price: number | null = null;
 }
 
-// @IsEnum(['Approve', 'Reject'], { message: '견적 상태는 "Approve" 또는 "Reject"여야 합니다.' })
-// @ApiProperty({ description: '견적 상태', enum: ['Approve', 'Reject'], type: String })
-// status: 'Approve' | 'Reject';
-
-// @IsString()
-// @ApiProperty({ description: '견적 상태', type: String })
-// status: 'Approve' | 'Reject';
-
-// @IsBoolean()
-// @ApiProperty({ description: '견적 반려 여부', type: Boolean })
-// isRejected: boolean;
-
 export class EstimationOutputDTO {
   @ApiProperty({ description: '견적 ID', type: String })
   id: string;
@@ -64,4 +79,70 @@ export class EstimationOutputDTO {
 
   @ApiProperty({ description: '드라이버 ID', type: String })
   driverId: string;
+}
+
+class DriverDTO {
+  @ApiProperty({ description: '드라이버 프로필 사진', type: Boolean })
+  image: Boolean; // 이미지 없으면 "image": null,
+
+  @ApiProperty({ description: '드라이버 이름', type: String })
+  name: string;
+
+  @ApiProperty({ description: '드라이버 별점', type: Number })
+  rating: number;
+
+  @ApiProperty({ description: '드라이버 리뷰 개수', type: Number })
+  reviewCount: number;
+
+  @ApiProperty({ description: '드라이버 경력(연차)', type: Number })
+  career: number;
+
+  @ApiProperty({ description: '확정 건수', type: Number })
+  applyCount: number;
+
+  @ApiProperty({ description: '드라이버 찜 여부', type: Boolean })
+  likedUsers: boolean; // 유저가 찜했으면 true, 안했으면 false
+
+  @ApiProperty({ description: '찜 숫자', type: Number })
+  likeCount: number;
+}
+
+class MoveInfoDTO {
+  @ApiProperty({ description: '이사 날짜', type: String, format: 'date-time' })
+  date: Date;
+
+  @ApiProperty({ description: '서비스 타입', type: String })
+  serviceType: ServiceType;
+
+  @ApiProperty({ description: '출발지', type: String })
+  fromAddress: string;
+
+  @ApiProperty({ description: '도착지', type: String })
+  toAddress: string;
+
+  // @ApiProperty({ description: '이사정보 상태', type: String })
+  // progress: Progress;
+}
+
+class EstimationInfoDTO {
+  @ApiProperty({ description: '견적 ID', type: String })
+  estimationId: string;
+
+  @ApiProperty({ description: '견적 가격', type: Number, nullable: true })
+  price?: number;
+}
+
+export class UserEstimationListDTO {
+  @ApiProperty({ description: '드라이버 정보', type: DriverDTO })
+  driver: DriverDTO;
+
+  @ApiProperty({ description: '이사 정보', type: MoveInfoDTO })
+  moveInfo: MoveInfoDTO;
+
+  @ApiProperty({ description: '견적 정보', type: EstimationInfoDTO })
+  estimationInfo: EstimationInfoDTO;
+
+  @IsOptional()
+  @ApiProperty({ description: '지정 견적 요청 상태', enum: ['Active', 'Inactive'] })
+  designatedRequest: IsActivate; //'Active': 지정 요청 견적, 'Inactive': 일반 견적
 }
