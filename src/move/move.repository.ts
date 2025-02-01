@@ -218,6 +218,16 @@ export class MoveRepository implements IMoveRepository {
     return moveInfo;
   }
 
+  async findWithEstimationsByUserId(userId: string) {
+    const moveInfos = await this.moveInfo.findMany({
+      where: { ownerId: userId, progress: { in: [Progress.CANCELED, Progress.COMPLETE] } },
+      forceFind: true,
+      include: { confirmedEstimation: { include: { driver: true } }, estimations: { include: { driver: true } } },
+    });
+
+    return moveInfos;
+  }
+
   async findByMoveInfoId(moveInfoId: string): Promise<IMoveInfo> {
     const moveInfo = await this.moveInfo.findUnique({
       where: { id: moveInfoId },
