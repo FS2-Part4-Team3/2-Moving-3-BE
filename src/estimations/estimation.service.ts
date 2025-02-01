@@ -13,7 +13,6 @@ import { DriverNotFoundException } from '#drivers/driver.exception.js';
 import { MoveInfoNotFoundException } from '#move/move.exception.js';
 import { DriverService } from '#drivers/driver.service.js';
 import { UnauthorizedException } from '#exceptions/http.exception.js';
-import { serviceType } from '#prisma/mock/mock.js';
 import { IsActivate, OffsetPaginationOptions } from '#types/options.type.js';
 
 @Injectable()
