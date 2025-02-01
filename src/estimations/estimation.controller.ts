@@ -22,7 +22,6 @@ export class EstimationController implements IEstimationController {
     private readonly estimationService: EstimationService,
     private readonly moveRepository: MoveRepository,
     private readonly als: AsyncLocalStorage<IStorage>,
-    private readonly driverService: DriverService,
   ) {}
 
   @Get('user')
