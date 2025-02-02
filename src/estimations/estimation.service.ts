@@ -1,6 +1,6 @@
 import { IEstimationService } from '#estimations/interfaces/estimation.service.interface.js';
 import { EstimationRepository } from '#estimations/estimation.repository.js';
-import { EstimationInputDTO, Estimation, UserEstimationListDTO } from '#estimations/estimation.types.js';
+import { EstimationInputDTO, Estimation, UserEstimationListDTO, ReviewableListDTO } from '#estimations/estimation.types.js';
 import { Injectable, Options } from '@nestjs/common';
 import { IStorage } from '#types/common.types.js';
 import { AsyncLocalStorage } from 'async_hooks';
@@ -14,6 +14,7 @@ import { MoveInfoNotFoundException } from '#move/move.exception.js';
 import { DriverService } from '#drivers/driver.service.js';
 import { UnauthorizedException } from '#exceptions/http.exception.js';
 import { IsActivate, OffsetPaginationOptions } from '#types/options.type.js';
+import { ReviewableGetQueries } from '#types/queries.type.js';
 
 @Injectable()
 export class EstimationService implements IEstimationService {
@@ -184,5 +185,50 @@ export class EstimationService implements IEstimationService {
       }),
     );
     return [...generalEstimationsWithInfo, ...specificEstimationsWithInfo];
+  }
+
+  // 작성 가능한 리뷰 목록 조회
+  async getReviewableEstimations(options: ReviewableGetQueries): Promise<ReviewableListDTO[]> {
+    const { userId } = this.als.getStore(); // 유저 ID 가져오기
+    if (!userId) {
+      throw new UnauthorizedException(); // 유저 ID가 없을 경우 예외 처리
+    }
+
+    const { page, pageSize } = options;
+    const moveInfos = await this.estimationRepository.getUserMoveInfos(userId);
+
+    if (moveInfos.length === 0) {
+      throw new MoveInfoNotFoundException(); // 이사 정보가 없을 경우 예외 처리
+    }
+
+    const moveInfoIds = moveInfos.map(info => info.id);
+    const estimations = await this.estimationRepository.findReviewable(userId, moveInfoIds, page, pageSize);
+
+    const result = await Promise.all(
+      estimations.map(async estimation => {
+        const driver = await this.driversService.findDriver(estimation.driverId);
+        const moveInfo = await this.moveRepository.findByMoveInfoId(estimation.moveInfoId);
+
+        // 지정 요청 여부 확인
+        const designatedRequest = await this.estimationRepository.isDesignatedRequest(estimation.id);
+
+        return {
+          driver: {
+            image: driver.image || null,
+            name: driver.name,
+          },
+          moveInfo: {
+            date: moveInfo.date,
+            serviceType: moveInfo.serviceType,
+          },
+          estimationInfo: {
+            estimationId: estimation.id,
+            price: estimation.price,
+          },
+          designatedRequest, // 지정견적요청유무 추가
+        };
+      }),
+    );
+    return result;
   }
 }

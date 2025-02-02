@@ -1,4 +1,4 @@
-import { EstimationInputDTO, Estimation } from '#estimations/estimation.types.js';
+import { EstimationInputDTO, Estimation, IsActivate } from '#estimations/estimation.types.js';
 import { IEstimationRepository } from '#estimations/interfaces/estimation.repository.interface.js';
 import { PrismaService } from '#global/prisma.service.js';
 import { FindOptions } from '#types/options.type.js';
@@ -87,5 +87,53 @@ export class EstimationRepository implements IEstimationRepository {
       skip: (page - 1) * pageSize,
       take: pageSize,
     });
+  }
+
+  // confirmedForId 값이 null이 아니면은 이사확정 끝난것이다..~!
+  async findReviewable(userId: string, moveInfoIds: string[], page: number, pageSize: number) {
+    const estimations = await this.prisma.estimation.findMany({
+      where: {
+        confirmedForId: { in: moveInfoIds }, // 완료된 이사와 연결된 견적을 조회
+      },
+      include: {
+        driver: true, // 견적과 관련된 드라이버 정보
+        moveInfo: true, // 견적과 관련된 이사 정보
+        reviews: true, // 견적에 작성된 리뷰들
+      },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    });
+
+    // 리뷰가 없는 견적만 필터링
+    return estimations.filter(estimation => !estimation.reviews.some(review => review.ownerId === userId));
+  }
+
+  // 유저의 이사 정보 목록 가져오기
+  async getUserMoveInfos(userId: string) {
+    return this.prisma.moveInfo.findMany({
+      where: { ownerId: userId }, // 로그인한 유저의 이사만 조회하기
+      select: { id: true }, // 이사 ID만 선택
+    });
+  }
+
+  // 지정 견적 요청 여부
+  async isDesignatedRequest(estimationId: string): Promise<IsActivate> {
+    const estimation = await this.prisma.estimation.findUnique({
+      where: { id: estimationId },
+      include: {
+        moveInfo: {
+          include: {
+            requests: {
+              where: {
+                status: 'APPLY', //
+              },
+            },
+          },
+        },
+      },
+    });
+
+    // 지정요청이면 'Active', 일반요청이면 'Inactive'
+    return estimation?.moveInfo.requests.length > 0 ? IsActivate.Active : IsActivate.Inactive;
   }
 }

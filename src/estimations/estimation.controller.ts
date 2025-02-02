@@ -1,6 +1,11 @@
 import { DriverService } from '#drivers/driver.service.js';
 import { EstimationService } from '#estimations/estimation.service.js';
-import { EstimationInputDTO, EstimationOutputDTO, UserEstimationListDTO } from '#estimations/estimation.types.js';
+import {
+  EstimationInputDTO,
+  EstimationOutputDTO,
+  ReviewableListDTO,
+  UserEstimationListDTO,
+} from '#estimations/estimation.types.js';
 import { IEstimationController } from '#estimations/interfaces/estimation.controller.interface.js';
 import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { MoveRepository } from '#move/move.repository.js';
@@ -9,19 +14,16 @@ import { QuestionListDTO, QuestionPostDTO } from '#questions/types/question.dto.
 import { QuestionEntity } from '#questions/types/question.types.js';
 import { IStorage } from '#types/common.types.js';
 import { SortOrder } from '#types/options.type.js';
-import { EstimationGetQueries, GetQueries } from '#types/queries.type.js';
+import { EstimationGetQueries, GetQueries, ReviewableGetQueries } from '#types/queries.type.js';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags, getSchemaPath } from '@nestjs/swagger';
 import { AsyncLocalStorage } from 'async_hooks';
 import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards, ValidationPipe } from '@nestjs/common';
-
 
 @Controller('estimations')
 export class EstimationController implements IEstimationController {
   constructor(
     private readonly questionService: QuestionService,
     private readonly estimationService: EstimationService,
-    private readonly moveRepository: MoveRepository,
-    private readonly als: AsyncLocalStorage<IStorage>,
   ) {}
 
   @Get('user')
@@ -37,6 +39,21 @@ export class EstimationController implements IEstimationController {
     const options = { page, pageSize };
     const estimations = await this.estimationService.getUserEstimationList(options);
 
+    return estimations;
+  }
+
+  @Get('reviewable')
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth('accessToken')
+  @ApiOperation({ summary: '작성 가능한 리뷰 목록 조회' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: ReviewableListDTO,
+  })
+  async getReviewableEstimations(@Query() query: ReviewableGetQueries) {
+    const { page = 1, pageSize = 10 } = query;
+    const options = { page, pageSize };
+    const estimations = await this.estimationService.getReviewableEstimations(options);
     return estimations;
   }
 

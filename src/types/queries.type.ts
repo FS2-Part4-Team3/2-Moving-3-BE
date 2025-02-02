@@ -12,3 +12,4 @@ export class DriversGetQueries extends PartialType(DriversFindOptions) {}
 export class MoveInfoGetQueries extends PartialType(MoveInfoFilter) {}
 export class moveInfoWithEstimationsGetQueries extends moveInfoWithEstimationsFilter {}
 export class EstimationGetQueries extends PartialType(OffsetPaginationOptions) {}
+export class ReviewableGetQueries extends PartialType(OffsetPaginationOptions) {}
