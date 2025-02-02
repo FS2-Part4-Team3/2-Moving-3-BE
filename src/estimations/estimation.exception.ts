@@ -27,3 +27,10 @@ export class RequestRejectedException extends BadRequestException {
     super(ExceptionMessages.REQUEST_REJECTED);
   }
 }
+
+// 견적 조회를 하는데 이사 요청을 하지 않은 경우에 이사 요청을 먼저 해주세요
+export class MoveRequestNotFoundException extends BadRequestException {
+  constructor() {
+    super(ExceptionMessages.MOVE_REQUEST_NOT_FOUND);
+  }
+}

@@ -1,6 +1,6 @@
 import { MoveRepository } from '#move/move.repository.js';
 import { NotificationService } from '#notifications/notification.service.js';
-import { getNextWeek } from '#utils/dateUtils.js';
+import { getNextDate, getNextWeek } from '#utils/dateUtils.js';
 import logger from '#utils/logger.js';
 import { Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
@@ -21,19 +21,24 @@ export class NotificationScheduler {
     return `일주일 후인 ${date.toLocaleDateString()}에 이사가 예정되어 있습니다.`;
   }
 
-  @Cron(CronExpression.EVERY_DAY_AT_5AM)
+  @Cron(CronExpression.EVERY_DAY_AT_6PM)
   async createNotificationForTodayAndNextWeek() {
     try {
       const today = new Date();
+      const nextDay = getNextDate(today);
       const nextWeek = getNextWeek(today);
 
       const todaysMoves = await this.moveRepository.findManyByDate(today);
-      const upcomingMoves = await this.moveRepository.findManyByDate(nextWeek);
+      const nextDaysMoves = await this.moveRepository.findManyByDate(nextDay);
+      const nextWeekMoves = await this.moveRepository.findManyByDate(nextWeek);
 
       for (const move of todaysMoves) {
         await this.createMoveNotification(move, NotificationType.D_DAY);
       }
-      for (const move of upcomingMoves) {
+      for (const move of nextDaysMoves) {
+        await this.createMoveNotification(move, NotificationType.D_1);
+      }
+      for (const move of nextWeekMoves) {
         await this.createMoveNotification(move, NotificationType.D_7);
       }
     } catch (error) {
@@ -48,6 +53,7 @@ export class NotificationScheduler {
       // 사용자 알림
       await this.notificationService.createNotification({
         userId: move.ownerId,
+        moveInfoId: move.id,
         type,
         message,
       });
@@ -55,6 +61,7 @@ export class NotificationScheduler {
       // 기사 알림, 존재 여부는 move 레이어에 맡김
       await this.notificationService.createNotification({
         driverId: move.confirmedEstimation.driverId,
+        moveInfoId: move.id,
         type,
         message,
       });

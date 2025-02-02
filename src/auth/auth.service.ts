@@ -4,19 +4,12 @@ import {
   AuthWrongCredentialException,
   AuthWrongPasswordException,
 } from '#auth/auth.exception.js';
-import {
-  GoogleAuthType,
-  GoogleCreateDTO,
-  KakaoAuthType,
-  KakaoCreateDTO,
-  NaverAuthType,
-  NaverCreateDTO,
-  SignInDTO,
-  SignUpDTO,
-  UpdatePasswordDTO,
-} from '#auth/auth.types.js';
 import { IAuthService } from '#auth/interfaces/auth.service.interface.js';
 import { JwtGenerateService } from '#auth/jwt-generate.service.js';
+import { GoogleCreateDTO, KakaoCreateDTO, NaverCreateDTO } from '#auth/types/provider.dto.js';
+import { GoogleAuthType, KakaoAuthType, NaverAuthType } from '#auth/types/provider.types.js';
+import { SignInDTO, SignUpDTO } from '#auth/types/sign.dto.js';
+import { UpdatePasswordDTO } from '#auth/types/update-password.dto.js';
 import { DriverRepository } from '#drivers/driver.repository.js';
 import { InvalidUserTypeException } from '#exceptions/common.exception.js';
 import { UnauthorizedException } from '#exceptions/http.exception.js';
@@ -145,7 +138,7 @@ export class AuthService implements IAuthService {
     }
 
     const data: GoogleCreateDTO = { email, name, image: photo, provider, providerId: id };
-    const person = await repo.createByGoogleCreateDTO(data);
+    const person = await repo.createByProviderCreateDTO(data);
 
     const accessToken = await this.jwtGenerateService.generateAccessToken({ id: person.id, type: userType });
     const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: person.id, type: userType });
@@ -178,7 +171,7 @@ export class AuthService implements IAuthService {
     }
 
     const data: KakaoCreateDTO = { email, name, image: photo, provider, providerId, phoneNumber };
-    const person = await repo.createByGoogleCreateDTO(data);
+    const person = await repo.createByProviderCreateDTO(data);
 
     const accessToken = await this.jwtGenerateService.generateAccessToken({ id: person.id, type: userType });
     const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: person.id, type: userType });
@@ -211,7 +204,7 @@ export class AuthService implements IAuthService {
     }
 
     const data: NaverCreateDTO = { email, name, image: photo, provider, providerId };
-    const person = await repo.createByGoogleCreateDTO(data);
+    const person = await repo.createByProviderCreateDTO(data);
 
     const accessToken = await this.jwtGenerateService.generateAccessToken({ id: person.id, type: userType });
     const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: person.id, type: userType });

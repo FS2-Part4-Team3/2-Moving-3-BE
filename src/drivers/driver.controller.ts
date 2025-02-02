@@ -1,7 +1,7 @@
-import { FilteredDriverOutputDTO } from '#auth/auth.types.js';
+import { FilteredDriverOutputDTO } from '#auth/types/filtered.driver.dto.js';
 import { DriverService } from '#drivers/driver.service.js';
-import { DriverPatchDTO } from '#drivers/driver.types.js';
 import { IDriverController } from '#drivers/interfaces/driver.controller.interface.js';
+import { DriverPatchDTO, DriversListDTO } from '#drivers/types/driver.dto.js';
 import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { DriverSortOrder } from '#types/options.type.js';
 import { DriversGetQueries } from '#types/queries.type.js';
@@ -19,7 +19,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiParam, ApiQuery, ApiResponse, getSchemaPath } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiQuery, ApiResponse } from '@nestjs/swagger';
 
 @Controller('drivers')
 export class DriverController implements IDriverController {
@@ -30,12 +30,7 @@ export class DriverController implements IDriverController {
   @ApiQuery({ name: 'orderBy', enum: DriverSortOrder })
   @ApiResponse({
     status: HttpStatus.OK,
-    schema: {
-      type: 'array',
-      items: {
-        $ref: getSchemaPath(FilteredDriverOutputDTO),
-      },
-    },
+    type: DriversListDTO,
   })
   async getDrivers(@Query() query: DriversGetQueries) {
     const { page = 1, pageSize = 10, orderBy, keyword = '', area, serviceType } = query;
@@ -62,12 +57,7 @@ export class DriverController implements IDriverController {
   })
   @ApiResponse({
     status: HttpStatus.OK,
-    schema: {
-      type: 'array',
-      items: {
-        $ref: getSchemaPath(FilteredDriverOutputDTO),
-      },
-    },
+    type: DriversListDTO,
   })
   async getLikedDrivers(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,

@@ -1,40 +1,44 @@
+import { DriverService } from '#drivers/driver.service.js';
+import { EstimationService } from '#estimations/estimation.service.js';
+import { EstimationInputDTO, EstimationOutputDTO, UserEstimationListDTO } from '#estimations/estimation.types.js';
 import { IEstimationController } from '#estimations/interfaces/estimation.controller.interface.js';
 import { AccessTokenGuard } from '#guards/access-token.guard.js';
+import { MoveRepository } from '#move/move.repository.js';
 import { QuestionService } from '#questions/question.service.js';
-import { QuestionEntity, QuestionPostDTO } from '#questions/question.types.js';
+import { QuestionListDTO, QuestionPostDTO } from '#questions/types/question.dto.js';
+import { QuestionEntity } from '#questions/types/question.types.js';
+import { IStorage } from '#types/common.types.js';
 import { SortOrder } from '#types/options.type.js';
-import { GetQueries } from '#types/queries.type.js';
-import {
-  Body,
-  Controller,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Param,
-  ParseBoolPipe,
-  Post,
-  Query,
-  UseGuards,
-  ValidationPipe,
-} from '@nestjs/common';
+import { EstimationGetQueries, GetQueries } from '#types/queries.type.js';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags, getSchemaPath } from '@nestjs/swagger';
-import { EstimationService } from '#estimations/estimation.service.js';
-import { EstimationOutputDTO, EstimationInputDTO } from '#estimations/estimation.types.js';
+import { AsyncLocalStorage } from 'async_hooks';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards, ValidationPipe } from '@nestjs/common';
+
 
 @Controller('estimations')
 export class EstimationController implements IEstimationController {
   constructor(
     private readonly questionService: QuestionService,
     private readonly estimationService: EstimationService,
+    private readonly moveRepository: MoveRepository,
+    private readonly als: AsyncLocalStorage<IStorage>,
   ) {}
 
-  @Get()
-  @ApiOperation({ summary: '견적 목록 조회' })
-  async getEstimations() {}
+  @Get('user')
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth('accessToken')
+  @ApiOperation({ summary: '유저 - 견적 대기중 목록 조회' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: UserEstimationListDTO,
+  })
+  async getUserEstimations(@Query() query: EstimationGetQueries) {
+    const { page = 1, pageSize = 10 } = query;
+    const options = { page, pageSize };
+    const estimations = await this.estimationService.getUserEstimationList(options);
 
-  @Get(':id')
-  @ApiOperation({ summary: '견적 상세 조회' })
-  async getEstimation() {}
+    return estimations;
+  }
 
   @Post(':moveInfoId')
   @UseGuards(AccessTokenGuard)
@@ -61,10 +65,7 @@ export class EstimationController implements IEstimationController {
   @ApiOperation({ summary: '문의 목록 조회' })
   @ApiResponse({
     status: HttpStatus.CREATED,
-    schema: {
-      type: 'array',
-      items: { $ref: getSchemaPath(QuestionEntity) },
-    },
+    type: QuestionListDTO,
   })
   async getQuestions(@Param('id') id: string, @Query() query: GetQueries) {
     const { page = 1, pageSize = 10 } = query;

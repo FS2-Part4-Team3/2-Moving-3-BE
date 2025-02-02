@@ -3,6 +3,7 @@ import { IEstimationRepository } from '#estimations/interfaces/estimation.reposi
 import { PrismaService } from '#global/prisma.service.js';
 import { FindOptions } from '#types/options.type.js';
 import { Injectable } from '@nestjs/common';
+import { Progress, Status } from '@prisma/client';
 
 @Injectable()
 export class EstimationRepository implements IEstimationRepository {
@@ -27,6 +28,64 @@ export class EstimationRepository implements IEstimationRepository {
         price: data.price ?? null, //견적가격(없으면 null로 처리하기)
         comment: data.comment, //견적코멘트
       },
+    });
+  }
+
+  async findEstimationsByUserId(userId: string, page: number, pageSize: number): Promise<Estimation[]> {
+    const moveInfos = await this.prisma.moveInfo.findMany({
+      where: { ownerId: userId },
+      select: { id: true },
+    });
+
+    const moveInfoIds = moveInfos.map(info => info.id);
+    // 일반 견적 조회
+    return this.prisma.estimation.findMany({
+      where: {
+        moveInfoId: { in: moveInfoIds },
+        moveInfo: {
+          progress: Progress.OPEN,
+          requests: {
+            none: {},
+          },
+        },
+      },
+      include: {
+        driver: true,
+        moveInfo: true,
+      },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    });
+  }
+
+  async findSpecificEstimations(userId: string, page: number, pageSize: number): Promise<Estimation[]> {
+    const moveInfos = await this.prisma.moveInfo.findMany({
+      where: { ownerId: userId },
+      select: { id: true },
+    });
+    const moveInfoIds = moveInfos.map(info => info.id);
+    // 지정 견적 조회
+    return this.prisma.estimation.findMany({
+      where: {
+        moveInfoId: { in: moveInfoIds },
+        moveInfo: {
+          requests: {
+            some: {
+              status: Status.PENDING,
+            },
+          },
+        },
+      },
+      include: {
+        driver: true,
+        moveInfo: {
+          include: {
+            requests: true,
+          },
+        },
+      },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
     });
   }
 }

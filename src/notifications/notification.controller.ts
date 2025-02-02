@@ -1,6 +1,6 @@
 import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { NotificationService } from '#notifications/notification.service.js';
-import { NotificationEntity } from '#notifications/notification.types.js';
+import { NotificationListDTO, NotificationOutputDTO } from '#notifications/types/notification.dto.js';
 import { Body, Controller, DefaultValuePipe, Get, HttpStatus, Param, ParseIntPipe, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiExcludeEndpoint, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
@@ -11,7 +11,7 @@ export class NotificationController {
 
   @Get()
   @ApiOperation({ summary: '알림 조회' })
-  @ApiResponse({ status: HttpStatus.OK, type: [NotificationEntity] })
+  @ApiResponse({ status: HttpStatus.OK, type: NotificationListDTO })
   async getNotifications(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('pageSize', new DefaultValuePipe(10), ParseIntPipe) pageSize: number,
@@ -23,7 +23,7 @@ export class NotificationController {
 
   @Post('read')
   @ApiOperation({ summary: '알림 읽음 처리(목록)' })
-  @ApiResponse({ status: HttpStatus.OK, type: [NotificationEntity] })
+  @ApiResponse({ status: HttpStatus.OK, type: [NotificationOutputDTO] })
   async readNotifications(@Body() ids: string[]) {
     const notifications = await this.notificationService.markNotificationAsRead(ids);
 
@@ -32,7 +32,7 @@ export class NotificationController {
 
   @Post(':id/read')
   @ApiOperation({ summary: '알림 읽음 처리(단일)' })
-  @ApiResponse({ status: HttpStatus.OK, type: NotificationEntity })
+  @ApiResponse({ status: HttpStatus.OK, type: NotificationOutputDTO })
   async readNotification(@Param('id') id: string) {
     const notifications = await this.notificationService.markNotificationAsRead([id]);
 

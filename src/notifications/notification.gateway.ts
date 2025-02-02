@@ -1,8 +1,8 @@
 import { WSPerson } from '#decorators/ws-person.decorator.js';
-import { Driver } from '#drivers/driver.types.js';
+import { Driver } from '#drivers/types/driver.types.js';
 import { WsJwtGuard } from '#guards/ws-jwt.guard.js';
 import { INotificationGateway } from '#notifications/interfaces/notification.gateway.interface.js';
-import { User } from '#users/user.types.js';
+import { User } from '#users/types/user.types.js';
 import { UseGuards } from '@nestjs/common';
 import { ConnectedSocket, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';

@@ -1,4 +1,3 @@
-import { BadRequestException } from '#exceptions/http.exception.js';
 import { INotificationService } from '#notifications/interfaces/notification.service.interface.js';
 import {
   NotificationInvalidRelationException,
@@ -7,7 +6,8 @@ import {
 } from '#notifications/notification.exception.js';
 import { NotificationGateway } from '#notifications/notification.gateway.js';
 import { NotificationRepository } from '#notifications/notification.repository.js';
-import { NotificationCreateDTO } from '#notifications/notification.types.js';
+import { notificationMessages } from '#notifications/notifications.messages.js';
+import { NotificationCreateDTO } from '#notifications/types/notification.dto.js';
 import { IStorage, UserType } from '#types/common.types.js';
 import { Injectable } from '@nestjs/common';
 import { NotificationType } from '@prisma/client';
@@ -21,19 +21,14 @@ export class NotificationService implements INotificationService {
     private readonly als: AsyncLocalStorage<IStorage>,
   ) {}
 
-  private validateNotificationData(data: any) {
+  private validateNotificationData(data: NotificationCreateDTO) {
     for (const key in data) {
       if (data[key] === '') {
         data[key] = null;
       }
     }
 
-    const { message, userId, driverId, type, moveInfoId, requestId, estimationId, questionId } = data;
-
-    // NOTE 메세지가 비어있는가
-    if (!message) {
-      throw new BadRequestException('메세지를 입력해주세요.');
-    }
+    const { userId, driverId, type, moveInfoId, requestId, estimationId, questionId } = data;
 
     // NOTE 유저 타입이 하나인가
     if ((userId && driverId) || (!userId && !driverId)) {
@@ -63,6 +58,7 @@ export class NotificationService implements INotificationService {
         break;
       case NotificationType.NEW_QUESTION:
       case NotificationType.D_7:
+      case NotificationType.D_1:
       case NotificationType.D_DAY:
         break;
       default:
@@ -72,6 +68,9 @@ export class NotificationService implements INotificationService {
     // NOTE relation 객체 검증
     switch (type) {
       case NotificationType.MOVE_INFO_EXPIRED:
+      case NotificationType.D_7:
+      case NotificationType.D_1:
+      case NotificationType.D_DAY:
         if (!moveInfoId) {
           throw new NotificationInvalidRelationException('이사 정보를 입력해주세요.');
         }
@@ -93,9 +92,6 @@ export class NotificationService implements INotificationService {
           throw new NotificationInvalidRelationException('문의 정보를 입력해주세요.');
         }
         break;
-      case NotificationType.D_7:
-      case NotificationType.D_DAY:
-        break;
       default:
         throw new NotificationInvalidTypeException();
     }
@@ -111,14 +107,13 @@ export class NotificationService implements INotificationService {
     return { totalCount, list };
   }
 
-  async createNotification(body: any) {
-    this.validateNotificationData(body);
-
-    const data: NotificationCreateDTO = body;
+  async createNotification(data: NotificationCreateDTO) {
+    this.validateNotificationData(data);
+    data.message = notificationMessages[data.type];
 
     const notification = await this.notificationRepository.create(data);
 
-    const validId = data.userId || data.driverId;
+    const validId = notification.userId || notification.driverId;
     this.notificationGateway.sendNotification(validId, { type: 'NEW_NOTIFICATION', data: notification });
 
     return notification;
