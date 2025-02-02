@@ -6,7 +6,11 @@ export function prismaSoftDeleteMiddleware(): Prisma.Middleware {
       params.args ??= {};
       params.args.where ??= {};
 
-      params.args.where.deletedAt = null;
+      if (!params.args.forceFind) {
+        params.args.where.deletedAt = null;
+      }
+
+      delete params.args.forceFind;
     }
 
     if (params.action === 'delete' && !params.args?.forceDelete) {

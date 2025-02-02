@@ -1,6 +1,6 @@
 import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { IMoveController } from '#move/interfaces/move.controller.interface.js';
-import { MoveInfoGetQueries } from '#types/queries.type.js';
+import { MoveInfoGetQueries, moveInfoWithEstimationsGetQueries } from '#types/queries.type.js';
 import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { MoveService } from './move.service.js';
@@ -9,6 +9,7 @@ import {
   MoveInfo,
   MoveInfoInputDTO,
   MoveInfoResponseDTO,
+  MoveInfoWithEstimationsDTO,
   MoveInputDTO,
   MovePatchInputDTO,
 } from './move.types.js';
@@ -62,6 +63,21 @@ export class MoveController implements IMoveController {
     const moveInfo = await this.moveService.checkMoveInfoExistence();
 
     return moveInfo;
+  }
+
+  @Get('estimations')
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth('accessToken')
+  @ApiOperation({ summary: '받았던 견적이 있는 이사정보 조회' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: [MoveInfoWithEstimationsDTO],
+  })
+  async getReceivedEstimations(@Query() query: moveInfoWithEstimationsGetQueries) {
+    const { filter } = query;
+    const moveInfoWithEstimations = await this.moveService.getReceivedEstimations(filter);
+
+    return moveInfoWithEstimations;
   }
 
   @Get(':moveInfoId')

@@ -42,6 +42,11 @@ export enum IsActivate {
   Inactive = 'Inactive',
 }
 
+export enum EstimationsFilter {
+  all = 'all',
+  confirmed = 'confirmed',
+}
+
 export class FindOptions extends OffsetPaginationOptions {
   @IsOptional()
   @IsEnum(SortOrder, { message: '올바른 정렬 기준을 골라주세요' })
@@ -94,4 +99,10 @@ export class MoveInfoFilter extends OmitType(FindOptions, ['orderBy']) {
   @IsString({ message: 'Active, Inactive로 보내주세요' })
   @ApiProperty({ description: '지정 견적 요청' })
   designatedRequest: string;
+}
+
+export class moveInfoWithEstimationsFilter {
+  @IsEnum(EstimationsFilter, { message: 'all, confirmed를 보내주세요' })
+  @ApiProperty({ description: '받았던 견적 필터링' })
+  filter: EstimationsFilter;
 }

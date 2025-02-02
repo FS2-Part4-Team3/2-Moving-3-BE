@@ -9,13 +9,31 @@ import { Progress } from '@prisma/client';
 import { MoveInfo, MoveInfoInputDTO } from './move.types.js';
 import { ForbiddenException } from '#exceptions/http.exception.js';
 import { DriverInvalidTokenException } from '#drivers/driver.exception.js';
+import { DriverService } from '#drivers/driver.service.js';
+import { EstimationsFilter } from '#types/options.type.js';
 
 @Injectable()
 export class MoveService implements IMoveService {
   constructor(
+    private readonly driverService: DriverService,
     private readonly moveRepository: MoveRepository,
     private readonly als: AsyncLocalStorage<IStorage>,
   ) {}
+
+  private async getFilteredDriverData(driverId: string) {
+    const driver = await this.driverService.findDriver(driverId);
+
+    return {
+      id: driver.id,
+      name: driver.name,
+      image: driver.image,
+      applyCount: driver.applyCount,
+      likeCount: driver.likeCount,
+      rating: driver.rating,
+      reviewCount: driver.reviewCount,
+      career: driver.career,
+    };
+  }
 
   async getMoveInfos(options: MoveInfoGetQueries) {
     const { driverId, driver: driverInfo } = this.als.getStore();
@@ -48,6 +66,35 @@ export class MoveService implements IMoveService {
     const moveInfo = await this.moveRepository.findByUserId(userId);
 
     return moveInfo;
+  }
+
+  async getReceivedEstimations(filter: EstimationsFilter) {
+    const { userId } = this.als.getStore();
+
+    const moveInfos = await this.moveRepository.findWithEstimationsByUserId(userId);
+
+    return await Promise.all(
+      moveInfos.map(async moveInfo => ({
+        ...moveInfo,
+        confirmedEstimation: moveInfo.confirmedEstimation
+          ? {
+              ...moveInfo.confirmedEstimation,
+              driver: await this.getFilteredDriverData(moveInfo.confirmedEstimation.driverId),
+            }
+          : null,
+        estimations:
+          filter === EstimationsFilter.confirmed
+            ? []
+            : await Promise.all(
+                moveInfo.estimations
+                  .filter(estimation => estimation.id !== moveInfo.confirmedEstimation?.id)
+                  .map(async estimation => ({
+                    ...estimation,
+                    driver: await this.getFilteredDriverData(estimation.driverId),
+                  })),
+              ),
+      })),
+    );
   }
 
   async postMoveInfo(moveData: MoveInfoInputDTO): Promise<MoveInfo> {
