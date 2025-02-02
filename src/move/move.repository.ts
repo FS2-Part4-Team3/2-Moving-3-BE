@@ -222,7 +222,7 @@ export class MoveRepository implements IMoveRepository {
     const moveInfos = await this.moveInfo.findMany({
       where: { ownerId: userId, progress: { in: [Progress.CANCELED, Progress.COMPLETE] } },
       forceFind: true,
-      include: { confirmedEstimation: { include: { driver: true } }, estimations: { include: { driver: true } } },
+      include: { confirmedEstimation: true, estimations: true },
     });
 
     return moveInfos;
