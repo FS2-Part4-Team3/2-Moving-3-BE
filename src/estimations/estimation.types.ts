@@ -146,3 +146,43 @@ export class UserEstimationListDTO {
   @ApiProperty({ description: '지정 견적 요청 상태', enum: ['Active', 'Inactive'] })
   designatedRequest: IsActivate; //'Active': 지정 요청 견적, 'Inactive': 일반 견적
 }
+
+class DriveList {
+  @ApiProperty({ description: '드라이버 프로필 사진', type: Boolean })
+  image: Boolean; // 이미지 없으면 "image": null,
+
+  @ApiProperty({ description: '드라이버 이름', type: String })
+  name: string;
+}
+
+class moveInfoList {
+  @ApiProperty({ description: '이사 날짜', type: String, format: 'date-time' })
+  date: Date;
+
+  @ApiProperty({ description: '서비스 타입', type: String })
+  serviceType: ServiceType;
+}
+
+class EstimationInfoList {
+  @ApiProperty({ description: '견적 ID', type: String })
+  estimationId: string;
+
+  @ApiProperty({ description: '견적 가격', type: Number, nullable: true })
+  price?: number;
+}
+
+// 리뷰 작성 가능한 목록 조회 DTO
+export class ReviewableListDTO {
+  @ApiProperty({ description: '드라이버 정보', type: DriveList })
+  driver: DriveList;
+
+  @ApiProperty({ description: '이사 정보', type: moveInfoList })
+  moveInfo: moveInfoList;
+
+  @ApiProperty({ description: '견적 정보', type: EstimationInfoList })
+  estimationInfo: EstimationInfoList;
+
+  @IsOptional()
+  @ApiProperty({ description: '지정 견적 요청 상태', enum: ['Active', 'Inactive'] })
+  designatedRequest: IsActivate; // 'Active': 지정 요청 견적, 'Inactive': 일반 견적
+}
