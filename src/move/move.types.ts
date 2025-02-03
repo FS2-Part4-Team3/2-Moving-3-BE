@@ -184,13 +184,14 @@ export class MoveInfoWithEstimationsDTO extends BaseMoveInfoOutputDTO {
   estimations: EstimationDTO[];
 }
 
-export class ConfirmEstimationDTO {
-  @ApiProperty({ description: '성공 메시지' })
-  message: string;
+// 필요가 없다!!
+// export class ConfirmEstimationDTO {
+//   @ApiProperty({ description: '성공 메시지..?' })
+//   message: string;
 
-  @ApiProperty({ description: '이사 정보 ID', type: String })
-  moveInfoId: string;
+//   @ApiProperty({ description: '이사 정보 ID', type: String })
+//   moveInfoId: string;
 
-  // @ApiProperty({ description: '확정할 견적 ID', type: String })
-  // estimationId: string;
-}
+//   // @ApiProperty({ description: '확정할 견적 ID', type: String })
+//   // estimationId: string;
+// }

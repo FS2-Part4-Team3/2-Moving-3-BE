@@ -1,12 +1,11 @@
 import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { IMoveController } from '#move/interfaces/move.controller.interface.js';
 import { MoveInfoGetQueries, moveInfoWithEstimationsGetQueries } from '#types/queries.type.js';
-import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { MoveService } from './move.service.js';
 import {
   BaseMoveInfoOutputDTO,
-  ConfirmEstimationDTO,
   MoveInfo,
   MoveInfoInputDTO,
   MoveInfoResponseDTO,
@@ -136,12 +135,15 @@ export class MoveController implements IMoveController {
   }
 
   @Post(':moveId/confirm/:estimationId')
+  @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth('accessToken')
   @ApiOperation({ summary: '이사 견적 확정' })
   @ApiResponse({
-    status: HttpStatus.OK,
-    type: ConfirmEstimationDTO,
+    status: HttpStatus.NO_CONTENT,
   })
-  async confirmEstimation() {}
+  async confirmEstimation(@Param('moveId') moveId: string, @Param('estimationId') estimationId: string) {
+    await this.moveService.confirmEstimation(estimationId, moveId);
+    return;
+  }
 }

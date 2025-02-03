@@ -19,7 +19,7 @@ export class MoveService implements IMoveService {
     private readonly driverService: DriverService,
     private readonly moveRepository: MoveRepository,
     private readonly als: AsyncLocalStorage<IStorage>,
-    private readonly estimatioRepository: EstimationRepository,
+    private readonly estimationRepository: EstimationRepository,
   ) {}
 
   private async getFilteredDriverData(driverId: string) {
@@ -144,5 +144,31 @@ export class MoveService implements IMoveService {
     const softDeleteMoveInfo = await this.moveRepository.softDeleteMoveInfo(moveId);
 
     return softDeleteMoveInfo;
+  }
+
+  async confirmEstimation(moveInfoId: string, estimationId: string) {
+    const { userId } = this.als.getStore();
+
+    // 1. 이사 정보 찾기 (사용자가 해당 이사 정보의 소유자인지 확인)
+    const moveInfo = await this.moveRepository.findMoveInfoById(moveInfoId, userId);
+    // if (!moveInfo) {
+    // 이사 정보를 찾을 수 없다..?
+    // }
+
+    // 2. 이미 확정된 견적이 있는지 확인
+    const isConfirmed = await this.moveRepository.checkConfirmedEstimation(moveInfoId);
+    // if (isConfirmed) {
+    //   이미 확정된 견적이 존재합니다.
+    // }
+
+    // 3. 해당 이사 정보에 연결된 견적 찾기 (해당 이사정보와 연결된 견적인지 확인)
+    const estimation = await this.estimationRepository.findEstimationByMoveInfo(moveInfoId, estimationId);
+
+    // if (!estimation) {
+    //  해당 이사 정보에 연결된 견적을 찾을 수 없다..?
+    // }
+
+    // 4. 이사 정보 업데이트하기 (확정된 견적 ID 등록 + 상태 업데이트)
+    return await this.moveRepository.confirmEstimation(moveInfoId);
   }
 }

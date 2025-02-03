@@ -259,7 +259,7 @@ export class MoveRepository implements IMoveRepository {
 
   // 견적확정하기 이사정보아이디 조회하기
   async findMoveInfoById(moveInfoId: string, userId: string) {
-    return this.prisma.moveInfo.findUnique({
+    return this.moveInfo.findUnique({
       where: {
         id: moveInfoId,
         ownerId: userId,
@@ -267,9 +267,19 @@ export class MoveRepository implements IMoveRepository {
     });
   }
 
+  // 확정된 견적이 있는지 확인하기 null이면 false 반환하고 있으면 true 반환하기
+  async checkConfirmedEstimation(moveInfoId: string) {
+    const moveInfo = await this.moveInfo.findUnique({
+      where: { id: moveInfoId },
+      select: { confirmedEstimationId: true },
+    });
+
+    return !!moveInfo?.confirmedEstimationId;
+  }
+
   // 견적 확정하기 랑 이사 정보 상태 업데이트
   async confirmEstimation(moveInfoId: string) {
-    return await this.prisma.moveInfo.update({
+    return this.moveInfo.update({
       where: { id: moveInfoId },
       data: {
         confirmedEstimationId: moveInfoId,
