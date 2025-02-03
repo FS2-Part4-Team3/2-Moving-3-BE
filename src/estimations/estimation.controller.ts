@@ -4,6 +4,7 @@ import {
   EstimationInputDTO,
   EstimationOutputDTO,
   ReviewableListDTO,
+  ReviewableListResponseDTO,
   UserEstimationListWithCountDTO,
 } from '#estimations/estimation.types.js';
 import { IEstimationController } from '#estimations/interfaces/estimation.controller.interface.js';
@@ -46,7 +47,7 @@ export class EstimationController implements IEstimationController {
   @ApiOperation({ summary: '작성 가능한 리뷰 목록 조회' })
   @ApiResponse({
     status: HttpStatus.OK,
-    type: ReviewableListDTO,
+    type: ReviewableListResponseDTO,
   })
   async getReviewableEstimations(@Query() query: ReviewableGetQueries) {
     const { page = 1, pageSize = 10 } = query;
