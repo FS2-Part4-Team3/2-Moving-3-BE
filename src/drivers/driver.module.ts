@@ -9,6 +9,6 @@ import { forwardRef, Module } from '@nestjs/common';
   imports: [DBModule, forwardRef(() => GuardModule)],
   controllers: [DriverController],
   providers: [DriverService, DriverRepository],
-  exports: [DriverRepository],
+  exports: [DriverRepository, DriverService],
 })
 export class DriverModule {}

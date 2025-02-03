@@ -1,14 +1,23 @@
+import { DriverService } from '#drivers/driver.service.js';
 import { EstimationService } from '#estimations/estimation.service.js';
-import { EstimationInputDTO, EstimationOutputDTO } from '#estimations/estimation.types.js';
+import {
+  EstimationInputDTO,
+  EstimationOutputDTO,
+  ReviewableListDTO,
+  UserEstimationListDTO,
+} from '#estimations/estimation.types.js';
 import { IEstimationController } from '#estimations/interfaces/estimation.controller.interface.js';
 import { AccessTokenGuard } from '#guards/access-token.guard.js';
+import { MoveRepository } from '#move/move.repository.js';
 import { QuestionService } from '#questions/question.service.js';
 import { QuestionListDTO, QuestionPostDTO } from '#questions/types/question.dto.js';
 import { QuestionEntity } from '#questions/types/question.types.js';
+import { IStorage } from '#types/common.types.js';
 import { SortOrder } from '#types/options.type.js';
-import { GetQueries } from '#types/queries.type.js';
+import { EstimationGetQueries, GetQueries, ReviewableGetQueries } from '#types/queries.type.js';
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags, getSchemaPath } from '@nestjs/swagger';
+import { AsyncLocalStorage } from 'async_hooks';
 import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards, ValidationPipe } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @Controller('estimations')
 export class EstimationController implements IEstimationController {
@@ -17,13 +26,36 @@ export class EstimationController implements IEstimationController {
     private readonly estimationService: EstimationService,
   ) {}
 
-  @Get()
-  @ApiOperation({ summary: '견적 목록 조회' })
-  async getEstimations() {}
+  @Get('user')
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth('accessToken')
+  @ApiOperation({ summary: '유저 - 견적 대기중 목록 조회' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: UserEstimationListDTO,
+  })
+  async getUserEstimations(@Query() query: EstimationGetQueries) {
+    const { page = 1, pageSize = 10 } = query;
+    const options = { page, pageSize };
+    const estimations = await this.estimationService.getUserEstimationList(options);
 
-  @Get(':id')
-  @ApiOperation({ summary: '견적 상세 조회' })
-  async getEstimation() {}
+    return estimations;
+  }
+
+  @Get('reviewable')
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth('accessToken')
+  @ApiOperation({ summary: '작성 가능한 리뷰 목록 조회' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: ReviewableListDTO,
+  })
+  async getReviewableEstimations(@Query() query: ReviewableGetQueries) {
+    const { page = 1, pageSize = 10 } = query;
+    const options = { page, pageSize };
+    const estimations = await this.estimationService.getReviewableEstimations(options);
+    return estimations;
+  }
 
   @Post(':moveInfoId')
   @UseGuards(AccessTokenGuard)

@@ -1,3 +1,4 @@
+import { EstimationOutputDTO } from '#estimations/estimation.types.js';
 import { ModelBase } from '#types/common.types.js';
 import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { $Enums, MoveInfo as PrismaMoveInfo, Progress, ServiceType } from '@prisma/client';
@@ -19,7 +20,7 @@ export class MoveInputDTO {
   @IsDate({ message: '유효한 날짜를 입력해주세요.' })
   @IsNotEmpty({ message: '이사 날짜는 필수입니다.' })
   @ApiProperty({ description: '이사 날짜' })
-  date: string;
+  date: Date;
 
   @IsString({ message: '출발 주소는 문자열이어야 합니다.' })
   @IsNotEmpty({ message: '출발 주소는 필수입니다.' })
@@ -39,10 +40,13 @@ export class BaseMoveInfoOutputDTO {
   id: string;
 
   @ApiProperty({ description: '작성 날짜', type: String, format: 'date-time' })
-  createdAt: string;
+  createdAt: Date;
 
   @ApiProperty({ description: '수정 날짜', type: String, format: 'date-time' })
-  updatedAt: string;
+  updatedAt: Date;
+
+  @ApiProperty({ description: '삭제된 날짜', type: String, format: 'date-time' })
+  deletedAt: Date;
 
   @ApiProperty({ description: '이사 유형', type: String })
   serviceType: ServiceType;
@@ -115,4 +119,67 @@ export class MoveInfoResponseDTO {
 
   @ApiProperty({ description: '이사 정보 목록', type: [MoveInfoOutputDTO] })
   list: MoveInfoOutputDTO[];
+}
+
+class DriverDTO {
+  @ApiProperty({ description: '드라이버 ID', type: String })
+  id: string;
+
+  @ApiProperty({ description: '드라이버 이름', type: String })
+  name: string;
+
+  @ApiProperty({ description: '드라이버 프로필이미지', type: String })
+  image: string;
+
+  @ApiProperty({ description: '확정 회수', type: Number })
+  applyCount: number;
+
+  @ApiProperty({ description: '찜하기 회수', type: Number })
+  likeCount: number;
+
+  @ApiProperty({ description: '기사 점수', type: Number })
+  rating: number;
+
+  @ApiProperty({ description: '리뷰 개수', type: Number })
+  reviewCount: number;
+
+  @ApiProperty({ description: '경력 년수', type: Number })
+  career: number;
+}
+
+class EstimationDTO {
+  @ApiProperty({ description: '견적 ID', type: String })
+  id: string;
+
+  @ApiProperty({ description: '작성 날짜', type: String, format: 'date-time' })
+  createdAt: Date;
+
+  @ApiProperty({ description: '수정 날짜', type: String, format: 'date-time' })
+  updatedAt: Date;
+
+  @ApiProperty({ description: '삭제된 날짜', type: String, format: 'date-time' })
+  deletedAt: Date;
+
+  @ApiProperty({ description: '견적 가격', type: Number })
+  price: number;
+
+  @ApiProperty({ description: '견적 코멘트', type: String })
+  comment: string;
+
+  @ApiProperty({ description: '이사 정보 ID', type: String })
+  moveInfoId: string;
+
+  @ApiProperty({ description: '드라이버 ID', type: String })
+  driverId: string;
+
+  @ApiProperty({ description: '드라이버 정보', type: DriverDTO })
+  driver: DriverDTO;
+}
+
+export class MoveInfoWithEstimationsDTO extends BaseMoveInfoOutputDTO {
+  @ApiProperty({ description: '확정된 견적', type: EstimationDTO })
+  confirmedEstimation: EstimationDTO;
+
+  @ApiProperty({ description: '이사정보의 견적들', type: [EstimationDTO] })
+  estimations: EstimationDTO[];
 }
