@@ -12,7 +12,7 @@ export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
     super({
       clientID: kakaoConfig.kakaoClientId,
       clientSecret: kakaoConfig.kakaoClientSecret,
-      callbackURL: kakaoConfig.kakaoRedirectURL,
+      callbackURL: '/auth/oauth2/redirect/kakao',
       passReqToCallback: true,
       scope: ['account_email', 'profile_nickname', 'profile_image', 'name', 'phone_number'],
     } as StrategyOptionWithRequest);
