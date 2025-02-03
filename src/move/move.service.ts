@@ -11,6 +11,7 @@ import { ForbiddenException } from '#exceptions/http.exception.js';
 import { DriverInvalidTokenException } from '#drivers/driver.exception.js';
 import { DriverService } from '#drivers/driver.service.js';
 import { EstimationsFilter } from '#types/options.type.js';
+import { EstimationRepository } from '#estimations/estimation.repository.js';
 
 @Injectable()
 export class MoveService implements IMoveService {
@@ -18,6 +19,7 @@ export class MoveService implements IMoveService {
     private readonly driverService: DriverService,
     private readonly moveRepository: MoveRepository,
     private readonly als: AsyncLocalStorage<IStorage>,
+    private readonly estimatioRepository: EstimationRepository,
   ) {}
 
   private async getFilteredDriverData(driverId: string) {

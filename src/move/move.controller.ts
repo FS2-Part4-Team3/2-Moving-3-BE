@@ -6,6 +6,7 @@ import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse }
 import { MoveService } from './move.service.js';
 import {
   BaseMoveInfoOutputDTO,
+  ConfirmEstimationDTO,
   MoveInfo,
   MoveInfoInputDTO,
   MoveInfoResponseDTO,
@@ -135,6 +136,12 @@ export class MoveController implements IMoveController {
   }
 
   @Post(':moveId/confirm/:estimationId')
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth('accessToken')
   @ApiOperation({ summary: '이사 견적 확정' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: ConfirmEstimationDTO,
+  })
   async confirmEstimation() {}
 }
