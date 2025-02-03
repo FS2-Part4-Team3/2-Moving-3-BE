@@ -31,15 +31,32 @@ export class EstimationRepository implements IEstimationRepository {
     });
   }
 
-  async findEstimationsByUserId(userId: string, page: number, pageSize: number): Promise<Estimation[]> {
+  async findEstimationsByUserId(
+    userId: string,
+    page: number,
+    pageSize: number,
+  ): Promise<{ estimations: Estimation[]; totalCount: number }> {
     const moveInfos = await this.prisma.moveInfo.findMany({
       where: { ownerId: userId },
       select: { id: true },
     });
 
     const moveInfoIds = moveInfos.map(info => info.id);
+
+    const totalCount = await this.prisma.estimation.count({
+      where: {
+        moveInfoId: { in: moveInfoIds },
+        moveInfo: {
+          progress: Progress.OPEN,
+          requests: {
+            none: {},
+          },
+        },
+      },
+    });
+
     // 일반 견적 조회
-    return this.prisma.estimation.findMany({
+    const estimations = await this.prisma.estimation.findMany({
       where: {
         moveInfoId: { in: moveInfoIds },
         moveInfo: {
@@ -56,16 +73,35 @@ export class EstimationRepository implements IEstimationRepository {
       skip: (page - 1) * pageSize,
       take: pageSize,
     });
+    return { estimations, totalCount };
   }
 
-  async findSpecificEstimations(userId: string, page: number, pageSize: number): Promise<Estimation[]> {
+  async findSpecificEstimations(
+    userId: string,
+    page: number,
+    pageSize: number,
+  ): Promise<{ estimations: Estimation[]; totalCount: number }> {
     const moveInfos = await this.prisma.moveInfo.findMany({
       where: { ownerId: userId },
       select: { id: true },
     });
     const moveInfoIds = moveInfos.map(info => info.id);
+
+    const totalCount = await this.prisma.estimation.count({
+      where: {
+        moveInfoId: { in: moveInfoIds },
+        moveInfo: {
+          requests: {
+            some: {
+              status: Status.PENDING,
+            },
+          },
+        },
+      },
+    });
+
     // 지정 견적 조회
-    return this.prisma.estimation.findMany({
+    const estimations = await this.prisma.estimation.findMany({
       where: {
         moveInfoId: { in: moveInfoIds },
         moveInfo: {
@@ -87,6 +123,7 @@ export class EstimationRepository implements IEstimationRepository {
       skip: (page - 1) * pageSize,
       take: pageSize,
     });
+    return { estimations, totalCount };
   }
 
   // confirmedForId 값이 null이 아니면은 이사확정 끝난것이다..~!

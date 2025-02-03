@@ -4,7 +4,7 @@ import {
   EstimationInputDTO,
   EstimationOutputDTO,
   ReviewableListDTO,
-  UserEstimationListDTO,
+  UserEstimationListWithCountDTO,
 } from '#estimations/estimation.types.js';
 import { IEstimationController } from '#estimations/interfaces/estimation.controller.interface.js';
 import { AccessTokenGuard } from '#guards/access-token.guard.js';
@@ -32,14 +32,15 @@ export class EstimationController implements IEstimationController {
   @ApiOperation({ summary: '유저 - 견적 대기중 목록 조회' })
   @ApiResponse({
     status: HttpStatus.OK,
-    type: UserEstimationListDTO,
+    type: UserEstimationListWithCountDTO,
   })
   async getUserEstimations(@Query() query: EstimationGetQueries) {
     const { page = 1, pageSize = 10 } = query;
     const options = { page, pageSize };
-    const estimations = await this.estimationService.getUserEstimationList(options);
 
-    return estimations;
+    const result = await this.estimationService.getUserEstimationList(options);
+
+    return result;
   }
 
   @Get('reviewable')

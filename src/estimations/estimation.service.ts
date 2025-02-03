@@ -1,6 +1,12 @@
 import { IEstimationService } from '#estimations/interfaces/estimation.service.interface.js';
 import { EstimationRepository } from '#estimations/estimation.repository.js';
-import { EstimationInputDTO, Estimation, UserEstimationListDTO, ReviewableListDTO } from '#estimations/estimation.types.js';
+import {
+  EstimationInputDTO,
+  Estimation,
+  UserEstimationListDTO,
+  ReviewableListDTO,
+  UserEstimationListWithCountDTO,
+} from '#estimations/estimation.types.js';
 import { Injectable, Options } from '@nestjs/common';
 import { IStorage } from '#types/common.types.js';
 import { AsyncLocalStorage } from 'async_hooks';
@@ -106,19 +112,21 @@ export class EstimationService implements IEstimationService {
   }
 
   // 견적 목록 조회
-  async getUserEstimationList(options: OffsetPaginationOptions): Promise<UserEstimationListDTO[]> {
-    const { userId } = this.als.getStore(); //유저 ID 가져오기
+  async getUserEstimationList(options: OffsetPaginationOptions): Promise<UserEstimationListWithCountDTO> {
+    const { userId } = this.als.getStore(); // 유저 ID 가져오기
     if (!userId) {
       throw new UnauthorizedException();
     }
     const { page, pageSize } = options;
-    const generalEstimations = await this.estimationRepository.findEstimationsByUserId(userId, page, pageSize);
 
-    if (!generalEstimations.length) {
+    const { estimations: generalEstimations, totalCount: generalTotalCount } =
+      await this.estimationRepository.findEstimationsByUserId(userId, page, pageSize);
+    if (generalEstimations.length === 0) {
       throw new MoveRequestNotFoundException();
     }
 
-    const specificEstimations = await this.estimationRepository.findSpecificEstimations(userId, page, pageSize);
+    const { estimations: specificEstimations, totalCount: specificTotalCount } =
+      await this.estimationRepository.findSpecificEstimations(userId, page, pageSize);
 
     const specificEstimationsWithInfo = await Promise.all(
       specificEstimations.map(async estimation => {
@@ -184,7 +192,12 @@ export class EstimationService implements IEstimationService {
         };
       }),
     );
-    return [...generalEstimationsWithInfo, ...specificEstimationsWithInfo];
+    const totalCount = generalTotalCount + specificTotalCount;
+
+    return {
+      estimations: [...generalEstimationsWithInfo, ...specificEstimationsWithInfo],
+      totalCount,
+    };
   }
 
   // 작성 가능한 리뷰 목록 조회
