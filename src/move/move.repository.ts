@@ -8,6 +8,7 @@ import { getDayEnd, getDayStart } from '#utils/dateUtils.js';
 import { Injectable } from '@nestjs/common';
 import { Area, Progress } from '@prisma/client';
 import { IMoveInfo } from './types/move.types.js';
+import { UserInvalidTokenException } from '#users/user.exception.js';
 
 @Injectable()
 export class MoveRepository implements IMoveRepository {
@@ -254,5 +255,26 @@ export class MoveRepository implements IMoveRepository {
     const moveInfo = await this.moveInfo.delete({ where: { id } });
 
     return moveInfo;
+  }
+
+  // 견적확정하기 이사정보아이디 조회하기
+  async findMoveInfoById(moveInfoId: string, userId: string) {
+    return this.prisma.moveInfo.findUnique({
+      where: {
+        id: moveInfoId,
+        ownerId: userId,
+      },
+    });
+  }
+
+  // 견적 확정하기 랑 이사 정보 상태 업데이트
+  async confirmEstimation(moveInfoId: string) {
+    return await this.prisma.moveInfo.update({
+      where: { id: moveInfoId },
+      data: {
+        confirmedEstimationId: moveInfoId,
+        progress: Progress.CONFIRMED, // 상태를 CONFIRMED로 업데이트
+      },
+    });
   }
 }
