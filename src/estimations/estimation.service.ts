@@ -216,14 +216,15 @@ export class EstimationService implements IEstimationService {
     }
 
     const moveInfoIds = moveInfos.map(info => info.id);
-    const { estimations, totalCount } = await this.estimationRepository.findReviewable(userId, moveInfoIds, page, pageSize);
+
+    const estimations = await this.estimationRepository.findReviewableEstimations(userId, moveInfoIds, page, pageSize);
+    const totalCount = await this.estimationRepository.findTotalCount(moveInfoIds);
 
     const result = await Promise.all(
       estimations.map(async estimation => {
         const driver = await this.driversService.findDriver(estimation.driverId);
         const moveInfo = await this.moveRepository.findByMoveInfoId(estimation.moveInfoId);
-
-        // 지정 요청 여부 확인
+        //지정요청 여부 확인하기
         const designatedRequest = await this.estimationRepository.isDesignatedRequest(estimation.id);
 
         return {

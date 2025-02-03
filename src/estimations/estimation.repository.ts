@@ -126,27 +126,32 @@ export class EstimationRepository implements IEstimationRepository {
     return { estimations, totalCount };
   }
 
-  // confirmedForId 값이 null이 아니면은 이사확정 끝난것이다..~!
-  async findReviewable(userId: string, moveInfoIds: string[], page: number, pageSize: number) {
+  // 토탈카운트
+  async findTotalCount(moveInfoIds: string[]): Promise<number> {
+    return this.prisma.estimation.count({
+      where: {
+        confirmedForId: { in: moveInfoIds },
+      },
+    });
+  }
+
+  // 리뷰 가능한 견적 목록
+  async findReviewableEstimations(userId: string, moveInfoIds: string[], page: number, pageSize: number) {
     const estimations = await this.prisma.estimation.findMany({
       where: {
-        confirmedForId: { in: moveInfoIds }, // 완료된 이사와 연결된 견적을 조회
+        confirmedForId: { in: moveInfoIds },
       },
       include: {
-        driver: true, // 견적과 관련된 드라이버 정보
-        moveInfo: true, // 견적과 관련된 이사 정보
-        reviews: true, // 견적에 작성된 리뷰들
+        driver: true,
+        moveInfo: true,
+        reviews: true,
       },
       skip: (page - 1) * pageSize,
       take: pageSize,
     });
 
     // 리뷰가 없는 견적만 필터링
-    const reviewableEstimations = estimations.filter(estimation => !estimation.reviews.some(review => review.ownerId === userId));
-    // 전체 견적 수를 계산
-    const totalCount = estimations.length;
-
-    return { estimations: reviewableEstimations, totalCount };
+    return estimations.filter(estimation => !estimation.reviews.some(review => review.ownerId === userId));
   }
 
   // 유저의 이사 정보 목록 가져오기
