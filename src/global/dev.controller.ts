@@ -3,7 +3,6 @@ import { PrismaService } from '#global/prisma.service.js';
 import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { NotificationService } from '#notifications/notification.service.js';
 import { IStorage, UserType } from '#types/common.types.js';
-import { UserService } from '#users/user.service.js';
 import { generateS3UploadUrl } from '#utils/S3/generate-s3-upload-url.js';
 import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiExcludeController } from '@nestjs/swagger';
@@ -13,7 +12,6 @@ import { AsyncLocalStorage } from 'async_hooks';
 @Controller('dev')
 export class DevController {
   constructor(
-    private readonly userService: UserService,
     private readonly notificationService: NotificationService,
     private readonly prisma: PrismaService,
     private readonly jwtGenerateService: JwtGenerateService,
@@ -21,12 +19,43 @@ export class DevController {
   ) {}
 
   @Get('users')
-  async getUsers(@Query() query) {
-    const { page = 1, pageSize = 10, orderBy = 'latest', keyword = '' } = query;
-    const options = { page, pageSize, orderBy, keyword };
-    const users = await this.userService.getUsers(options);
+  async getUsers() {
+    return await this.prisma.user.findMany();
+  }
 
-    return users;
+  @Get('drivers')
+  async getDrivers() {
+    return await this.prisma.driver.findMany();
+  }
+
+  @Get('estimations')
+  async getEstimations() {
+    return await this.prisma.estimation.findMany();
+  }
+
+  @Get('moves')
+  async getMoveInfos() {
+    return await this.prisma.moveInfo.findMany();
+  }
+
+  @Get('notifications')
+  async getNotifications() {
+    return await this.prisma.notification.findMany();
+  }
+
+  @Get('questions')
+  async getQuestions() {
+    return await this.prisma.question.findMany();
+  }
+
+  @Get('requests')
+  async getRequests() {
+    return await this.prisma.request.findMany();
+  }
+
+  @Get('reviews')
+  async getReviews() {
+    return await this.prisma.review.findMany();
   }
 
   @Get('login/user')
@@ -68,7 +97,7 @@ export class DevController {
     return url;
   }
 
-  @Post('notification')
+  @Post('notification/push')
   async createNotificationTest(@Body() body: any) {
     const notification = await this.notificationService.createNotification(body);
 
