@@ -258,11 +258,10 @@ export class MoveRepository implements IMoveRepository {
   }
 
   // 견적확정하기 이사정보아이디 조회하기
-  async findMoveInfoById(moveInfoId: string, userId: string) {
+  async findMoveInfoById(moveInfoId: string) {
     return this.moveInfo.findUnique({
       where: {
         id: moveInfoId,
-        ownerId: userId,
       },
     });
   }
@@ -278,11 +277,11 @@ export class MoveRepository implements IMoveRepository {
   }
 
   // 견적 확정하기 랑 이사 정보 상태 업데이트
-  async confirmEstimation(moveInfoId: string) {
+  async confirmEstimation(moveInfoId: string, estimationId: string) {
     return this.moveInfo.update({
       where: { id: moveInfoId },
       data: {
-        confirmedEstimationId: moveInfoId,
+        confirmedEstimationId: estimationId,
         progress: Progress.CONFIRMED, // 상태를 CONFIRMED로 업데이트
       },
     });

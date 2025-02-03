@@ -34,3 +34,10 @@ export class MoveRequestNotFoundException extends BadRequestException {
     super(ExceptionMessages.MOVE_REQUEST_NOT_FOUND);
   }
 }
+
+// 이미 확정 된 견적이 있을 때
+export class ConfirmedEstimationException extends BadRequestException {
+  constructor() {
+    super(ExceptionMessages.ESTIMATION_ALREADY_CONFIRMED);
+  }
+}

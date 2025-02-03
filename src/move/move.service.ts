@@ -7,11 +7,12 @@ import { MoveRepository } from './move.repository.js';
 import { MoveInfoNotFoundException, ReceivedEstimationException } from './move.exception.js';
 import { Progress } from '@prisma/client';
 import { MoveInfo, MoveInfoInputDTO } from './move.types.js';
-import { ForbiddenException } from '#exceptions/http.exception.js';
+import { ForbiddenException, NotFoundException } from '#exceptions/http.exception.js';
 import { DriverInvalidTokenException } from '#drivers/driver.exception.js';
 import { DriverService } from '#drivers/driver.service.js';
 import { EstimationsFilter } from '#types/options.type.js';
 import { EstimationRepository } from '#estimations/estimation.repository.js';
+import { ConfirmedEstimationException, EstimationNotFoundException } from '#estimations/estimation.exception.js';
 
 @Injectable()
 export class MoveService implements IMoveService {
@@ -149,26 +150,49 @@ export class MoveService implements IMoveService {
   async confirmEstimation(moveInfoId: string, estimationId: string) {
     const { userId } = this.als.getStore();
 
-    // 1. 이사 정보 찾기 (사용자가 해당 이사 정보의 소유자인지 확인)
-    const moveInfo = await this.moveRepository.findMoveInfoById(moveInfoId, userId);
-    // if (!moveInfo) {
-    // 이사 정보를 찾을 수 없다..?
+    //     if (!moveInfo) {
+    //   throw new MoveInfoNotFoundException();
     // }
+    // if (moveInfo.ownerId !== userId) {
+    //   throw new ForbiddenException();
+    // }
+    console.log('User ID:', userId); // 로그로 유저 ID 확인
+    console.log('MoveInfo ID:', moveInfoId); // 로그로 이사 정보 ID 확인
+    // 1. 이사 정보 찾기
+    const moveInfo = await this.moveRepository.findMoveInfoById(moveInfoId);
+    if (!moveInfo) {
+      console.log('MoveInfo:', moveInfo); // 조회된 이사 정보 확인
+      throw new MoveInfoNotFoundException();
+    }
+
+    if (moveInfo.ownerId !== userId) {
+      console.error('권한이 없습니다.'); // 권한이 없는 경우의 로그
+      throw new ForbiddenException();
+    }
 
     // 2. 이미 확정된 견적이 있는지 확인
     const isConfirmed = await this.moveRepository.checkConfirmedEstimation(moveInfoId);
-    // if (isConfirmed) {
-    //   이미 확정된 견적이 존재합니다.
-    // }
+    console.log('Is Confirmed:', isConfirmed); // 확정된 견적 여부 확인
+
+    if (isConfirmed) {
+      console.error('이미 확정된 견적이 있습니다.'); // 이미 확정된 견적이 있을 때의 로그
+
+      throw new ConfirmedEstimationException();
+    }
 
     // 3. 해당 이사 정보에 연결된 견적 찾기 (해당 이사정보와 연결된 견적인지 확인)
     const estimation = await this.estimationRepository.findEstimationByMoveInfo(moveInfoId, estimationId);
+    console.log('Estimation:', estimation); // 조회된 견적 정보 확인
 
-    // if (!estimation) {
-    //  해당 이사 정보에 연결된 견적을 찾을 수 없다..?
-    // }
+    if (!estimation) {
+      console.error('견적 정보가 없습니다.'); // 견적 정보가 없을 때의 로그
+
+      throw new EstimationNotFoundException();
+    }
 
     // 4. 이사 정보 업데이트하기 (확정된 견적 ID 등록 + 상태 업데이트)
-    return await this.moveRepository.confirmEstimation(moveInfoId);
+    console.log('Confirming Estimation...'); // 확정 처리 로그
+
+    return this.moveRepository.confirmEstimation(moveInfoId, estimationId);
   }
 }
