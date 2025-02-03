@@ -236,7 +236,7 @@ export class AuthController implements IAuthController {
     const { person, accessToken, refreshToken } = await this.authService.naverAuth(redirectResult);
     this.setRefreshToken(response, refreshToken);
 
-    response.redirect(`http://localhost:3000/callback/kakao?accessToken=${accessToken}`);
+    response.redirect(`http://localhost:3000/callback/naver?accessToken=${accessToken}`);
     // response.redirect(`https://www.moving.wiki/callback/kakao?accessToken=${accessToken}`);
   }
 }

@@ -12,7 +12,7 @@ export class NaverStrategy extends PassportStrategy(Strategy, 'naver') {
     super({
       clientID: naverConfig.naverClientId,
       clientSecret: naverConfig.naverClientSecret,
-      callbackURL: naverConfig.naverRedirectURL,
+      callbackURL: '/auth/oauth2/redirect/naver',
       passReqToCallback: true,
     });
   }
@@ -42,7 +42,7 @@ export class NaverStrategy extends PassportStrategy(Strategy, 'naver') {
       }
 
       const userType = state;
-      console.log('🚀 ~ NaverStrategy ~ validate ~ profile:', profile);
+
       const { _json, provider, id, displayName } = profile;
       const user = {
         email: _json.email,
@@ -53,7 +53,7 @@ export class NaverStrategy extends PassportStrategy(Strategy, 'naver') {
         id,
         userType,
       };
-      console.log('🚀 ~ NaverStrategy ~ validate ~ user:', user);
+
       const result = { ...user, accessToken, refreshToken };
       done(null, result);
     } catch (error) {
