@@ -142,7 +142,11 @@ export class EstimationRepository implements IEstimationRepository {
     });
 
     // 리뷰가 없는 견적만 필터링
-    return estimations.filter(estimation => !estimation.reviews.some(review => review.ownerId === userId));
+    const reviewableEstimations = estimations.filter(estimation => !estimation.reviews.some(review => review.ownerId === userId));
+    // 전체 견적 수를 계산
+    const totalCount = estimations.length;
+
+    return { estimations: reviewableEstimations, totalCount };
   }
 
   // 유저의 이사 정보 목록 가져오기

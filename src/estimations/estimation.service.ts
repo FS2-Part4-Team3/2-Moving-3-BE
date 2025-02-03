@@ -3,7 +3,6 @@ import { EstimationRepository } from '#estimations/estimation.repository.js';
 import {
   EstimationInputDTO,
   Estimation,
-  UserEstimationListDTO,
   ReviewableListDTO,
   UserEstimationListWithCountDTO,
 } from '#estimations/estimation.types.js';
@@ -201,7 +200,9 @@ export class EstimationService implements IEstimationService {
   }
 
   // 작성 가능한 리뷰 목록 조회
-  async getReviewableEstimations(options: ReviewableGetQueries): Promise<ReviewableListDTO[]> {
+  async getReviewableEstimations(
+    options: ReviewableGetQueries,
+  ): Promise<{ estimations: ReviewableListDTO[]; totalCount: number }> {
     const { userId } = this.als.getStore(); // 유저 ID 가져오기
     if (!userId) {
       throw new UnauthorizedException(); // 유저 ID가 없을 경우 예외 처리
@@ -215,7 +216,7 @@ export class EstimationService implements IEstimationService {
     }
 
     const moveInfoIds = moveInfos.map(info => info.id);
-    const estimations = await this.estimationRepository.findReviewable(userId, moveInfoIds, page, pageSize);
+    const { estimations, totalCount } = await this.estimationRepository.findReviewable(userId, moveInfoIds, page, pageSize);
 
     const result = await Promise.all(
       estimations.map(async estimation => {
@@ -242,6 +243,6 @@ export class EstimationService implements IEstimationService {
         };
       }),
     );
-    return result;
+    return { estimations: result, totalCount };
   }
 }
