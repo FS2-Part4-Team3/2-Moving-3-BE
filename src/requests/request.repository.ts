@@ -1,6 +1,6 @@
 import { PrismaService } from '#global/prisma.service.js';
 import { IRequestRepository } from '#requests/interfaces/request.repository.interface.js';
-import { CreateRequestDTO, PatchRequestDTO, RequestInputDTO } from '#requests/request.types.js';
+import { CreateRequestDTO, PatchRequestDTO } from '#requests/request.types.js';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
@@ -12,7 +12,6 @@ export class RequestRepository implements IRequestRepository {
   async findById(requestId: string) {
     const request = await this.request.findUnique({
       where: { id: requestId },
-      include: { moveInfo: { select: { ownerId: true } } },
     });
 
     return request;

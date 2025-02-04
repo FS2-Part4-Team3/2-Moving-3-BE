@@ -45,14 +45,9 @@ export class BaseRequestOutputDTO {
   driverId: string;
 }
 
-export class MoveInfoOwnerIdDTO {
-  @ApiProperty({ description: '이사정보 작성자 ID', type: String })
-  ownerId: string;
-}
-
 export class RequestOutputDTO extends BaseRequestOutputDTO {
-  @ApiProperty({ description: '이사 정보 목록', type: MoveInfoOwnerIdDTO })
-  moveInfo: MoveInfoOwnerIdDTO;
+  @ApiProperty({ description: '이사 정보의 작성자', type: String })
+  moveInfoOwnerId: String;
 }
 
 export class checkRequestOutputDTO {
