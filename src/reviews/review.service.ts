@@ -4,7 +4,7 @@ import { FindOptions } from '#types/options.type.js';
 import { Injectable } from '@nestjs/common';
 import { AsyncLocalStorage } from 'async_hooks';
 import { ReviewRepository } from './review.repository.js';
-import { ReviewInputDTO } from './review.types.js';
+import { ReviewBodyDTO, PatchReviewDTO } from './review.types.js';
 import { ForbiddenException } from '#exceptions/http.exception.js';
 import { ReviewAlreadyExistsException, ReviewNotFoundException } from './review.exception.js';
 import { EstimationRepository } from '#estimations/estimation.repository.js';
@@ -38,7 +38,7 @@ export class ReviewService implements IReviewService {
     return { totalCount, stats, list };
   }
 
-  async postReview(estimationId: string, body: ReviewInputDTO) {
+  async postReview(estimationId: string, body: ReviewBodyDTO) {
     const { userId } = this.als.getStore();
     const { comment, score } = body;
 
@@ -56,7 +56,7 @@ export class ReviewService implements IReviewService {
     return review;
   }
 
-  async patchReview(reviewId: string, body: Partial<ReviewInputDTO>) {
+  async patchReview(reviewId: string, body: PatchReviewDTO) {
     const { userId } = this.als.getStore();
     const reviewInfo = await this.reviewRepository.findByReviewId(reviewId);
     if (!reviewInfo) {

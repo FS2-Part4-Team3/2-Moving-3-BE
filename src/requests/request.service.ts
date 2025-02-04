@@ -8,6 +8,7 @@ import { AlreadyRequestedException, RequestNotFoundException } from './request.e
 import { ForbiddenException } from '#exceptions/http.exception.js';
 import { RequestRepository } from './request.repository.js';
 import { MoveInfoNotFoundException } from '#move/move.exception.js';
+import { CreateRequestDTO } from './request.types.js';
 
 @Injectable()
 export class RequestService implements IRequestService {
@@ -62,7 +63,7 @@ export class RequestService implements IRequestService {
       throw new AlreadyRequestedException();
     }
 
-    const data = { moveInfoId: moveInfo[0].id, status: Status.PENDING, driverId: driverId };
+    const data: CreateRequestDTO = { moveInfoId: moveInfo[0].id, status: Status.PENDING, driverId: driverId };
 
     const request = await this.requestRepository.create(data);
 

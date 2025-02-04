@@ -1,10 +1,8 @@
-import { Request, RequestInputDTO } from '#requests/request.types.js';
-import { FindOptions } from '#types/options.type.js';
+import { CreateRequestDTO, IRequest, PatchRequestDTO, RequestOutputDTO } from '#requests/request.types.js';
 
 export interface IRequestRepository {
-  findMany: (options: FindOptions) => void;
-  findById: (requestId: string) => Promise<Request>;
-  create: (data: RequestInputDTO) => Promise<Request>;
-  update: (id: string, data: Partial<RequestInputDTO>) => void;
-  delete: (id: string) => Promise<Request>;
+  findById: (requestId: string) => Promise<RequestOutputDTO>;
+  create: (data: CreateRequestDTO) => Promise<IRequest>;
+  update: (id: string, data: PatchRequestDTO) => void;
+  delete: (id: string) => Promise<IRequest>;
 }
