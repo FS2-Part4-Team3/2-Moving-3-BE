@@ -152,4 +152,11 @@ export class EstimationRepository implements IEstimationRepository {
       data: { confirmedForId: moveInfoId },
     });
   }
+
+  // async confirmedForIdEstimation(estimationId: string, moveInfoId: string) {
+  //     // return this.estimation.update({
+  //     where: { id: estimationId },
+  //     data: { confirmedForId: moveInfoId },
+  //   });
+  // }
 }

@@ -295,5 +295,5 @@ export class MoveRepository implements IMoveRepository {
     });
   }
 }
-
+// return prisma.moveInfo.update({
 // confirmedFor 이걸 받기..? confirmedForId에 moveinfo아이디 넣기?
