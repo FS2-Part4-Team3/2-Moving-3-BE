@@ -91,7 +91,7 @@ class ReviewDriverDTO {
   image: String;
 }
 
-class MyReviewOutputDTO extends ReviewOutputDTO {
+export class MyReviewOutputDTO extends ReviewOutputDTO {
   @ApiProperty({
     description: '견적 정보',
     type: ReviewEstimationDTO,
@@ -110,12 +110,20 @@ class OwnerNameDTO {
   name: String;
 }
 
-class DriverReviewOutputDTO extends ReviewOutputDTO {
+export class DriverReviewOutputDTO extends ReviewOutputDTO {
   @ApiProperty({
     description: '작성자 정보',
     type: OwnerNameDTO,
   })
   owner: OwnerNameDTO;
+}
+
+export class ratingStatsDTO {
+  @ApiProperty({ description: '점수 개수', type: Number })
+  _count: number;
+
+  @ApiProperty({ description: '점수', type: Number })
+  score: number;
 }
 
 export class statsDTO {

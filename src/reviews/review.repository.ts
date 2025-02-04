@@ -102,29 +102,24 @@ export class ReviewRepository implements IReviewRepository {
     return list;
   }
 
-  async getDriverReviewStats(driverId: string) {
+  async getDriverRatingStats(driverId: string) {
     const ratingStats = await this.review.groupBy({
       by: ['score'],
       where: { driverId },
       _count: true,
     });
+    return ratingStats;
+  }
 
-    const averageRating = await this.review.aggregate({
+  async getDriverAverageRating(driverId: string) {
+    const { _avg } = await this.review.aggregate({
       where: { driverId },
       _avg: { score: true },
     });
 
-    const ratingCounts = Array(5)
-      .fill(0)
-      .map((_, index) => {
-        const stat = ratingStats.find(s => s.score === index + 1);
-        return stat ? stat._count : 0;
-      });
+    const averageRating = _avg.score;
 
-    return {
-      averageRating: Number(averageRating._avg.score?.toFixed(1)) || 0,
-      ratingCounts,
-    };
+    return averageRating;
   }
 
   async findByReviewId(id: string) {

@@ -33,7 +33,17 @@ export class ReviewService implements IReviewService {
   async getDriverReviews(driverId: string, options: FindOptions) {
     const list = await this.reviewRepository.findManyDriverReviews(driverId, options);
     const totalCount = await this.reviewRepository.totalCount(driverId, 'driver');
-    const stats = await this.reviewRepository.getDriverReviewStats(driverId);
+    const ratingStats = await this.reviewRepository.getDriverRatingStats(driverId);
+    const averageRating = await this.reviewRepository.getDriverAverageRating(driverId);
+
+    const ratingCounts = Array(5)
+      .fill(0)
+      .map((_, index) => {
+        const stat = ratingStats.find(s => s.score === index + 1);
+        return stat ? stat._count : 0;
+      });
+
+    const stats = { averageRating: Number(averageRating?.toFixed(1)) || 0, ratingCounts };
 
     return { totalCount, stats, list };
   }
