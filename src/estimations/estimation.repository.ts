@@ -145,4 +145,11 @@ export class EstimationRepository implements IEstimationRepository {
   }
 
   // findFirst 가 맞을까 아니면 findUnique(아이디는 고유한 값이니까 유니크가 좀 더 명확하다),,??
+
+  async confirmedForIdEstimation(estimationId: string, moveInfoId: string) {
+    return this.estimation.update({
+      where: { id: estimationId },
+      data: { confirmedForId: moveInfoId },
+    });
+  }
 }

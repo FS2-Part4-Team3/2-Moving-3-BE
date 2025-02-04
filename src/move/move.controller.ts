@@ -143,7 +143,8 @@ export class MoveController implements IMoveController {
     status: HttpStatus.NO_CONTENT,
   })
   async confirmEstimation(@Param('moveId') moveId: string, @Param('estimationId') estimationId: string) {
-    await this.moveService.confirmEstimation(estimationId, moveId);
+    console.log(moveId);
+    await this.moveService.confirmEstimation(moveId, estimationId);
     return;
   }
 }

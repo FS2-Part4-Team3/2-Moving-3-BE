@@ -193,6 +193,7 @@ export class MoveService implements IMoveService {
     // 4. 이사 정보 업데이트하기 (확정된 견적 ID 등록 + 상태 업데이트)
     console.log('Confirming Estimation...'); // 확정 처리 로그
 
-    return this.moveRepository.confirmEstimation(moveInfoId, estimationId);
+    this.moveRepository.confirmEstimation(moveInfoId, estimationId);
+    this.estimationRepository.confirmedForIdEstimation(estimationId, moveInfoId);
   }
 }

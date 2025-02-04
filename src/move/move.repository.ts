@@ -258,12 +258,20 @@ export class MoveRepository implements IMoveRepository {
   }
 
   // 견적확정하기 이사정보아이디 조회하기
-  async findMoveInfoById(moveInfoId: string) {
-    return this.moveInfo.findUnique({
-      where: {
-        id: moveInfoId,
-      },
+  // async findMoveInfoById(moveInfoId: string) {
+  //   return this.moveInfo.findUnique({
+  //     where: {
+  //       id: moveInfoId,
+  //     },
+  //   });
+  // }
+
+  async findMoveInfoById(moveInfoId: string): Promise<IMoveInfo | null> {
+    const moveInfo = await this.moveInfo.findUnique({
+      where: { id: moveInfoId },
     });
+
+    return moveInfo;
   }
 
   // 확정된 견적이 있는지 확인하기 null이면 false 반환하고 있으면 true 반환하기
@@ -287,3 +295,5 @@ export class MoveRepository implements IMoveRepository {
     });
   }
 }
+
+// confirmedFor 이걸 받기..? confirmedForId에 moveinfo아이디 넣기?
