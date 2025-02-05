@@ -52,7 +52,7 @@ export class BaseMoveInfoOutputDTO {
   serviceType: ServiceType;
 
   @ApiProperty({ description: '이사 날짜', type: String, format: 'date-time' })
-  date: string;
+  date: Date;
 
   @ApiProperty({ description: '출발지', type: String })
   fromAddress: string;

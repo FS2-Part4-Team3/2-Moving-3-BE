@@ -182,4 +182,27 @@ export class EstimationRepository implements IEstimationRepository {
     // 지정요청이면 'Active', 일반요청이면 'Inactive'
     return estimation?.moveInfo.requests.length > 0 ? IsActivate.Active : IsActivate.Inactive;
   }
+
+  // 견적확정하기 - 견적 조회 (특정 이사 정보 ID와 견적 ID로 조회
+  async findEstimationByMoveInfo(moveInfoId: string, estimationId: string) {
+    return this.estimation.findUnique({
+      where: { id: estimationId, moveInfoId },
+    });
+  }
+
+  // findFirst 가 맞을까 아니면 findUnique(아이디는 고유한 값이니까 유니크가 좀 더 명확하다),,??
+
+  async confirmedForIdEstimation(estimationId: string, moveInfoId: string) {
+    return this.estimation.update({
+      where: { id: estimationId },
+      data: { confirmedForId: moveInfoId },
+    });
+  }
+
+  // async confirmedForIdEstimation(estimationId: string, moveInfoId: string) {
+  //     // return this.estimation.update({
+  //     where: { id: estimationId },
+  //     data: { confirmedForId: moveInfoId },
+  //   });
+  // }
 }
