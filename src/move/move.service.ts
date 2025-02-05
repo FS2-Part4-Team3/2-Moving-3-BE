@@ -14,6 +14,7 @@ import { EstimationsFilter } from '#types/options.type.js';
 import { EstimationRepository } from '#estimations/estimation.repository.js';
 import { ConfirmedEstimationException, EstimationNotFoundException } from '#estimations/estimation.exception.js';
 import { PrismaService } from '#global/prisma.service.js';
+import { RequestRepository } from '#requests/request.repository.js';
 
 @Injectable()
 export class MoveService implements IMoveService {
@@ -22,6 +23,7 @@ export class MoveService implements IMoveService {
     private readonly moveRepository: MoveRepository,
     private readonly als: AsyncLocalStorage<IStorage>,
     private readonly estimationRepository: EstimationRepository,
+    private readonly requestRepository: RequestRepository,
   ) {}
 
   private async getFilteredDriverData(driverId: string) {
@@ -86,6 +88,9 @@ export class MoveService implements IMoveService {
           ? {
               ...moveInfo.confirmedEstimation,
               driver: await this.getFilteredDriverData(moveInfo.confirmedEstimation.driverId),
+              isSpecificRequest: (await this.requestRepository.findByMoveInfoId(moveInfo.confirmedEstimation.moveInfoId)).some(
+                req => req.driverId === moveInfo.confirmedEstimation.driverId,
+              ),
             }
           : null,
         estimations:
@@ -97,6 +102,9 @@ export class MoveService implements IMoveService {
                   .map(async estimation => ({
                     ...estimation,
                     driver: await this.getFilteredDriverData(estimation.driverId),
+                    isSpecificRequest: (await this.requestRepository.findByMoveInfoId(estimation.moveInfoId)).some(
+                      req => req.driverId === estimation.driverId,
+                    ),
                   })),
               ),
       })),
