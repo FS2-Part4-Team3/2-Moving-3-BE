@@ -4,19 +4,17 @@ import {
   EstimationInputDTO,
   EstimationOutputDTO,
   ReviewableListDTO,
-  UserEstimationListDTO,
+  ReviewableListResponseDTO,
+  UserEstimationListWithCountDTO,
 } from '#estimations/estimation.types.js';
 import { IEstimationController } from '#estimations/interfaces/estimation.controller.interface.js';
 import { AccessTokenGuard } from '#guards/access-token.guard.js';
-import { MoveRepository } from '#move/move.repository.js';
 import { QuestionService } from '#questions/question.service.js';
 import { QuestionListDTO, QuestionPostDTO } from '#questions/types/question.dto.js';
 import { QuestionEntity } from '#questions/types/question.types.js';
-import { IStorage } from '#types/common.types.js';
 import { SortOrder } from '#types/options.type.js';
 import { EstimationGetQueries, GetQueries, ReviewableGetQueries } from '#types/queries.type.js';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags, getSchemaPath } from '@nestjs/swagger';
-import { AsyncLocalStorage } from 'async_hooks';
 import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards, ValidationPipe } from '@nestjs/common';
 
 @Controller('estimations')
@@ -32,14 +30,15 @@ export class EstimationController implements IEstimationController {
   @ApiOperation({ summary: '유저 - 견적 대기중 목록 조회' })
   @ApiResponse({
     status: HttpStatus.OK,
-    type: UserEstimationListDTO,
+    type: UserEstimationListWithCountDTO,
   })
   async getUserEstimations(@Query() query: EstimationGetQueries) {
     const { page = 1, pageSize = 10 } = query;
     const options = { page, pageSize };
-    const estimations = await this.estimationService.getUserEstimationList(options);
 
-    return estimations;
+    const result = await this.estimationService.getUserEstimationList(options);
+
+    return result;
   }
 
   @Get('reviewable')
@@ -48,13 +47,16 @@ export class EstimationController implements IEstimationController {
   @ApiOperation({ summary: '작성 가능한 리뷰 목록 조회' })
   @ApiResponse({
     status: HttpStatus.OK,
-    type: ReviewableListDTO,
+    type: ReviewableListResponseDTO,
   })
   async getReviewableEstimations(@Query() query: ReviewableGetQueries) {
     const { page = 1, pageSize = 10 } = query;
     const options = { page, pageSize };
-    const estimations = await this.estimationService.getReviewableEstimations(options);
-    return estimations;
+    const { estimations, totalCount } = await this.estimationService.getReviewableEstimations(options);
+    return {
+      estimations,
+      totalCount,
+    };
   }
 
   @Post(':moveInfoId')
