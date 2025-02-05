@@ -1,7 +1,8 @@
 import { EstimationOutputDTO } from '#estimations/estimation.types.js';
-import { ModelBase } from '#types/common.types.js';
+import { IRequest } from '#requests/request.types.js';
+import { ModelBase, Progress, ServiceType } from '#types/common.types.js';
 import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { $Enums, MoveInfo as PrismaMoveInfo, Progress, ServiceType } from '@prisma/client';
+import { $Enums, MoveInfo as PrismaMoveInfo } from '@prisma/client';
 import { IsDate, IsEnum, IsNotEmpty, IsString } from 'class-validator';
 
 interface PrismaMoveInfoBase extends Omit<PrismaMoveInfo, keyof ModelBase> {}
@@ -10,6 +11,39 @@ interface MoveInfoBase extends PrismaMoveInfoBase {}
 export interface MoveInfo extends MoveInfoBase, ModelBase {}
 
 export interface MoveInfoInputDTO extends Omit<MoveInfo, keyof ModelBase> {}
+
+export interface IMoveInfo {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt?: Date;
+
+  serviceType: ServiceType;
+  date: Date;
+  fromAddress: string;
+  toAddress: string;
+  progress: Progress;
+
+  confirmedEstimationId: string;
+
+  ownerId: string;
+  estimations: IEstimation[];
+  requests: IRequest[];
+}
+
+export interface IEstimation {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+
+  price: number;
+  comment: string;
+
+  moveInfoId: string;
+  driverId: string;
+
+  confirmedForId: string;
+}
 
 export class MoveInputDTO {
   @IsEnum($Enums.ServiceType, { message: '서비스 타입이 유효하지 않습니다.' })

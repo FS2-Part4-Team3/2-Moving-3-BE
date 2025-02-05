@@ -74,8 +74,8 @@ export class MoveController implements IMoveController {
     type: [MoveInfoWithEstimationsDTO],
   })
   async getReceivedEstimations(@Query() query: moveInfoWithEstimationsGetQueries) {
-    const { filter } = query;
-    const moveInfoWithEstimations = await this.moveService.getReceivedEstimations(filter);
+    const options = query;
+    const moveInfoWithEstimations = await this.moveService.getReceivedEstimations(options);
 
     return moveInfoWithEstimations;
   }

@@ -24,6 +24,14 @@ export class SensitiveData {
 
 export const sensitiveKeys = Object.keys(new SensitiveData());
 
+export type ServiceType = 'SMALL' | 'HOME' | 'OFFICE';
+
+enum ServiceTypeEnum {
+  SMALL = 'SMALL',
+  HOME = 'HOME',
+  OFFICE = 'OFFICE',
+}
+
 export type Status = 'PENDING' | 'EXPIRED' | 'APPLY' | 'REJECTED' | 'CANCELED';
 
 export enum StatusEnum {

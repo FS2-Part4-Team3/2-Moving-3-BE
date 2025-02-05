@@ -1,7 +1,7 @@
 import { PrismaService } from '#global/prisma.service.js';
 import { IMoveRepository } from '#move/interfaces/move.repository.interface.js';
 import { MoveInfo, MoveInfoInputDTO } from '#move/move.types.js';
-import { IsActivate, MoveInfoSortOrder } from '#types/options.type.js';
+import { IsActivate, MoveInfoSortOrder, OffsetPaginationOptions } from '#types/options.type.js';
 import { MoveInfoGetQueries } from '#types/queries.type.js';
 import { areaToKeyword } from '#utils/address-utils.js';
 import { getDayEnd, getDayStart } from '#utils/dateUtils.js';
@@ -218,10 +218,13 @@ export class MoveRepository implements IMoveRepository {
     return moveInfo;
   }
 
-  async findWithEstimationsByUserId(userId: string) {
+  async findWithEstimationsByUserId(userId: string, paginationOptions: OffsetPaginationOptions) {
+    const { page = 1, pageSize = 10 } = paginationOptions;
     const moveInfos = await this.moveInfo.findMany({
       where: { ownerId: userId, progress: { in: [Progress.CANCELED, Progress.COMPLETE] } },
       forceFind: true,
+      skip: (page - 1) * pageSize,
+      take: pageSize,
       include: { confirmedEstimation: true, estimations: true },
     });
 
