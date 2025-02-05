@@ -9,7 +9,7 @@ import { RequestRepository } from '#requests/request.repository.js';
 import { IMoveInfo } from '#move/types/move.types.js';
 import { EstimateAlreadyExistsException, MoveRequestNotFoundException } from './estimation.exception.js';
 import { RequestRejectedException } from './estimation.exception.js';
-import { DriverNotFoundException } from '#drivers/driver.exception.js';
+import { DriverNotFoundException, DriverUnauthorizedException } from '#drivers/driver.exception.js';
 import { MoveInfoNotFoundException } from '#move/move.exception.js';
 import { DriverService } from '#drivers/driver.service.js';
 import { UnauthorizedException } from '#exceptions/http.exception.js';
@@ -231,4 +231,14 @@ export class EstimationService implements IEstimationService {
     );
     return result;
   }
+
+  // 드라이버 - 보낸 견적 조회(드라이버가 승인한 견적)
+  // async getDriverEstimations {
+  //   const { driverId } = this.als.getStore();
+  //   if (!driverId) {
+  //     throw new DriverUnauthorizedException
+  //   }
+
+  //   return this.estimationRepository.findDriverEstimations(driverId);
+  // }
 }

@@ -186,3 +186,5 @@ export class ReviewableListDTO {
   @ApiProperty({ description: '지정 견적 요청 상태', enum: ['Active', 'Inactive'] })
   designatedRequest: IsActivate; // 'Active': 지정 요청 견적, 'Inactive': 일반 견적
 }
+
+// 견적 목록 조회 - 드라이버 보낸 견적

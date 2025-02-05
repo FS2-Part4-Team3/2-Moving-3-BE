@@ -1,7 +1,7 @@
 import { EstimationInputDTO, Estimation, IsActivate } from '#estimations/estimation.types.js';
 import { IEstimationRepository } from '#estimations/interfaces/estimation.repository.interface.js';
 import { PrismaService } from '#global/prisma.service.js';
-import { FindOptions } from '#types/options.type.js';
+import { FindOptions, SortOrder } from '#types/options.type.js';
 import { Injectable } from '@nestjs/common';
 import { Progress, Status } from '@prisma/client';
 
@@ -135,5 +135,84 @@ export class EstimationRepository implements IEstimationRepository {
 
     // 지정요청이면 'Active', 일반요청이면 'Inactive'
     return estimation?.moveInfo.requests.length > 0 ? IsActivate.Active : IsActivate.Inactive;
+  }
+
+  //드라이버가 보낸 견적 조회
+  async findSentEstimations(driverId: string, moveInfoIds: string[], page: number, pageSize: number, orderBy: SortOrder) {
+    return this.estimation.findMany({
+      where: {
+        driverId,
+        moveInfoId: { in: moveInfoIds },
+        moveInfo: {
+          requests: {
+            some: {
+              driverId, //리퀘스트 안에 드라이버 아이디가 있으면 지정요청을 받은거
+            },
+          },
+        },
+      },
+      include: {
+        moveInfo: {
+          include: {
+            requests: true,
+          },
+        },
+      },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+      orderBy: {
+        createdAt: orderBy === SortOrder.Oldest ? 'asc' : 'desc', // 정렬
+      },
+    });
+  }
+
+  // 자기가 보낸 견적..반려한거 제외하기..?
+  async findSentDriverEstimations(driverId: string, page: number, pageSize: number, orderBy: SortOrder) {
+    return this.estimation.findMany({
+      where: {
+        driverId, //드라이버가 일치하는 견적만 조회하기
+        price: { not: null }, // 가격이 없는 견적은 제외하기 (반려하면 가격을 안적으니까)
+      },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+      orderBy: {
+        createdAt: orderBy === SortOrder.Oldest ? 'asc' : 'desc',
+        // 정렬  진행중 견적이 맨위고 (걔네를 최신순으로 정렬을 하고) / 이사 견적 더못보내는 견적끼리 (최신순으로 정렬)
+        // 프로그레스 상태에 따라 정렬을..?
+      },
+    });
+  }
+
+  //만료된 상태보내주기..? 효빈-> 이사가 진행중인지 아닌지만, 견적이 막혀있나 안막혀있나로 하기
+
+  // 지정 견적 요청 여부 (상태 제외)
+  async isDesignatedRequestDriver(estimationId: string): Promise<IsActivate> {
+    const estimation = await this.prisma.estimation.findUnique({
+      where: { id: estimationId },
+      include: {
+        moveInfo: {
+          include: {
+            requests: {
+              where: {
+                driverId: { not: null }, // 지정 요청을 받은 드라이버 ID가 있어야 함
+              },
+            },
+          },
+        },
+      },
+    });
+
+    // 지정요청이 있으면 'Active', 없으면 'Inactive'
+    return estimation?.moveInfo.requests.some(request => request.driverId) ? IsActivate.Active : IsActivate.Inactive;
+  }
+
+  // 드라이버 토탈카운트
+  async countByDriverId(driverId: string): Promise<number> {
+    return this.estimation.count({
+      where: {
+        driverId,
+        price: { not: null }, // 가격이 없는 견적 제외
+      },
+    });
   }
 }

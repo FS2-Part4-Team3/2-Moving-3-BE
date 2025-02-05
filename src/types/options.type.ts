@@ -106,3 +106,10 @@ export class moveInfoWithEstimationsFilter {
   @ApiProperty({ description: '받았던 견적 필터링' })
   filter: EstimationsFilter;
 }
+
+export class DriverEstimationOptions extends OffsetPaginationOptions {
+  @IsOptional()
+  @IsEnum(SortOrder, { message: '정렬 기준을 골라주세요' })
+  @ApiProperty({ description: '정렬 기준', required: false })
+  orderBy?: SortOrder;
+}

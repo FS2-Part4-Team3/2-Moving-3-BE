@@ -14,7 +14,7 @@ import { QuestionListDTO, QuestionPostDTO } from '#questions/types/question.dto.
 import { QuestionEntity } from '#questions/types/question.types.js';
 import { IStorage } from '#types/common.types.js';
 import { SortOrder } from '#types/options.type.js';
-import { EstimationGetQueries, GetQueries, ReviewableGetQueries } from '#types/queries.type.js';
+import { DriverEstimationsGetQueries, EstimationGetQueries, GetQueries, ReviewableGetQueries } from '#types/queries.type.js';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags, getSchemaPath } from '@nestjs/swagger';
 import { AsyncLocalStorage } from 'async_hooks';
 import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards, ValidationPipe } from '@nestjs/common';
@@ -57,6 +57,21 @@ export class EstimationController implements IEstimationController {
     return estimations;
   }
 
+  // @Get('driver')
+  // @UseGuards(AccessTokenGuard)
+  // @ApiBearerAuth('accessToken')
+  // @ApiOperation({ summary: '기사 - 보낸 견적 조회' })
+  // async getDriverEstimations(@Query() query: DriverEstimationsGetQueries) {
+  //   const { page = 1, pageSize = 10 } = query;
+  //   const options = { page, pageSize };
+  //   const estimations = await this.estimationService.getDriverEstimations(options);
+  //   return estimations;
+  // }
+
+  @Get('rejected')
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth('accessToken')
+  @ApiOperation({ summary: '기사 - 반려 요청 조회' })
   @Post(':moveInfoId')
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth('accessToken')
