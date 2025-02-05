@@ -77,10 +77,10 @@ export class MoveService implements IMoveService {
     const paginationOptions = { page, pageSize };
     const { userId } = this.als.getStore();
 
-    const moveInfos = await this.moveRepository.findWithEstimationsByUserId(userId, paginationOptions);
+    const { totalCount, list } = await this.moveRepository.findWithEstimationsByUserId(userId, paginationOptions);
 
-    return await Promise.all(
-      moveInfos.map(async moveInfo => ({
+    const processedMoveInfos = await Promise.all(
+      list.map(async moveInfo => ({
         ...moveInfo,
         confirmedEstimation: moveInfo.confirmedEstimation
           ? {
@@ -101,6 +101,7 @@ export class MoveService implements IMoveService {
               ),
       })),
     );
+    return { totalCount, list: processedMoveInfos };
   }
 
   async postMoveInfo(moveData: MoveInfoInputDTO): Promise<MoveInfo> {

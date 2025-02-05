@@ -217,3 +217,11 @@ export class MoveInfoWithEstimationsDTO extends BaseMoveInfoOutputDTO {
   @ApiProperty({ description: '이사정보의 견적들', type: [EstimationDTO] })
   estimations: EstimationDTO[];
 }
+
+export class MoveInfoWithEstimationsResponseDTO {
+  @ApiProperty({ description: '전체 이사정보 개수', type: Number })
+  totalCount: number;
+
+  @ApiProperty({ description: '이사 정보 목록', type: [MoveInfoWithEstimationsDTO] })
+  list: MoveInfoWithEstimationsDTO[];
+}

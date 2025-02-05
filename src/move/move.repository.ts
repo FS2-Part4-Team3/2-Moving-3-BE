@@ -221,7 +221,13 @@ export class MoveRepository implements IMoveRepository {
 
   async findWithEstimationsByUserId(userId: string, paginationOptions: OffsetPaginationOptions) {
     const { page = 1, pageSize = 10 } = paginationOptions;
-    const moveInfos = await this.moveInfo.findMany({
+
+    const totalCount = await this.moveInfo.count({
+      where: { ownerId: userId, progress: { in: [Progress.CANCELED, Progress.COMPLETE] } },
+      forceFind: true,
+    });
+
+    const list = await this.moveInfo.findMany({
       where: { ownerId: userId, progress: { in: [Progress.CANCELED, Progress.COMPLETE] } },
       forceFind: true,
       skip: (page - 1) * pageSize,
@@ -229,7 +235,7 @@ export class MoveRepository implements IMoveRepository {
       include: { confirmedEstimation: true, estimations: true },
     });
 
-    return moveInfos;
+    return { totalCount, list };
   }
 
   async findByMoveInfoId(moveInfoId: string): Promise<IMoveInfo> {
