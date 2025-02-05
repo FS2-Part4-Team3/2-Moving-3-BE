@@ -31,15 +31,32 @@ export class EstimationRepository implements IEstimationRepository {
     });
   }
 
-  async findEstimationsByUserId(userId: string, page: number, pageSize: number): Promise<Estimation[]> {
+  // 일반 견적 조회
+  async findEstimationsByUserId(
+    userId: string,
+    page: number,
+    pageSize: number,
+  ): Promise<{ estimations: Estimation[]; totalCount: number }> {
     const moveInfos = await this.prisma.moveInfo.findMany({
       where: { ownerId: userId },
       select: { id: true },
     });
 
     const moveInfoIds = moveInfos.map(info => info.id);
-    // 일반 견적 조회
-    return this.prisma.estimation.findMany({
+
+    const totalCount = await this.prisma.estimation.count({
+      where: {
+        moveInfoId: { in: moveInfoIds },
+        moveInfo: {
+          progress: Progress.OPEN,
+          requests: {
+            none: {},
+          },
+        },
+      },
+    });
+
+    const estimations = await this.prisma.estimation.findMany({
       where: {
         moveInfoId: { in: moveInfoIds },
         moveInfo: {
@@ -56,16 +73,35 @@ export class EstimationRepository implements IEstimationRepository {
       skip: (page - 1) * pageSize,
       take: pageSize,
     });
+    return { estimations, totalCount };
   }
 
-  async findSpecificEstimations(userId: string, page: number, pageSize: number): Promise<Estimation[]> {
+  // 지정 견적 조회
+  async findSpecificEstimations(
+    userId: string,
+    page: number,
+    pageSize: number,
+  ): Promise<{ estimations: Estimation[]; totalCount: number }> {
     const moveInfos = await this.prisma.moveInfo.findMany({
       where: { ownerId: userId },
       select: { id: true },
     });
     const moveInfoIds = moveInfos.map(info => info.id);
-    // 지정 견적 조회
-    return this.prisma.estimation.findMany({
+
+    const totalCount = await this.prisma.estimation.count({
+      where: {
+        moveInfoId: { in: moveInfoIds },
+        moveInfo: {
+          requests: {
+            some: {
+              status: Status.PENDING,
+            },
+          },
+        },
+      },
+    });
+
+    const estimations = await this.prisma.estimation.findMany({
       where: {
         moveInfoId: { in: moveInfoIds },
         moveInfo: {
@@ -87,18 +123,28 @@ export class EstimationRepository implements IEstimationRepository {
       skip: (page - 1) * pageSize,
       take: pageSize,
     });
+    return { estimations, totalCount };
   }
 
-  // confirmedForId 값이 null이 아니면은 이사확정 끝난것이다..~!
-  async findReviewable(userId: string, moveInfoIds: string[], page: number, pageSize: number) {
+  // 리뷰 가능한 견적 목록 토탈 카운트
+  async findTotalCount(moveInfoIds: string[]): Promise<number> {
+    return this.prisma.estimation.count({
+      where: {
+        confirmedForId: { in: moveInfoIds },
+      },
+    });
+  }
+
+  // 리뷰 가능한 견적 목록
+  async findReviewableEstimations(userId: string, moveInfoIds: string[], page: number, pageSize: number) {
     const estimations = await this.prisma.estimation.findMany({
       where: {
-        confirmedForId: { in: moveInfoIds }, // 완료된 이사와 연결된 견적을 조회
+        confirmedForId: { in: moveInfoIds },
       },
       include: {
-        driver: true, // 견적과 관련된 드라이버 정보
-        moveInfo: true, // 견적과 관련된 이사 정보
-        reviews: true, // 견적에 작성된 리뷰들
+        driver: true,
+        moveInfo: true,
+        reviews: true,
       },
       skip: (page - 1) * pageSize,
       take: pageSize,
@@ -178,6 +224,7 @@ export class EstimationRepository implements IEstimationRepository {
       orderBy: {
         createdAt: orderBy === SortOrder.Oldest ? 'asc' : 'desc',
         // 정렬  진행중 견적이 맨위고 (걔네를 최신순으로 정렬을 하고) / 이사 견적 더못보내는 견적끼리 (최신순으로 정렬)
+        // 최신순으로 가공을하고 -> 데이터를 재가공..?..하기..? 데이터를 뽑아올때 그룹화해서 뽑아 올 수 잇는지 ?
         // 프로그레스 상태에 따라 정렬을..?
       },
     });
@@ -213,6 +260,20 @@ export class EstimationRepository implements IEstimationRepository {
         driverId,
         price: { not: null }, // 가격이 없는 견적 제외
       },
+    });
+  }
+
+  // 견적확정하기 - 견적 조회 (특정 이사 정보 ID와 견적 ID로 조회
+  async findEstimationByMoveInfo(moveInfoId: string, estimationId: string) {
+    return this.estimation.findUnique({
+      where: { id: estimationId, moveInfoId },
+    });
+  }
+
+  async confirmedForIdEstimation(estimationId: string, moveInfoId: string) {
+    return this.estimation.update({
+      where: { id: estimationId },
+      data: { confirmedForId: moveInfoId },
     });
   }
 }

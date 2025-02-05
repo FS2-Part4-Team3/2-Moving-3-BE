@@ -8,6 +8,7 @@ import { getDayEnd, getDayStart } from '#utils/dateUtils.js';
 import { Injectable } from '@nestjs/common';
 import { Area, Progress } from '@prisma/client';
 import { IMoveInfo } from './types/move.types.js';
+import { UserInvalidTokenException } from '#users/user.exception.js';
 
 @Injectable()
 export class MoveRepository implements IMoveRepository {
@@ -254,5 +255,34 @@ export class MoveRepository implements IMoveRepository {
     const moveInfo = await this.moveInfo.delete({ where: { id } });
 
     return moveInfo;
+  }
+
+  async findMoveInfoById(moveInfoId: string): Promise<IMoveInfo | null> {
+    const moveInfo = await this.moveInfo.findUnique({
+      where: { id: moveInfoId },
+    });
+
+    return moveInfo;
+  }
+
+  // 확정된 견적이 있는지 확인하기 null이면 false 반환하고 있으면 true 반환하기
+  async checkConfirmedEstimation(moveInfoId: string) {
+    const moveInfo = await this.moveInfo.findUnique({
+      where: { id: moveInfoId },
+      select: { confirmedEstimationId: true },
+    });
+
+    return !!moveInfo?.confirmedEstimationId;
+  }
+
+  // 견적 확정하기 랑 이사 정보 상태 업데이트
+  async confirmEstimation(moveInfoId: string, estimationId: string) {
+    return this.moveInfo.update({
+      where: { id: moveInfoId },
+      data: {
+        confirmedEstimationId: estimationId,
+        progress: Progress.CONFIRMED, // 상태를 CONFIRMED로 업데이트
+      },
+    });
   }
 }

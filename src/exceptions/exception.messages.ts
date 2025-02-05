@@ -21,6 +21,7 @@ enum ExceptionMessages {
   RECEIVED_ESTIMATE = '받은 견적이 있습니다',
 
   MOVE_REQUEST_NOT_FOUND = '이사 요청을 먼저 해주세요.',
+  ESTIMATION_ALREADY_CONFIRMED = '이미 확정된 견적이 있습니다.',
 
   PENDING_REQUEST_NOT_FOUND = '해당 드라이버에 대한 지정 견적 요청이 존재하지 않습니다.',
   ESTIMATION_NOT_FOUND = '찾을 수 없는 견적입니다.',
