@@ -1,6 +1,11 @@
 import { IEstimationService } from '#estimations/interfaces/estimation.service.interface.js';
 import { EstimationRepository } from '#estimations/estimation.repository.js';
-import { EstimationInputDTO, Estimation, UserEstimationListDTO, ReviewableListDTO } from '#estimations/estimation.types.js';
+import {
+  EstimationInputDTO,
+  Estimation,
+  ReviewableListDTO,
+  UserEstimationListWithCountDTO,
+} from '#estimations/estimation.types.js';
 import { Injectable, Options } from '@nestjs/common';
 import { IStorage } from '#types/common.types.js';
 import { AsyncLocalStorage } from 'async_hooks';
@@ -106,19 +111,21 @@ export class EstimationService implements IEstimationService {
   }
 
   // 견적 목록 조회
-  async getUserEstimationList(options: OffsetPaginationOptions): Promise<UserEstimationListDTO[]> {
-    const { userId } = this.als.getStore(); //유저 ID 가져오기
+  async getUserEstimationList(options: OffsetPaginationOptions): Promise<UserEstimationListWithCountDTO> {
+    const { userId } = this.als.getStore(); // 유저 ID 가져오기
     if (!userId) {
       throw new UnauthorizedException();
     }
     const { page, pageSize } = options;
-    const generalEstimations = await this.estimationRepository.findEstimationsByUserId(userId, page, pageSize);
 
-    if (!generalEstimations.length) {
+    const { estimations: generalEstimations, totalCount: generalTotalCount } =
+      await this.estimationRepository.findEstimationsByUserId(userId, page, pageSize);
+    if (generalEstimations.length === 0) {
       throw new MoveRequestNotFoundException();
     }
 
-    const specificEstimations = await this.estimationRepository.findSpecificEstimations(userId, page, pageSize);
+    const { estimations: specificEstimations, totalCount: specificTotalCount } =
+      await this.estimationRepository.findSpecificEstimations(userId, page, pageSize);
 
     const specificEstimationsWithInfo = await Promise.all(
       specificEstimations.map(async estimation => {
@@ -184,11 +191,18 @@ export class EstimationService implements IEstimationService {
         };
       }),
     );
-    return [...generalEstimationsWithInfo, ...specificEstimationsWithInfo];
+    const totalCount = generalTotalCount + specificTotalCount;
+
+    return {
+      estimations: [...generalEstimationsWithInfo, ...specificEstimationsWithInfo],
+      totalCount,
+    };
   }
 
   // 작성 가능한 리뷰 목록 조회
-  async getReviewableEstimations(options: ReviewableGetQueries): Promise<ReviewableListDTO[]> {
+  async getReviewableEstimations(
+    options: ReviewableGetQueries,
+  ): Promise<{ estimations: ReviewableListDTO[]; totalCount: number }> {
     const { userId } = this.als.getStore(); // 유저 ID 가져오기
     if (!userId) {
       throw new UnauthorizedException(); // 유저 ID가 없을 경우 예외 처리
@@ -202,14 +216,15 @@ export class EstimationService implements IEstimationService {
     }
 
     const moveInfoIds = moveInfos.map(info => info.id);
-    const estimations = await this.estimationRepository.findReviewable(userId, moveInfoIds, page, pageSize);
+
+    const estimations = await this.estimationRepository.findReviewableEstimations(userId, moveInfoIds, page, pageSize);
+    const totalCount = await this.estimationRepository.findTotalCount(moveInfoIds);
 
     const result = await Promise.all(
       estimations.map(async estimation => {
         const driver = await this.driversService.findDriver(estimation.driverId);
         const moveInfo = await this.moveRepository.findByMoveInfoId(estimation.moveInfoId);
-
-        // 지정 요청 여부 확인
+        //지정요청 여부 확인하기
         const designatedRequest = await this.estimationRepository.isDesignatedRequest(estimation.id);
 
         return {
@@ -229,6 +244,6 @@ export class EstimationService implements IEstimationService {
         };
       }),
     );
-    return result;
+    return { estimations: result, totalCount };
   }
 }

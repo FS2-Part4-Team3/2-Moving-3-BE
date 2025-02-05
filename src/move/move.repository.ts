@@ -8,6 +8,7 @@ import { getDayEnd, getDayStart } from '#utils/dateUtils.js';
 import { Injectable } from '@nestjs/common';
 import { Area, Progress } from '@prisma/client';
 import { IMoveInfo } from './types/move.types.js';
+import { UserInvalidTokenException } from '#users/user.exception.js';
 
 @Injectable()
 export class MoveRepository implements IMoveRepository {
@@ -258,4 +259,44 @@ export class MoveRepository implements IMoveRepository {
 
     return moveInfo;
   }
+
+  // 견적확정하기 이사정보아이디 조회하기
+  // async findMoveInfoById(moveInfoId: string) {
+  //   return this.moveInfo.findUnique({
+  //     where: {
+  //       id: moveInfoId,
+  //     },
+  //   });
+  // }
+
+  async findMoveInfoById(moveInfoId: string): Promise<IMoveInfo | null> {
+    const moveInfo = await this.moveInfo.findUnique({
+      where: { id: moveInfoId },
+    });
+
+    return moveInfo;
+  }
+
+  // 확정된 견적이 있는지 확인하기 null이면 false 반환하고 있으면 true 반환하기
+  async checkConfirmedEstimation(moveInfoId: string) {
+    const moveInfo = await this.moveInfo.findUnique({
+      where: { id: moveInfoId },
+      select: { confirmedEstimationId: true },
+    });
+
+    return !!moveInfo?.confirmedEstimationId;
+  }
+
+  // 견적 확정하기 랑 이사 정보 상태 업데이트
+  async confirmEstimation(moveInfoId: string, estimationId: string) {
+    return this.moveInfo.update({
+      where: { id: moveInfoId },
+      data: {
+        confirmedEstimationId: estimationId,
+        progress: Progress.CONFIRMED, // 상태를 CONFIRMED로 업데이트
+      },
+    });
+  }
 }
+// return prisma.moveInfo.update({
+// confirmedFor 이걸 받기..? confirmedForId에 moveinfo아이디 넣기?
