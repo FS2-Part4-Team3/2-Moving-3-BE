@@ -1,13 +1,13 @@
 import { MoveRepository } from '#move/move.repository.js';
 import { IRequestService } from '#requests/interfaces/request.service.interface.js';
-import { IStorage } from '#types/common.types.js';
+import { IStorage, StatusEnum } from '#types/common.types.js';
 import { Injectable } from '@nestjs/common';
-import { Status } from '@prisma/client';
 import { AsyncLocalStorage } from 'async_hooks';
 import { AlreadyRequestedException, RequestNotFoundException } from './request.exception.js';
 import { ForbiddenException } from '#exceptions/http.exception.js';
 import { RequestRepository } from './request.repository.js';
 import { MoveInfoNotFoundException } from '#move/move.exception.js';
+import { CreateRequestDTO } from './request.types.js';
 
 @Injectable()
 export class RequestService implements IRequestService {
@@ -19,12 +19,16 @@ export class RequestService implements IRequestService {
 
   async getRequest(requestId: string) {
     const request = await this.requestRepository.findById(requestId);
-
     if (!request) {
       throw new RequestNotFoundException();
     }
 
-    return request;
+    const { moveInfoId } = request;
+    const { ownerId: moveinfoOwnerId } = await this.moveRepository.findByMoveInfoId(moveInfoId);
+
+    const requsetDetail = { ...request, moveinfoOwnerId };
+
+    return requsetDetail;
   }
 
   async checkRequest(driverId: string) {
@@ -62,7 +66,7 @@ export class RequestService implements IRequestService {
       throw new AlreadyRequestedException();
     }
 
-    const data = { moveInfoId: moveInfo[0].id, status: Status.PENDING, driverId: driverId };
+    const data: CreateRequestDTO = { moveInfoId: moveInfo[0].id, status: StatusEnum.PENDING, driverId: driverId };
 
     const request = await this.requestRepository.create(data);
 

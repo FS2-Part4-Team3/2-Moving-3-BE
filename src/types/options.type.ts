@@ -101,7 +101,7 @@ export class MoveInfoFilter extends OmitType(FindOptions, ['orderBy']) {
   designatedRequest: string;
 }
 
-export class moveInfoWithEstimationsFilter {
+export class moveInfoWithEstimationsFilter extends OffsetPaginationOptions {
   @IsEnum(EstimationsFilter, { message: 'all, confirmed를 보내주세요' })
   @ApiProperty({ description: '받았던 견적 필터링' })
   filter: EstimationsFilter;

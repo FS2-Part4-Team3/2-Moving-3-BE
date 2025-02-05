@@ -4,7 +4,7 @@ import { FindOptions } from '#types/options.type.js';
 import { Injectable } from '@nestjs/common';
 import { AsyncLocalStorage } from 'async_hooks';
 import { ReviewRepository } from './review.repository.js';
-import { ReviewInputDTO } from './review.types.js';
+import { ReviewBodyDTO, PatchReviewDTO } from './review.types.js';
 import { ForbiddenException } from '#exceptions/http.exception.js';
 import { ReviewAlreadyExistsException, ReviewNotFoundException } from './review.exception.js';
 import { EstimationRepository } from '#estimations/estimation.repository.js';
@@ -33,12 +33,22 @@ export class ReviewService implements IReviewService {
   async getDriverReviews(driverId: string, options: FindOptions) {
     const list = await this.reviewRepository.findManyDriverReviews(driverId, options);
     const totalCount = await this.reviewRepository.totalCount(driverId, 'driver');
-    const stats = await this.reviewRepository.getDriverReviewStats(driverId);
+    const ratingStats = await this.reviewRepository.getDriverRatingStats(driverId);
+    const averageRating = await this.reviewRepository.getDriverAverageRating(driverId);
+
+    const ratingCounts = Array(5)
+      .fill(0)
+      .map((_, index) => {
+        const stat = ratingStats.find(s => s.score === index + 1);
+        return stat ? stat._count : 0;
+      });
+
+    const stats = { averageRating: Number(averageRating?.toFixed(1)) || 0, ratingCounts };
 
     return { totalCount, stats, list };
   }
 
-  async postReview(estimationId: string, body: ReviewInputDTO) {
+  async postReview(estimationId: string, body: ReviewBodyDTO) {
     const { userId } = this.als.getStore();
     const { comment, score } = body;
 
@@ -56,7 +66,7 @@ export class ReviewService implements IReviewService {
     return review;
   }
 
-  async patchReview(reviewId: string, body: Partial<ReviewInputDTO>) {
+  async patchReview(reviewId: string, body: PatchReviewDTO) {
     const { userId } = this.als.getStore();
     const reviewInfo = await this.reviewRepository.findByReviewId(reviewId);
     if (!reviewInfo) {

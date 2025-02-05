@@ -1,12 +1,20 @@
-import { Review, ReviewInputDTO, statsDTO } from '#reviews/review.types.js';
+import {
+  CreateReviewDTO,
+  DriverReviewOutputDTO,
+  IReivew,
+  MyReviewOutputDTO,
+  PatchReviewDTO,
+  ratingStatsDTO,
+} from '#reviews/review.types.js';
 import { FindOptions } from '#types/options.type.js';
 
 export interface IReviewRepository {
-  findManyMyReviews: (userId: string, options: FindOptions) => Promise<Review[]>;
-  findManyDriverReviews: (driverId: string, options: FindOptions) => Promise<Review[]>;
-  getDriverReviewStats: (driverId: string) => Promise<statsDTO>;
-  findByReviewId: (id: string) => Promise<Review>;
-  create: (data: ReviewInputDTO) => Promise<Review>;
-  update: (id: string, data: Partial<ReviewInputDTO>) => Promise<Review>;
-  delete: (id: string) => Promise<Review>;
+  findManyMyReviews: (userId: string, options: FindOptions) => Promise<MyReviewOutputDTO[]>;
+  findManyDriverReviews: (driverId: string, options: FindOptions) => Promise<DriverReviewOutputDTO[]>;
+  getDriverRatingStats: (driverId: string) => Promise<ratingStatsDTO[]>;
+  getDriverAverageRating: (driverId: string) => Promise<number>;
+  findByReviewId: (id: string) => Promise<IReivew>;
+  create: (data: CreateReviewDTO) => Promise<IReivew>;
+  update: (id: string, data: PatchReviewDTO) => Promise<IReivew>;
+  delete: (id: string) => Promise<IReivew>;
 }

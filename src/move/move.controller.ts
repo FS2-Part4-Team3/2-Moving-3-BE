@@ -10,6 +10,7 @@ import {
   MoveInfoInputDTO,
   MoveInfoResponseDTO,
   MoveInfoWithEstimationsDTO,
+  MoveInfoWithEstimationsResponseDTO,
   MoveInputDTO,
   MovePatchInputDTO,
 } from './move.types.js';
@@ -71,11 +72,11 @@ export class MoveController implements IMoveController {
   @ApiOperation({ summary: '받았던 견적이 있는 이사정보 조회' })
   @ApiResponse({
     status: HttpStatus.OK,
-    type: [MoveInfoWithEstimationsDTO],
+    type: MoveInfoWithEstimationsResponseDTO,
   })
   async getReceivedEstimations(@Query() query: moveInfoWithEstimationsGetQueries) {
-    const { filter } = query;
-    const moveInfoWithEstimations = await this.moveService.getReceivedEstimations(filter);
+    const options = query;
+    const moveInfoWithEstimations = await this.moveService.getReceivedEstimations(options);
 
     return moveInfoWithEstimations;
   }

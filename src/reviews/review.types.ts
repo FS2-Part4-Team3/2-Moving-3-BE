@@ -1,6 +1,7 @@
 import { ModelBase } from '#types/common.types.js';
 import { ApiProperty } from '@nestjs/swagger';
 import { Review as PrismaReview } from '@prisma/client';
+import { IsNotEmpty, IsOptional, IsPositive, IsString, IsUUID } from 'class-validator';
 
 interface PrismaReviewBase extends Omit<PrismaReview, keyof ModelBase> {}
 interface ReviewBase extends PrismaReviewBase {}
@@ -9,15 +10,32 @@ export interface Review extends ReviewBase, ModelBase {}
 
 export interface ReviewInputDTO extends Omit<Review, keyof ModelBase> {}
 
+export interface IReivew {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt?: Date;
+
+  comment: string;
+  score: number;
+
+  driverId: string;
+  ownerId: string;
+  estimationId: string;
+}
+
 export class ReviewOutputDTO {
   @ApiProperty({ description: '리뷰 ID', type: String })
   id: string;
 
-  @ApiProperty({ description: '작성 날짜', type: String, format: 'date-time' })
-  createdAt: string;
+  @ApiProperty({ description: '작성 날짜', type: Date, format: 'date-time' })
+  createdAt: Date;
 
-  @ApiProperty({ description: '수정 날짜', type: String, format: 'date-time' })
-  updatedAt: string;
+  @ApiProperty({ description: '수정 날짜', type: Date, format: 'date-time' })
+  updatedAt: Date;
+
+  @ApiProperty({ description: '삭제 날짜', type: Date, format: 'date-time' })
+  deletedAt: Date;
 
   @ApiProperty({ description: '리뷰 내용', type: String })
   comment: string;
@@ -73,7 +91,7 @@ class ReviewDriverDTO {
   image: String;
 }
 
-class MyReviewOutputDTO extends ReviewOutputDTO {
+export class MyReviewOutputDTO extends ReviewOutputDTO {
   @ApiProperty({
     description: '견적 정보',
     type: ReviewEstimationDTO,
@@ -92,12 +110,20 @@ class OwnerNameDTO {
   name: String;
 }
 
-class DriverReviewOutputDTO extends ReviewOutputDTO {
+export class DriverReviewOutputDTO extends ReviewOutputDTO {
   @ApiProperty({
     description: '작성자 정보',
     type: OwnerNameDTO,
   })
   owner: OwnerNameDTO;
+}
+
+export class ratingStatsDTO {
+  @ApiProperty({ description: '점수 개수', type: Number })
+  _count: number;
+
+  @ApiProperty({ description: '점수', type: Number })
+  score: number;
 }
 
 export class statsDTO {
@@ -128,8 +154,39 @@ export class DriverReviewResponseDTO {
 }
 
 export class ReviewBodyDTO {
+  @IsNotEmpty()
+  @IsString()
   @ApiProperty({ description: '리뷰 내용', type: String })
   comment: string;
+
+  @IsNotEmpty()
+  @IsPositive()
+  @ApiProperty({ description: '점수', type: Number })
+  score: number;
+}
+
+export class CreateReviewDTO extends ReviewBodyDTO {
+  @IsUUID()
+  @IsNotEmpty()
+  ownerId: string;
+
+  @IsUUID()
+  @IsNotEmpty()
+  driverId: string;
+
+  @IsUUID()
+  @IsNotEmpty()
+  estimationId: string;
+}
+
+export class PatchReviewDTO {
+  @IsOptional()
+  @IsString()
+  @ApiProperty({ description: '리뷰 내용', type: String })
+  comment: string;
+
+  @IsOptional()
+  @IsPositive()
   @ApiProperty({ description: '점수', type: Number })
   score: number;
 }

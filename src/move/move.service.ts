@@ -1,6 +1,6 @@
 import { IMoveService } from '#move/interfaces/move.service.interface.js';
 import { IStorage, UserType } from '#types/common.types.js';
-import { MoveInfoGetQueries } from '#types/queries.type.js';
+import { MoveInfoGetQueries, moveInfoWithEstimationsGetQueries } from '#types/queries.type.js';
 import { Injectable } from '@nestjs/common';
 import { AsyncLocalStorage } from 'async_hooks';
 import { MoveRepository } from './move.repository.js';
@@ -72,13 +72,15 @@ export class MoveService implements IMoveService {
     return moveInfo;
   }
 
-  async getReceivedEstimations(filter: EstimationsFilter) {
+  async getReceivedEstimations(options: moveInfoWithEstimationsGetQueries) {
+    const { filter, page, pageSize } = options;
+    const paginationOptions = { page, pageSize };
     const { userId } = this.als.getStore();
 
-    const moveInfos = await this.moveRepository.findWithEstimationsByUserId(userId);
+    const { totalCount, list } = await this.moveRepository.findWithEstimationsByUserId(userId, paginationOptions);
 
-    return await Promise.all(
-      moveInfos.map(async moveInfo => ({
+    const processedMoveInfos = await Promise.all(
+      list.map(async moveInfo => ({
         ...moveInfo,
         confirmedEstimation: moveInfo.confirmedEstimation
           ? {
@@ -99,6 +101,7 @@ export class MoveService implements IMoveService {
               ),
       })),
     );
+    return { totalCount, list: processedMoveInfos };
   }
 
   async postMoveInfo(moveData: MoveInfoInputDTO): Promise<MoveInfo> {

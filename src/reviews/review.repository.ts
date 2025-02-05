@@ -1,6 +1,6 @@
 import { PrismaService } from '#global/prisma.service.js';
 import { IReviewRepository } from '#reviews/interfaces/review.repository.interface.js';
-import { ReviewInputDTO } from '#reviews/review.types.js';
+import { CreateReviewDTO, PatchReviewDTO } from '#reviews/review.types.js';
 import { FindOptions, SortOrder } from '#types/options.type.js';
 import { Injectable } from '@nestjs/common';
 
@@ -102,29 +102,24 @@ export class ReviewRepository implements IReviewRepository {
     return list;
   }
 
-  async getDriverReviewStats(driverId: string) {
+  async getDriverRatingStats(driverId: string) {
     const ratingStats = await this.review.groupBy({
       by: ['score'],
       where: { driverId },
       _count: true,
     });
+    return ratingStats;
+  }
 
-    const averageRating = await this.review.aggregate({
+  async getDriverAverageRating(driverId: string) {
+    const { _avg } = await this.review.aggregate({
       where: { driverId },
       _avg: { score: true },
     });
 
-    const ratingCounts = Array(5)
-      .fill(0)
-      .map((_, index) => {
-        const stat = ratingStats.find(s => s.score === index + 1);
-        return stat ? stat._count : 0;
-      });
+    const averageRating = _avg.score;
 
-    return {
-      averageRating: Number(averageRating._avg.score?.toFixed(1)) || 0,
-      ratingCounts,
-    };
+    return averageRating;
   }
 
   async findByReviewId(id: string) {
@@ -133,7 +128,7 @@ export class ReviewRepository implements IReviewRepository {
     return review;
   }
 
-  async create(data: ReviewInputDTO) {
+  async create(data: CreateReviewDTO) {
     const review = await this.prisma.$transaction(async tx => {
       const review = await tx.review.create({ data });
       await this.updateDriverRating(tx, data.driverId);
@@ -143,7 +138,7 @@ export class ReviewRepository implements IReviewRepository {
     return review;
   }
 
-  async update(id: string, data: Partial<ReviewInputDTO>) {
+  async update(id: string, data: PatchReviewDTO) {
     const review = await this.prisma.$transaction(async tx => {
       const review = await tx.review.update({
         where: { id },
