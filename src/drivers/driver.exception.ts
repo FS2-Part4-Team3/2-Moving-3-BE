@@ -1,5 +1,10 @@
 import ExceptionMessages from '#exceptions/exception.messages.js';
-import { BadRequestException, InternalServerErrorException, NotFoundException } from '#exceptions/http.exception.js';
+import {
+  BadRequestException,
+  InternalServerErrorException,
+  NotFoundException,
+  UnauthorizedException,
+} from '#exceptions/http.exception.js';
 
 export class DriverNotFoundException extends NotFoundException {
   constructor() {
@@ -28,5 +33,11 @@ export class DriverIsUnLikedException extends BadRequestException {
 export class DriverInvalidEntityException extends InternalServerErrorException {
   constructor() {
     super();
+  }
+}
+
+export class DriverUnauthorizedException extends UnauthorizedException {
+  constructor() {
+    super(ExceptionMessages.DRIVER_UNAUTHORIZED);
   }
 }

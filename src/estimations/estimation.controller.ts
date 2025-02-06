@@ -1,6 +1,7 @@
 import { DriverService } from '#drivers/driver.service.js';
 import { EstimationService } from '#estimations/estimation.service.js';
 import {
+  DriverEstimationsListDTO,
   EstimationInputDTO,
   EstimationOutputDTO,
   ReviewableListDTO,
@@ -14,7 +15,7 @@ import { QuestionService } from '#questions/question.service.js';
 import { QuestionListDTO, QuestionPostDTO } from '#questions/types/question.dto.js';
 import { QuestionEntity } from '#questions/types/question.types.js';
 import { SortOrder } from '#types/options.type.js';
-import { EstimationGetQueries, GetQueries, ReviewableGetQueries } from '#types/queries.type.js';
+import { DriverEstimationsGetQueries, EstimationGetQueries, GetQueries, ReviewableGetQueries } from '#types/queries.type.js';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags, getSchemaPath } from '@nestjs/swagger';
 import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards, ValidationPipe } from '@nestjs/common';
 
@@ -58,6 +59,35 @@ export class EstimationController implements IEstimationController {
       estimations,
       totalCount,
     };
+  }
+
+  @Get('user/:estimationId')
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth('accessToken')
+  @ApiOperation({ summary: '유저 - 견적 상세 조회' })
+  @ApiParam({ name: 'estimationId', description: '견적 ID', type: 'string' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: UserEstimationDetailDTO,
+  })
+  async getUserEstimationDetail(@Param('estimationId') estimationId: string) {
+    const estimation = await this.estimationService.getUserEstimationDetail(estimationId);
+    return estimation;
+  }
+
+  @Get('driver')
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth('accessToken')
+  @ApiOperation({ summary: '드라이버 - 보낸 견적 조회' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: DriverEstimationsListDTO,
+  })
+  async getDriverEstimations(@Query() query: DriverEstimationsGetQueries) {
+    const { page = 1, pageSize = 10 } = query;
+    const options = { page, pageSize };
+    const estimations = await this.estimationService.getDriverEstimations(options);
+    return estimations;
   }
 
   @Post(':moveInfoId')
@@ -107,19 +137,5 @@ export class EstimationController implements IEstimationController {
     const question = await this.questionService.createQuestion(id, body);
 
     return question;
-  }
-
-  @Get('user/:estimationId')
-  @UseGuards(AccessTokenGuard)
-  @ApiBearerAuth('accessToken')
-  @ApiOperation({ summary: '유저 - 견적 상세 조회' })
-  @ApiParam({ name: 'estimationId', description: '견적 ID', type: 'string' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    type: UserEstimationDetailDTO,
-  })
-  async getUserEstimationDetail(@Param('estimationId') estimationId: string) {
-    const estimation = await this.estimationService.getUserEstimationDetail(estimationId);
-    return estimation;
   }
 }

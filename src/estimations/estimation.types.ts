@@ -203,27 +203,40 @@ export class ReviewableListResponseDTO {
   totalCount: number;
 }
 
-class EstimationDetail {
-  @IsString()
-  @ApiProperty({ description: '견적 코멘트', type: String })
-  comment: string;
+//유저 정보
+class UserList {
+  @ApiProperty({ description: '고객 이름', type: String })
+  name: string;
+}
 
-  @ApiProperty({ description: '견적 ID', type: String })
-  estimationId: string;
+//드라이버 보낸 견적 조회
+export class DriverEstimationsListDTO {
+  @ApiProperty({ description: '견적 정보', type: EstimationInfoList })
+  estimationInfo: EstimationInfoList;
 
-  @ApiProperty({ description: '견적 가격', type: Number, nullable: true })
-  price?: number;
+  @ApiProperty({ description: '이사 정보', type: MoveInfoDTO })
+  moveInfo: MoveInfoDTO;
+
+  @ApiProperty({ description: '고객 정보', type: UserList })
+  user: UserList;
+
+  @IsOptional()
+  @ApiProperty({ description: '지정 견적 요청 상태', enum: ['Active', 'Inactive'] })
+  designatedRequest: IsActivate;
+
+  @ApiProperty({ description: '이사정보 상태', type: String })
+  progress: Progress;
 }
 
 class MoveInfoDetail {
-  @ApiProperty({ description: '견적 요청일', type: String, format: 'date-time' })
+  @ApiProperty({ description: '작성 날짜', type: String, format: 'date-time' })
   createdAt: Date;
 
   @ApiProperty({ description: '이사 날짜', type: String, format: 'date-time' })
   date: Date;
 
   @ApiProperty({ description: '서비스 타입', type: String })
-  serviceType: ServiceType;
+  serviceType: string; // ServiceType이 제대로 정의되어 있다면 그 타입으로 사용
 
   @ApiProperty({ description: '출발지', type: String })
   fromAddress: string;
@@ -232,7 +245,19 @@ class MoveInfoDetail {
   toAddress: string;
 
   @ApiProperty({ description: '이사정보 상태', type: String })
-  progress: progress;
+  progress: string; // progress 타입을 맞추세요
+}
+
+class EstimationDetail {
+  @IsString()
+  @ApiProperty({ description: '견적 코멘트', type: String })
+  comment: string;
+
+  @ApiProperty({ description: '견적 ID', type: String })
+  id: string;
+
+  @ApiProperty({ description: '견적 가격', type: Number, nullable: true })
+  price?: number;
 }
 
 // 유저 상세조회
@@ -244,7 +269,7 @@ export class UserEstimationDetailDTO {
   moveInfo: MoveInfoDetail;
 
   @ApiProperty({ description: '견적 정보', type: EstimationDetail })
-  estimationInfo: EstimationDetail;
+  estimation: EstimationDetail;
 
   @IsOptional()
   @ApiProperty({ description: '지정 견적 요청 상태', enum: ['Active', 'Inactive'] })
