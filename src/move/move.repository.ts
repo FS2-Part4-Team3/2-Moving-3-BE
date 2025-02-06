@@ -17,78 +17,6 @@ export class MoveRepository implements IMoveRepository {
     this.moveInfo = prisma.moveInfo;
   }
 
-  private getBaseWhereCondition(options: MoveInfoGetQueries, driverId: string, driverAvailableAreas: Area[]) {
-    const { keyword, serviceType, serviceArea, designatedRequest } = options;
-
-    const serviceTypes = serviceType
-      ? serviceType
-          .split(/[,+\s]/)
-          .map(type => type.trim())
-          .filter(type => type)
-      : undefined;
-
-    const baseWhereCondition = {
-      AND: [
-        ...(keyword
-          ? [
-              {
-                OR: [
-                  { owner: { name: { contains: keyword } } },
-                  { fromAddress: { contains: keyword } },
-                  { toAddress: { contains: keyword } },
-                ],
-              },
-            ]
-          : []),
-        ...(serviceTypes?.length
-          ? [
-              {
-                serviceType: { in: serviceTypes },
-              },
-            ]
-          : []),
-
-        ...(serviceArea === IsActivate.Active
-          ? [
-              {
-                OR: [
-                  ...driverAvailableAreas.map(area => ({
-                    fromAddress: { contains: areaToKeyword(area) },
-                  })),
-                  ...driverAvailableAreas.map(area => ({
-                    toAddress: { contains: areaToKeyword(area) },
-                  })),
-                ],
-              },
-            ]
-          : []),
-        ...(designatedRequest === IsActivate.Active && driverId
-          ? [
-              {
-                requests: {
-                  some: {
-                    driverId: designatedRequest ? driverId : null,
-                  },
-                },
-              },
-            ]
-          : []),
-        {
-          NOT: {
-            estimations: {
-              some: {
-                driverId: driverId,
-              },
-            },
-          },
-        },
-        { progress: Progress.OPEN },
-      ],
-    };
-
-    return baseWhereCondition;
-  }
-
   async findManyByDate(date: Date) {
     const moveInfos = await this.moveInfo.findMany({
       where: {
@@ -107,9 +35,8 @@ export class MoveRepository implements IMoveRepository {
     return moveInfos;
   }
 
-  async findMany(options: MoveInfoGetQueries, driverId: string, driverAvailableAreas: Area[]) {
+  async findMany(options: MoveInfoGetQueries, driverId: string, whereCondition: any) {
     const { page = 1, pageSize = 10, orderBy } = options;
-    const baseWhereCondition = this.getBaseWhereCondition(options, driverId, driverAvailableAreas);
 
     let orderByCondition;
     if (orderBy === MoveInfoSortOrder.UpcomingMoveDate) {
@@ -121,7 +48,7 @@ export class MoveRepository implements IMoveRepository {
     }
 
     const list = await this.moveInfo.findMany({
-      where: baseWhereCondition,
+      where: whereCondition,
       skip: (page - 1) * pageSize,
       take: pageSize,
       orderBy: orderByCondition,
@@ -139,9 +66,8 @@ export class MoveRepository implements IMoveRepository {
     return addedList;
   }
 
-  async getTotalCount(options: MoveInfoGetQueries, driverId: string, driverAvailableAreas: Area[]) {
-    const baseWhereCondition = this.getBaseWhereCondition(options, driverId, driverAvailableAreas);
-    const totalCount = await this.moveInfo.count({ where: baseWhereCondition });
+  async getTotalCount(whereCondition: any, isForceFind: boolean) {
+    const totalCount = await this.moveInfo.count({ where: whereCondition, forceFind: isForceFind });
 
     return totalCount;
   }
@@ -222,11 +148,6 @@ export class MoveRepository implements IMoveRepository {
   async findWithEstimationsByUserId(userId: string, paginationOptions: OffsetPaginationOptions) {
     const { page = 1, pageSize = 10 } = paginationOptions;
 
-    const totalCount = await this.moveInfo.count({
-      where: { ownerId: userId, progress: { in: [Progress.CANCELED, Progress.COMPLETE] } },
-      forceFind: true,
-    });
-
     const list = await this.moveInfo.findMany({
       where: { ownerId: userId, progress: { in: [Progress.CANCELED, Progress.COMPLETE] } },
       forceFind: true,
@@ -235,7 +156,7 @@ export class MoveRepository implements IMoveRepository {
       include: { confirmedEstimation: true, estimations: true },
     });
 
-    return { totalCount, list };
+    return list;
   }
 
   async findByMoveInfoId(moveInfoId: string): Promise<IMoveInfo> {
