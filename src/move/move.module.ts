@@ -5,10 +5,11 @@ import { GuardModule } from '#guards/guard.module.js';
 import { MoveController } from '#move/move.controller.js';
 import { MoveRepository } from '#move/move.repository.js';
 import { MoveService } from '#move/move.service.js';
+import { RequestModule } from '#requests/request.module.js';
 import { forwardRef, Module } from '@nestjs/common';
 
 @Module({
-  imports: [DBModule, GuardModule, DriverModule, forwardRef(() => EstimationModule)],
+  imports: [DBModule, GuardModule, DriverModule, forwardRef(() => EstimationModule), forwardRef(() => RequestModule)],
   controllers: [MoveController],
   providers: [MoveService, MoveRepository],
   exports: [MoveRepository],

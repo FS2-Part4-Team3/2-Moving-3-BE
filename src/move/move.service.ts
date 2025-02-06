@@ -1,5 +1,5 @@
 import { IMoveService } from '#move/interfaces/move.service.interface.js';
-import { IStorage, UserType } from '#types/common.types.js';
+import { AreaType, IStorage, UserType } from '#types/common.types.js';
 import { MoveInfoGetQueries, moveInfoWithEstimationsGetQueries } from '#types/queries.type.js';
 import { Injectable } from '@nestjs/common';
 import { AsyncLocalStorage } from 'async_hooks';
@@ -10,10 +10,12 @@ import { MoveInfo, MoveInfoInputDTO } from './move.types.js';
 import { ForbiddenException, InternalServerErrorException, NotFoundException } from '#exceptions/http.exception.js';
 import { DriverInvalidTokenException } from '#drivers/driver.exception.js';
 import { DriverService } from '#drivers/driver.service.js';
-import { EstimationsFilter } from '#types/options.type.js';
+import { EstimationsFilter, IsActivate } from '#types/options.type.js';
 import { EstimationRepository } from '#estimations/estimation.repository.js';
 import { ConfirmedEstimationException, EstimationNotFoundException } from '#estimations/estimation.exception.js';
 import { PrismaService } from '#global/prisma.service.js';
+import { RequestRepository } from '#requests/request.repository.js';
+import { areaToKeyword } from '#utils/address-utils.js';
 
 @Injectable()
 export class MoveService implements IMoveService {
@@ -22,6 +24,7 @@ export class MoveService implements IMoveService {
     private readonly moveRepository: MoveRepository,
     private readonly als: AsyncLocalStorage<IStorage>,
     private readonly estimationRepository: EstimationRepository,
+    private readonly requestRepository: RequestRepository,
   ) {}
 
   private async getFilteredDriverData(driverId: string) {
@@ -39,11 +42,91 @@ export class MoveService implements IMoveService {
     };
   }
 
+  private getMoveInfosWhereCondition(options: MoveInfoGetQueries, driverId: string, driverAvailableAreas: AreaType[]) {
+    const { keyword, serviceType, serviceArea, designatedRequest } = options;
+
+    const serviceTypes = serviceType
+      ? serviceType
+          .split(/[,+\s]/)
+          .map(type => type.trim())
+          .filter(type => type)
+      : undefined;
+
+    const baseWhereCondition = {
+      AND: [
+        ...(keyword
+          ? [
+              {
+                OR: [
+                  { owner: { name: { contains: keyword } } },
+                  { fromAddress: { contains: keyword } },
+                  { toAddress: { contains: keyword } },
+                ],
+              },
+            ]
+          : []),
+        ...(serviceTypes?.length
+          ? [
+              {
+                serviceType: { in: serviceTypes },
+              },
+            ]
+          : []),
+
+        ...(serviceArea === IsActivate.Active
+          ? [
+              {
+                OR: [
+                  ...driverAvailableAreas.map(area => ({
+                    fromAddress: { contains: areaToKeyword(area) },
+                  })),
+                  ...driverAvailableAreas.map(area => ({
+                    toAddress: { contains: areaToKeyword(area) },
+                  })),
+                ],
+              },
+            ]
+          : []),
+        ...(designatedRequest === IsActivate.Active && driverId
+          ? [
+              {
+                requests: {
+                  some: {
+                    driverId: designatedRequest ? driverId : null,
+                  },
+                },
+              },
+            ]
+          : []),
+        {
+          NOT: {
+            estimations: {
+              some: {
+                driverId: driverId,
+              },
+            },
+          },
+        },
+        { progress: Progress.OPEN },
+      ],
+    };
+
+    return baseWhereCondition;
+  }
+
+  private getReceivedEstimationsWhereCondition(userId: string) {
+    return {
+      ownerId: userId,
+      progress: { in: [Progress.CANCELED, Progress.COMPLETE] },
+    };
+  }
+
   async getMoveInfos(options: MoveInfoGetQueries) {
     const { driverId, driver: driverInfo } = this.als.getStore();
+    const whereCondition = this.getMoveInfosWhereCondition(options, driverId, driverInfo.availableAreas);
 
-    const list = await this.moveRepository.findMany(options, driverId, driverInfo.availableAreas);
-    const totalCount = await this.moveRepository.getTotalCount(options, driverId, driverInfo.availableAreas);
+    const list = await this.moveRepository.findMany(options, driverId, whereCondition);
+    const totalCount = await this.moveRepository.getTotalCount(whereCondition, false);
     const counts = await this.moveRepository.getFilteringCounts(driverId, driverInfo.availableAreas);
 
     const moveInfo = { totalCount, counts, list };
@@ -77,7 +160,10 @@ export class MoveService implements IMoveService {
     const paginationOptions = { page, pageSize };
     const { userId } = this.als.getStore();
 
-    const { totalCount, list } = await this.moveRepository.findWithEstimationsByUserId(userId, paginationOptions);
+    const whereCondition = this.getReceivedEstimationsWhereCondition(userId);
+    const totalCount = await this.moveRepository.getTotalCount(whereCondition, true);
+
+    const list = await this.moveRepository.findWithEstimationsByUserId(userId, paginationOptions);
 
     const processedMoveInfos = await Promise.all(
       list.map(async moveInfo => ({
@@ -86,6 +172,9 @@ export class MoveService implements IMoveService {
           ? {
               ...moveInfo.confirmedEstimation,
               driver: await this.getFilteredDriverData(moveInfo.confirmedEstimation.driverId),
+              isSpecificRequest: (await this.requestRepository.findByMoveInfoId(moveInfo.confirmedEstimation.moveInfoId)).some(
+                req => req.driverId === moveInfo.confirmedEstimation.driverId,
+              ),
             }
           : null,
         estimations:
@@ -97,6 +186,9 @@ export class MoveService implements IMoveService {
                   .map(async estimation => ({
                     ...estimation,
                     driver: await this.getFilteredDriverData(estimation.driverId),
+                    isSpecificRequest: (await this.requestRepository.findByMoveInfoId(estimation.moveInfoId)).some(
+                      req => req.driverId === estimation.driverId,
+                    ),
                   })),
               ),
       })),

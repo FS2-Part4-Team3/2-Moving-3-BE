@@ -17,6 +17,14 @@ export class RequestRepository implements IRequestRepository {
     return request;
   }
 
+  async findByMoveInfoId(moveInfoId: string) {
+    const request = await this.request.findMany({
+      where: { moveInfoId },
+    });
+
+    return request;
+  }
+
   async create(data: CreateRequestDTO) {
     const request = await this.request.create({ data });
 
