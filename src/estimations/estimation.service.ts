@@ -121,12 +121,7 @@ export class EstimationService implements IEstimationService {
 
     const { estimations: generalEstimations, totalCount: generalTotalCount } =
       await this.estimationRepository.findEstimationsByUserId(userId, page, pageSize);
-    // console.log('d~~~~~~~~~~~~~~~~~~~~~~~~~~', generalEstimations);
-    // if (generalEstimations.length === 0) {
-    //   throw new MoveRequestNotFoundException();
-    // }
-    //5개이상이 안되어서 2페이지가 안된다..? 다음페이지로 넘어갔을때 0..
-    // 2.5로 보냈을때 1페이지 6개.
+
 
     const { estimations: specificEstimations, totalCount: specificTotalCount } =
       await this.estimationRepository.findSpecificEstimations(userId, page, pageSize);
