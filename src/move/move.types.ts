@@ -179,6 +179,9 @@ class DriverDTO {
 
   @ApiProperty({ description: '경력 년수', type: Number })
   career: number;
+
+  @ApiProperty({ description: '기사 찜하기 여부', type: Boolean })
+  isliked: Boolean;
 }
 
 class EstimationDTO {
@@ -208,6 +211,9 @@ class EstimationDTO {
 
   @ApiProperty({ description: '드라이버 정보', type: DriverDTO })
   driver: DriverDTO;
+
+  @ApiProperty({ description: '지정견적요청 여부', type: Boolean })
+  isSpecificRequest: Boolean;
 }
 
 export class MoveInfoWithEstimationsDTO extends BaseMoveInfoOutputDTO {
