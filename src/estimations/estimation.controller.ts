@@ -1,6 +1,7 @@
 import { DriverService } from '#drivers/driver.service.js';
 import { EstimationService } from '#estimations/estimation.service.js';
 import {
+  DriverEstimationsListDTO,
   EstimationInputDTO,
   EstimationOutputDTO,
   ReviewableListDTO,
@@ -59,21 +60,21 @@ export class EstimationController implements IEstimationController {
     };
   }
 
-  // @Get('driver')
-  // @UseGuards(AccessTokenGuard)
-  // @ApiBearerAuth('accessToken')
-  // @ApiOperation({ summary: '기사 - 보낸 견적 조회' })
-  // async getDriverEstimations(@Query() query: DriverEstimationsGetQueries) {
-  //   const { page = 1, pageSize = 10 } = query;
-  //   const options = { page, pageSize };
-  //   const estimations = await this.estimationService.getDriverEstimations(options);
-  //   return estimations;
-  // }
-
-  @Get('rejected')
+  @Get('driver')
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth('accessToken')
-  @ApiOperation({ summary: '기사 - 반려 요청 조회' })
+  @ApiOperation({ summary: '드라이버 - 보낸 견적 조회' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: DriverEstimationsListDTO,
+  })
+  async getDriverEstimations(@Query() query: DriverEstimationsGetQueries) {
+    const { page = 1, pageSize = 10 } = query;
+    const options = { page, pageSize };
+    const estimations = await this.estimationService.getDriverEstimations(options);
+    return estimations;
+  }
+
   @Post(':moveInfoId')
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth('accessToken')

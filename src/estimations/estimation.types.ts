@@ -119,9 +119,6 @@ class MoveInfoDTO {
 
   @ApiProperty({ description: '도착지', type: String })
   toAddress: string;
-
-  // @ApiProperty({ description: '이사정보 상태', type: String })
-  // progress: Progress;
 }
 
 class EstimationInfoDTO {
@@ -202,4 +199,29 @@ export class ReviewableListResponseDTO {
 
   @ApiProperty({ description: '총 견적 개수', type: Number })
   totalCount: number;
+}
+
+//유저 정보
+class UserList {
+  @ApiProperty({ description: '고객 이름', type: String })
+  name: string;
+}
+
+//드라이버 보낸 견적 조회
+export class DriverEstimationsListDTO {
+  @ApiProperty({ description: '견적 정보', type: EstimationInfoList })
+  estimationInfo: EstimationInfoList;
+
+  @ApiProperty({ description: '이사 정보', type: MoveInfoDTO })
+  moveInfo: MoveInfoDTO;
+
+  @ApiProperty({ description: '고객 정보', type: UserList })
+  user: UserList;
+
+  @IsOptional()
+  @ApiProperty({ description: '지정 견적 요청 상태', enum: ['Active', 'Inactive'] })
+  designatedRequest: IsActivate;
+
+  @ApiProperty({ description: '이사정보 상태', type: String })
+  progress: Progress;
 }

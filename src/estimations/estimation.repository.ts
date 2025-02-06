@@ -183,55 +183,6 @@ export class EstimationRepository implements IEstimationRepository {
     return estimation?.moveInfo.requests.length > 0 ? IsActivate.Active : IsActivate.Inactive;
   }
 
-  //드라이버가 보낸 견적 조회
-  async findSentEstimations(driverId: string, moveInfoIds: string[], page: number, pageSize: number, orderBy: SortOrder) {
-    return this.estimation.findMany({
-      where: {
-        driverId,
-        moveInfoId: { in: moveInfoIds },
-        moveInfo: {
-          requests: {
-            some: {
-              driverId, //리퀘스트 안에 드라이버 아이디가 있으면 지정요청을 받은거
-            },
-          },
-        },
-      },
-      include: {
-        moveInfo: {
-          include: {
-            requests: true,
-          },
-        },
-      },
-      skip: (page - 1) * pageSize,
-      take: pageSize,
-      orderBy: {
-        createdAt: orderBy === SortOrder.Oldest ? 'asc' : 'desc', // 정렬
-      },
-    });
-  }
-
-  // 자기가 보낸 견적..반려한거 제외하기..?
-  async findSentDriverEstimations(driverId: string, page: number, pageSize: number, orderBy: SortOrder) {
-    return this.estimation.findMany({
-      where: {
-        driverId, //드라이버가 일치하는 견적만 조회하기
-        price: { not: null }, // 가격이 없는 견적은 제외하기 (반려하면 가격을 안적으니까)
-      },
-      skip: (page - 1) * pageSize,
-      take: pageSize,
-      orderBy: {
-        createdAt: orderBy === SortOrder.Oldest ? 'asc' : 'desc',
-        // 정렬  진행중 견적이 맨위고 (걔네를 최신순으로 정렬을 하고) / 이사 견적 더못보내는 견적끼리 (최신순으로 정렬)
-        // 최신순으로 가공을하고 -> 데이터를 재가공..?..하기..? 데이터를 뽑아올때 그룹화해서 뽑아 올 수 잇는지 ?
-        // 프로그레스 상태에 따라 정렬을..?
-      },
-    });
-  }
-
-  //만료된 상태보내주기..? 효빈-> 이사가 진행중인지 아닌지만, 견적이 막혀있나 안막혀있나로 하기
-
   // 지정 견적 요청 여부 (상태 제외)
   async isDesignatedRequestDriver(estimationId: string): Promise<IsActivate> {
     const estimation = await this.prisma.estimation.findUnique({
@@ -275,5 +226,65 @@ export class EstimationRepository implements IEstimationRepository {
       where: { id: estimationId },
       data: { confirmedForId: moveInfoId },
     });
+  }
+
+  async findEstimationsByDriverId(driverId: string, page: number, pageSize: number) {
+    // 1. 진행 중인 상태 조회 (OPEN, CONFIRMED)
+    const inProgressEstimations = await this.estimation.findMany({
+      where: {
+        driverId,
+        moveInfo: { progress: { in: ['OPEN', 'CONFIRMED'] } },
+      },
+      include: { moveInfo: { include: { owner: true } } },
+      orderBy: { createdAt: 'desc' }, // 최신순 정렬
+    });
+
+    // 2. 완료된 상태 조회 (COMPLETE, EXPIRED, CANCELED)
+    const completedEstimations = await this.estimation.findMany({
+      where: {
+        driverId,
+        moveInfo: { progress: { in: ['COMPLETE', 'EXPIRED', 'CANCELED'] } },
+      },
+      include: { moveInfo: { include: { owner: true } } },
+      orderBy: { createdAt: 'desc' }, // 최신순 정렬
+    });
+
+    // 3. 진행 중 → 완료 순서 유지 후, createdAt 기준 재정렬
+    const sortedResults = [...inProgressEstimations, ...completedEstimations].sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
+
+    // 4. 페이지네이션 적용
+    return sortedResults.slice((page - 1) * pageSize, page * pageSize);
+  }
+
+  //드라이버가 보낸 견적조회 토탈카운트
+  async countEstimationsByDriverId(driverId: string): Promise<number> {
+    return this.estimation.count({
+      where: {
+        driverId,
+        moveInfo: { progress: { in: ['OPEN', 'CONFIRMED', 'COMPLETE', 'EXPIRED', 'CANCELED'] } },
+      },
+    });
+  }
+
+  async isDesignatedRequestForDriver(estimationId: string, driverId: string): Promise<IsActivate> {
+    const estimation = await this.prisma.estimation.findUnique({
+      where: { id: estimationId },
+      include: {
+        moveInfo: {
+          include: {
+            requests: {
+              where: {
+                driverId: driverId, // 로그인한 드라이버의 ID로 필터링
+              },
+            },
+          },
+        },
+      },
+    });
+
+    // 지정요청이면 'Active', 일반요청이면 'Inactive'
+    return estimation?.moveInfo.requests.length > 0 ? IsActivate.Active : IsActivate.Inactive;
   }
 }
