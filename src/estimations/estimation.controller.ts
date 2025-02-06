@@ -1,6 +1,7 @@
 import { DriverService } from '#drivers/driver.service.js';
 import { EstimationService } from '#estimations/estimation.service.js';
 import {
+  DriverEstimationsListDTO,
   EstimationInputDTO,
   EstimationOutputDTO,
   ReviewableListDTO,
@@ -13,7 +14,7 @@ import { QuestionService } from '#questions/question.service.js';
 import { QuestionListDTO, QuestionPostDTO } from '#questions/types/question.dto.js';
 import { QuestionEntity } from '#questions/types/question.types.js';
 import { SortOrder } from '#types/options.type.js';
-import { EstimationGetQueries, GetQueries, ReviewableGetQueries } from '#types/queries.type.js';
+import { DriverEstimationsGetQueries, EstimationGetQueries, GetQueries, ReviewableGetQueries } from '#types/queries.type.js';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags, getSchemaPath } from '@nestjs/swagger';
 import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards, ValidationPipe } from '@nestjs/common';
 
@@ -57,6 +58,21 @@ export class EstimationController implements IEstimationController {
       estimations,
       totalCount,
     };
+  }
+
+  @Get('driver')
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth('accessToken')
+  @ApiOperation({ summary: '드라이버 - 보낸 견적 조회' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: DriverEstimationsListDTO,
+  })
+  async getDriverEstimations(@Query() query: DriverEstimationsGetQueries) {
+    const { page = 1, pageSize = 10 } = query;
+    const options = { page, pageSize };
+    const estimations = await this.estimationService.getDriverEstimations(options);
+    return estimations;
   }
 
   @Post(':moveInfoId')

@@ -1,7 +1,7 @@
 import { EstimationInputDTO, Estimation, IsActivate } from '#estimations/estimation.types.js';
 import { IEstimationRepository } from '#estimations/interfaces/estimation.repository.interface.js';
 import { PrismaService } from '#global/prisma.service.js';
-import { FindOptions } from '#types/options.type.js';
+import { FindOptions, SortOrder } from '#types/options.type.js';
 import { Injectable } from '@nestjs/common';
 import { Progress, Status } from '@prisma/client';
 
@@ -31,6 +31,7 @@ export class EstimationRepository implements IEstimationRepository {
     });
   }
 
+  // 일반 견적 조회
   async findEstimationsByUserId(
     userId: string,
     page: number,
@@ -55,7 +56,6 @@ export class EstimationRepository implements IEstimationRepository {
       },
     });
 
-    // 일반 견적 조회
     const estimations = await this.prisma.estimation.findMany({
       where: {
         moveInfoId: { in: moveInfoIds },
@@ -76,6 +76,7 @@ export class EstimationRepository implements IEstimationRepository {
     return { estimations, totalCount };
   }
 
+  // 지정 견적 조회
   async findSpecificEstimations(
     userId: string,
     page: number,
@@ -100,7 +101,6 @@ export class EstimationRepository implements IEstimationRepository {
       },
     });
 
-    // 지정 견적 조회
     const estimations = await this.prisma.estimation.findMany({
       where: {
         moveInfoId: { in: moveInfoIds },
@@ -126,7 +126,7 @@ export class EstimationRepository implements IEstimationRepository {
     return { estimations, totalCount };
   }
 
-  // 토탈카운트
+  // 리뷰 가능한 견적 목록 토탈 카운트
   async findTotalCount(moveInfoIds: string[]): Promise<number> {
     return this.prisma.estimation.count({
       where: {
@@ -183,14 +183,43 @@ export class EstimationRepository implements IEstimationRepository {
     return estimation?.moveInfo.requests.length > 0 ? IsActivate.Active : IsActivate.Inactive;
   }
 
+  // 지정 견적 요청 여부 (상태 제외)
+  async isDesignatedRequestDriver(estimationId: string): Promise<IsActivate> {
+    const estimation = await this.prisma.estimation.findUnique({
+      where: { id: estimationId },
+      include: {
+        moveInfo: {
+          include: {
+            requests: {
+              where: {
+                driverId: { not: null }, // 지정 요청을 받은 드라이버 ID가 있어야 함
+              },
+            },
+          },
+        },
+      },
+    });
+
+    // 지정요청이 있으면 'Active', 없으면 'Inactive'
+    return estimation?.moveInfo.requests.some(request => request.driverId) ? IsActivate.Active : IsActivate.Inactive;
+  }
+
+  // 드라이버 토탈카운트
+  async countByDriverId(driverId: string): Promise<number> {
+    return this.estimation.count({
+      where: {
+        driverId,
+        price: { not: null }, // 가격이 없는 견적 제외
+      },
+    });
+  }
+
   // 견적확정하기 - 견적 조회 (특정 이사 정보 ID와 견적 ID로 조회
   async findEstimationByMoveInfo(moveInfoId: string, estimationId: string) {
     return this.estimation.findUnique({
       where: { id: estimationId, moveInfoId },
     });
   }
-
-  // findFirst 가 맞을까 아니면 findUnique(아이디는 고유한 값이니까 유니크가 좀 더 명확하다),,??
 
   async confirmedForIdEstimation(estimationId: string, moveInfoId: string) {
     return this.estimation.update({
@@ -199,10 +228,63 @@ export class EstimationRepository implements IEstimationRepository {
     });
   }
 
-  // async confirmedForIdEstimation(estimationId: string, moveInfoId: string) {
-  //     // return this.estimation.update({
-  //     where: { id: estimationId },
-  //     data: { confirmedForId: moveInfoId },
-  //   });
-  // }
+  async findEstimationsByDriverId(driverId: string, page: number, pageSize: number) {
+    // 1. 진행 중인 상태 조회 (OPEN, CONFIRMED)
+    const inProgressEstimations = await this.estimation.findMany({
+      where: {
+        driverId,
+        moveInfo: { progress: { in: ['OPEN', 'CONFIRMED'] } },
+      },
+      include: { moveInfo: { include: { owner: true } } },
+      orderBy: { createdAt: 'desc' }, // 최신순 정렬
+    });
+
+    // 2. 완료된 상태 조회 (COMPLETE, EXPIRED, CANCELED)
+    const completedEstimations = await this.estimation.findMany({
+      where: {
+        driverId,
+        moveInfo: { progress: { in: ['COMPLETE', 'EXPIRED', 'CANCELED'] } },
+      },
+      include: { moveInfo: { include: { owner: true } } },
+      orderBy: { createdAt: 'desc' }, // 최신순 정렬
+    });
+
+    // 3. 진행 중 → 완료 순서 유지 후, createdAt 기준 재정렬
+    const sortedResults = [...inProgressEstimations, ...completedEstimations].sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
+
+    // 4. 페이지네이션 적용
+    return sortedResults.slice((page - 1) * pageSize, page * pageSize);
+  }
+
+  //드라이버가 보낸 견적조회 토탈카운트
+  async countEstimationsByDriverId(driverId: string): Promise<number> {
+    return this.estimation.count({
+      where: {
+        driverId,
+        moveInfo: { progress: { in: ['OPEN', 'CONFIRMED', 'COMPLETE', 'EXPIRED', 'CANCELED'] } },
+      },
+    });
+  }
+
+  async isDesignatedRequestForDriver(estimationId: string, driverId: string): Promise<IsActivate> {
+    const estimation = await this.prisma.estimation.findUnique({
+      where: { id: estimationId },
+      include: {
+        moveInfo: {
+          include: {
+            requests: {
+              where: {
+                driverId: driverId, // 로그인한 드라이버의 ID로 필터링
+              },
+            },
+          },
+        },
+      },
+    });
+
+    // 지정요청이면 'Active', 일반요청이면 'Inactive'
+    return estimation?.moveInfo.requests.length > 0 ? IsActivate.Active : IsActivate.Inactive;
+  }
 }

@@ -5,6 +5,7 @@ import {
   Estimation,
   ReviewableListDTO,
   UserEstimationListWithCountDTO,
+  DriverEstimationsListDTO,
 } from '#estimations/estimation.types.js';
 import { Injectable, Options } from '@nestjs/common';
 import { IStorage } from '#types/common.types.js';
@@ -14,12 +15,12 @@ import { RequestRepository } from '#requests/request.repository.js';
 import { IMoveInfo } from '#move/types/move.types.js';
 import { EstimateAlreadyExistsException, MoveRequestNotFoundException } from './estimation.exception.js';
 import { RequestRejectedException } from './estimation.exception.js';
-import { DriverNotFoundException } from '#drivers/driver.exception.js';
+import { DriverNotFoundException, DriverUnauthorizedException } from '#drivers/driver.exception.js';
 import { MoveInfoNotFoundException } from '#move/move.exception.js';
 import { DriverService } from '#drivers/driver.service.js';
 import { UnauthorizedException } from '#exceptions/http.exception.js';
 import { IsActivate, OffsetPaginationOptions } from '#types/options.type.js';
-import { ReviewableGetQueries } from '#types/queries.type.js';
+import { DriverEstimationsGetQueries, ReviewableGetQueries } from '#types/queries.type.js';
 
 @Injectable()
 export class EstimationService implements IEstimationService {
@@ -120,9 +121,7 @@ export class EstimationService implements IEstimationService {
 
     const { estimations: generalEstimations, totalCount: generalTotalCount } =
       await this.estimationRepository.findEstimationsByUserId(userId, page, pageSize);
-    if (generalEstimations.length === 0) {
-      throw new MoveRequestNotFoundException();
-    }
+
 
     const { estimations: specificEstimations, totalCount: specificTotalCount } =
       await this.estimationRepository.findSpecificEstimations(userId, page, pageSize);
@@ -245,5 +244,45 @@ export class EstimationService implements IEstimationService {
       }),
     );
     return { estimations: result, totalCount };
+  }
+
+  // 드라이버 - 보낸 견적 조회(드라이버가 승인한 견적)
+  async getDriverEstimations(
+    options: DriverEstimationsGetQueries,
+  ): Promise<{ estimations: DriverEstimationsListDTO[]; totalCount: number }> {
+    const { driverId } = this.als.getStore(); // 드라이버 ID 가져오기
+    if (!driverId) {
+      throw new UnauthorizedException();
+    }
+
+    const { page, pageSize } = options;
+    const estimations = await this.estimationRepository.findEstimationsByDriverId(driverId, page, pageSize);
+    const totalCount = await this.estimationRepository.countEstimationsByDriverId(driverId);
+
+    const estimationData = await Promise.all(
+      estimations.map(async estimation => {
+        const designatedRequest = await this.estimationRepository.isDesignatedRequestForDriver(estimation.id, driverId);
+
+        return {
+          estimationInfo: {
+            estimationId: estimation.id,
+            price: estimation.price,
+          },
+          moveInfo: {
+            date: estimation.moveInfo.date,
+            serviceType: estimation.moveInfo.serviceType,
+            fromAddress: estimation.moveInfo.fromAddress,
+            toAddress: estimation.moveInfo.toAddress,
+          },
+          user: {
+            name: estimation.moveInfo.owner.name,
+          },
+          designatedRequest: designatedRequest,
+          progress: estimation.moveInfo.progress,
+        };
+      }),
+    );
+
+    return { estimations: estimationData, totalCount };
   }
 }

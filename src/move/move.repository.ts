@@ -187,15 +187,6 @@ export class MoveRepository implements IMoveRepository {
     return moveInfo;
   }
 
-  // 견적확정하기 이사정보아이디 조회하기
-  // async findMoveInfoById(moveInfoId: string) {
-  //   return this.moveInfo.findUnique({
-  //     where: {
-  //       id: moveInfoId,
-  //     },
-  //   });
-  // }
-
   async findMoveInfoById(moveInfoId: string): Promise<IMoveInfo | null> {
     const moveInfo = await this.moveInfo.findUnique({
       where: { id: moveInfoId },
@@ -225,5 +216,3 @@ export class MoveRepository implements IMoveRepository {
     });
   }
 }
-// return prisma.moveInfo.update({
-// confirmedFor 이걸 받기..? confirmedForId에 moveinfo아이디 넣기?
