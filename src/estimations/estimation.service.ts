@@ -293,8 +293,6 @@ export class EstimationService implements IEstimationService {
       throw new UnauthorizedException();
     }
 
-    // const estimation = await this.estimationRepository.findByEstimationId(estimationId);
-
     const estimation = await this.estimationRepository.findEstimationDetail(estimationId);
     const driver = await this.driversService.findDriver(estimation.driverId);
     const isLiked = await this.driversService.isLikedDriver(estimation.driverId);
@@ -317,10 +315,10 @@ export class EstimationService implements IEstimationService {
         serviceType: estimation.moveInfo?.serviceType,
         fromAddress: estimation.moveInfo.fromAddress,
         toAddress: estimation.moveInfo.toAddress,
-        progress: estimation.moveInfo.progress, // 진행 상태
+        progress: estimation.moveInfo.progress,
       },
       estimation: {
-        comment: estimation.comment, // 견적 코멘트
+        comment: estimation.comment,
         id: estimation.id,
         price: estimation.price,
       },
