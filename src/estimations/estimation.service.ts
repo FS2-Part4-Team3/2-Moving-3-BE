@@ -246,4 +246,17 @@ export class EstimationService implements IEstimationService {
     );
     return { estimations: result, totalCount };
   }
+
+  // 견적 상세 조회 - 유저
+  async getUserEstimationDetail(estimationId: string) {
+    const { userId } = this.als.getStore(); // 유저 ID 가져오기
+    if (!userId) {
+      throw new UnauthorizedException();
+    }
+
+    const estimation = await this.estimationRepository.findEstimationDetail(estimationId, userId);
+    if (!estimation) {
+      // throw new NotFoundException('견적을 찾을 수 없습니다.');
+    }
+  }
 }

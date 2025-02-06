@@ -154,8 +154,9 @@ export class UserEstimationListWithCountDTO {
 }
 
 class DriveList {
-  @ApiProperty({ description: '드라이버 프로필 사진', type: Boolean })
-  image: Boolean; // 이미지 없으면 "image": null,
+  @ApiProperty({ description: '드라이버 프로필 이미지', type: String, nullable: true })
+  @IsOptional()
+  image?: string;
 
   @ApiProperty({ description: '드라이버 이름', type: String })
   name: string;
