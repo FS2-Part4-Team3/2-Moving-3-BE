@@ -342,19 +342,14 @@ export class EstimationService implements IEstimationService {
     }
 
     const { page, pageSize } = options;
-    console.log('~~~~~~~~~~~~~~~driverId:', driverId);
-    console.log('~~~~~~~~~~~~~~~~~~~Pagination:', { page, pageSize });
 
     const estimations = await this.estimationRepository.findRejectedEstimationsByDriverId(driverId, page, pageSize);
-    console.log('#############################:', estimations);
 
     if (!estimations || estimations.length === 0) {
-      console.log('########################### No rejected.');
       return { estimations: [], totalCount: 0 };
     }
 
     const totalCount = await this.estimationRepository.countRejectedEstimationsByDriverId(driverId);
-    console.log('~~~~~~~~~#####################~~~~~~~~~~~~~', totalCount);
 
     const estimationData = estimations.map(estimation => ({
       moveInfo: {
