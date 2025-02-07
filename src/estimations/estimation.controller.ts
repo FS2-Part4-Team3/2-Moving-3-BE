@@ -4,6 +4,7 @@ import {
   DriverEstimationsListDTO,
   EstimationInputDTO,
   EstimationOutputDTO,
+  RejectedEstimationsListDTO,
   ReviewableListDTO,
   ReviewableListResponseDTO,
   UserEstimationDetailDTO,
@@ -15,7 +16,13 @@ import { QuestionService } from '#questions/question.service.js';
 import { QuestionListDTO, QuestionPostDTO } from '#questions/types/question.dto.js';
 import { QuestionEntity } from '#questions/types/question.types.js';
 import { SortOrder } from '#types/options.type.js';
-import { DriverEstimationsGetQueries, EstimationGetQueries, GetQueries, ReviewableGetQueries } from '#types/queries.type.js';
+import {
+  DriverEstimationsGetQueries,
+  DriverRejectedEstimations,
+  EstimationGetQueries,
+  GetQueries,
+  ReviewableGetQueries,
+} from '#types/queries.type.js';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags, getSchemaPath } from '@nestjs/swagger';
 import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards, ValidationPipe } from '@nestjs/common';
 
@@ -137,5 +144,20 @@ export class EstimationController implements IEstimationController {
     const question = await this.questionService.createQuestion(id, body);
 
     return question;
+  }
+
+  @Get('rejected')
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth('accessToken')
+  @ApiOperation({ summary: '드라이버 - 반려 견적 조회' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: RejectedEstimationsListDTO,
+  })
+  async getRejectedRequests(@Query() query: DriverRejectedEstimations) {
+    const { page = 1, pageSize = 10 } = query;
+    const options = { page, pageSize };
+    const estimations = await this.estimationService.getRejectedEstimations(options);
+    return estimations;
   }
 }

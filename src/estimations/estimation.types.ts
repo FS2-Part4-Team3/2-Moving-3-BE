@@ -236,7 +236,7 @@ class MoveInfoDetail {
   date: Date;
 
   @ApiProperty({ description: '서비스 타입', type: String })
-  serviceType: string; // ServiceType이 제대로 정의되어 있다면 그 타입으로 사용
+  serviceType: ServiceType;
 
   @ApiProperty({ description: '출발지', type: String })
   fromAddress: string;
@@ -274,4 +274,33 @@ export class UserEstimationDetailDTO {
   @IsOptional()
   @ApiProperty({ description: '지정 견적 요청 상태', enum: ['Active', 'Inactive'] })
   designatedRequest: IsActivate; //'Active': 지정 요청 견적, 'Inactive': 일반 견적
+}
+
+class RejectMoveInfo {
+  @ApiProperty({ description: '이사 날짜', type: String, format: 'date-time' })
+  date: Date;
+
+  @ApiProperty({ description: '서비스 타입', type: String })
+  serviceType: ServiceType;
+
+  @ApiProperty({ description: '출발지', type: String })
+  fromAddress: string;
+
+  @ApiProperty({ description: '도착지', type: String })
+  toAddress: string;
+}
+
+class RejectEstimation {
+  @ApiProperty({ description: '견적 ID', type: String })
+  id: string;
+}
+export class RejectedEstimationsListDTO {
+  @ApiProperty({ description: '이사 정보', type: RejectMoveInfo })
+  moveInfo: RejectMoveInfo;
+
+  @ApiProperty({ description: '고객 정보', type: UserList })
+  user: UserList;
+
+  @ApiProperty({ description: '견적 정보', type: RejectEstimation })
+  estimation: RejectEstimation;
 }

@@ -7,6 +7,7 @@ import {
   UserEstimationListWithCountDTO,
   DriverEstimationsListDTO,
   UserEstimationDetailDTO,
+  RejectedEstimationsListDTO,
 } from '#estimations/estimation.types.js';
 import { Injectable, Options } from '@nestjs/common';
 import { IStorage } from '#types/common.types.js';
@@ -21,7 +22,12 @@ import { MoveInfoNotFoundException } from '#move/move.exception.js';
 import { DriverService } from '#drivers/driver.service.js';
 import { UnauthorizedException } from '#exceptions/http.exception.js';
 import { IsActivate, OffsetPaginationOptions } from '#types/options.type.js';
-import { DriverEstimationsGetQueries, ReviewableGetQueries } from '#types/queries.type.js';
+import {
+  DriverEstimationsGetQueries,
+  DriverRejectedEstimations,
+  EstimationGetQueries,
+  ReviewableGetQueries,
+} from '#types/queries.type.js';
 
 @Injectable()
 export class EstimationService implements IEstimationService {
@@ -113,7 +119,7 @@ export class EstimationService implements IEstimationService {
   }
 
   // 견적 목록 조회
-  async getUserEstimationList(options: OffsetPaginationOptions): Promise<UserEstimationListWithCountDTO> {
+  async getUserEstimationList(options: EstimationGetQueries): Promise<UserEstimationListWithCountDTO> {
     const { userId } = this.als.getStore(); // 유저 ID 가져오기
     if (!userId) {
       throw new UnauthorizedException();
@@ -324,5 +330,48 @@ export class EstimationService implements IEstimationService {
       },
       designatedRequest,
     };
+  }
+
+  // 드라이버 반려 견적 조회
+  async getRejectedEstimations(
+    options: DriverRejectedEstimations,
+  ): Promise<{ estimations: RejectedEstimationsListDTO[]; totalCount: number }> {
+    const { driverId } = this.als.getStore();
+    if (!driverId) {
+      throw new UnauthorizedException();
+    }
+
+    const { page, pageSize } = options;
+    console.log('~~~~~~~~~~~~~~~driverId:', driverId);
+    console.log('~~~~~~~~~~~~~~~~~~~Pagination:', { page, pageSize });
+
+    const estimations = await this.estimationRepository.findRejectedEstimationsByDriverId(driverId, page, pageSize);
+    console.log('#############################:', estimations);
+
+    if (!estimations || estimations.length === 0) {
+      console.log('########################### No rejected.');
+      return { estimations: [], totalCount: 0 };
+    }
+
+    const totalCount = await this.estimationRepository.countRejectedEstimationsByDriverId(driverId);
+    console.log('~~~~~~~~~#####################~~~~~~~~~~~~~', totalCount);
+
+    const estimationData = estimations.map(estimation => ({
+      moveInfo: {
+        date: estimation.moveInfo.date,
+        serviceType: estimation.moveInfo.serviceType,
+        fromAddress: estimation.moveInfo.fromAddress,
+        toAddress: estimation.moveInfo.toAddress,
+        createdAt: estimation.moveInfo.createdAt,
+      },
+      user: {
+        name: estimation.moveInfo.owner.name,
+      },
+      estimationInfo: {
+        estimationId: estimation.id,
+      },
+    }));
+
+    return { estimations: estimationData, totalCount };
   }
 }
