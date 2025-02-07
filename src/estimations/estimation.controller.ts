@@ -1,6 +1,7 @@
 import { DriverService } from '#drivers/driver.service.js';
 import { EstimationService } from '#estimations/estimation.service.js';
 import {
+  DriverEstimationDetailDTO,
   DriverEstimationsListDTO,
   EstimationInputDTO,
   EstimationOutputDTO,
@@ -95,6 +96,20 @@ export class EstimationController implements IEstimationController {
     const options = { page, pageSize };
     const estimations = await this.estimationService.getDriverEstimations(options);
     return estimations;
+  }
+
+  @Get('driver/:estimationId')
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth('accessToken')
+  @ApiOperation({ summary: '드라이버 - 견적 상세 조회' })
+  @ApiParam({ name: 'estimationId', description: '견적 ID', type: 'string' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: DriverEstimationDetailDTO,
+  })
+  async getDriverEstimationDetail(@Param('estimationId') estimationId: string) {
+    const estimation = await this.estimationService.getDriverEstimationDetail(estimationId);
+    return estimation;
   }
 
   @Post(':moveInfoId')

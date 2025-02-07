@@ -8,6 +8,7 @@ import {
   DriverEstimationsListDTO,
   UserEstimationDetailDTO,
   RejectedEstimationsListDTO,
+  DriverEstimationDetailDTO,
 } from '#estimations/estimation.types.js';
 import { Injectable, Options } from '@nestjs/common';
 import { IStorage } from '#types/common.types.js';
@@ -15,7 +16,7 @@ import { AsyncLocalStorage } from 'async_hooks';
 import { MoveRepository } from '#move/move.repository.js';
 import { RequestRepository } from '#requests/request.repository.js';
 import { IMoveInfo } from '#move/types/move.types.js';
-import { EstimateAlreadyExistsException } from './estimation.exception.js';
+import { EstimateAlreadyExistsException, EstimationAccessForbiddenException } from './estimation.exception.js';
 import { RequestRejectedException } from './estimation.exception.js';
 import { DriverNotFoundException, DriverUnauthorizedException } from '#drivers/driver.exception.js';
 import { MoveInfoNotFoundException } from '#move/move.exception.js';
@@ -121,6 +122,7 @@ export class EstimationService implements IEstimationService {
   // 견적 목록 조회
   async getUserEstimationList(options: EstimationGetQueries): Promise<UserEstimationListWithCountDTO> {
     const { userId } = this.als.getStore(); // 유저 ID 가져오기
+
     if (!userId) {
       throw new UnauthorizedException();
     }
@@ -208,16 +210,16 @@ export class EstimationService implements IEstimationService {
   async getReviewableEstimations(
     options: ReviewableGetQueries,
   ): Promise<{ estimations: ReviewableListDTO[]; totalCount: number }> {
-    const { userId } = this.als.getStore(); // 유저 ID 가져오기
+    const { userId } = this.als.getStore();
     if (!userId) {
-      throw new UnauthorizedException(); // 유저 ID가 없을 경우 예외 처리
+      throw new UnauthorizedException();
     }
 
     const { page, pageSize } = options;
     const moveInfos = await this.estimationRepository.getUserMoveInfos(userId);
 
     if (moveInfos.length === 0) {
-      throw new MoveInfoNotFoundException(); // 이사 정보가 없을 경우 예외 처리
+      throw new MoveInfoNotFoundException();
     }
 
     const moveInfoIds = moveInfos.map(info => info.id);
@@ -245,7 +247,7 @@ export class EstimationService implements IEstimationService {
             estimationId: estimation.id,
             price: estimation.price,
           },
-          designatedRequest, // 지정견적요청유무 추가
+          designatedRequest,
         };
       }),
     );
@@ -256,7 +258,7 @@ export class EstimationService implements IEstimationService {
   async getDriverEstimations(
     options: DriverEstimationsGetQueries,
   ): Promise<{ estimations: DriverEstimationsListDTO[]; totalCount: number }> {
-    const { driverId } = this.als.getStore(); // 드라이버 ID 가져오기
+    const { driverId } = this.als.getStore();
     if (!driverId) {
       throw new UnauthorizedException();
     }
@@ -294,7 +296,7 @@ export class EstimationService implements IEstimationService {
 
   // 견적 상세 조회 - 유저
   async getUserEstimationDetail(estimationId: string): Promise<UserEstimationDetailDTO> {
-    const { userId } = this.als.getStore(); // 유저 ID 가져오기
+    const { userId } = this.als.getStore();
     if (!userId) {
       throw new UnauthorizedException();
     }
@@ -332,6 +334,38 @@ export class EstimationService implements IEstimationService {
     };
   }
 
+  // 견적 상세 조회 - 드라이버
+  async getDriverEstimationDetail(estimationId: string): Promise<DriverEstimationDetailDTO> {
+    const { driverId } = this.als.getStore();
+    if (!driverId) {
+      throw new UnauthorizedException();
+    }
+    const estimation = await this.estimationRepository.findEstimationDriverDetail(estimationId);
+
+    if (estimation.driverId !== driverId) {
+      throw new EstimationAccessForbiddenException();
+    }
+
+    const designatedRequest = await this.estimationRepository.findDesignatedStatus(estimation.moveInfoId, estimation.driverId);
+
+    return {
+      user: {
+        name: estimation.moveInfo.owner.name,
+      },
+      estimationInfo: {
+        estimationId: estimation.id,
+        price: estimation.price,
+      },
+      moveInfo: {
+        createdAt: estimation.moveInfo.createdAt,
+        date: estimation.moveInfo.date,
+        serviceType: estimation.moveInfo.serviceType,
+        fromAddress: estimation.moveInfo.fromAddress,
+        toAddress: estimation.moveInfo.toAddress,
+      },
+      designatedRequest,
+    };
+  }
   // 드라이버 반려 견적 조회
   async getRejectedEstimations(
     options: DriverRejectedEstimations,

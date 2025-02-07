@@ -102,7 +102,7 @@ class DriverDTO {
   applyCount: number;
 
   @ApiProperty({ description: '드라이버 찜 여부', type: Boolean })
-  likedUsers: boolean; // 유저가 찜했으면 true, 안했으면 false
+  likedUsers: boolean;
 
   @ApiProperty({ description: '찜 숫자', type: Number })
   likeCount: number;
@@ -191,7 +191,7 @@ export class ReviewableListDTO {
 
   @IsOptional()
   @ApiProperty({ description: '지정 견적 요청 상태', enum: ['Active', 'Inactive'] })
-  designatedRequest: IsActivate; // 'Active': 지정 요청 견적, 'Inactive': 일반 견적
+  designatedRequest: IsActivate;
 }
 
 //리뷰 목록 조회
@@ -245,7 +245,7 @@ class MoveInfoDetail {
   toAddress: string;
 
   @ApiProperty({ description: '이사정보 상태', type: String })
-  progress: string; // progress 타입을 맞추세요
+  progress: string;
 }
 
 class EstimationDetail {
@@ -273,7 +273,39 @@ export class UserEstimationDetailDTO {
 
   @IsOptional()
   @ApiProperty({ description: '지정 견적 요청 상태', enum: ['Active', 'Inactive'] })
-  designatedRequest: IsActivate; //'Active': 지정 요청 견적, 'Inactive': 일반 견적
+  designatedRequest: IsActivate;
+}
+
+class DriverMoveInfoDetail {
+  @ApiProperty({ description: '작성 날짜', type: String, format: 'date-time' })
+  createdAt: Date;
+
+  @ApiProperty({ description: '이사 날짜', type: String, format: 'date-time' })
+  date: Date;
+
+  @ApiProperty({ description: '서비스 타입', type: String })
+  serviceType: ServiceType;
+
+  @ApiProperty({ description: '출발지', type: String })
+  fromAddress: string;
+
+  @ApiProperty({ description: '도착지', type: String })
+  toAddress: string;
+}
+//견적 상세 조회
+export class DriverEstimationDetailDTO {
+  @ApiProperty({ description: '고객 정보', type: UserList })
+  user: UserList;
+
+  @ApiProperty({ description: '견적 정보', type: EstimationInfoList })
+  estimationInfo: EstimationInfoList;
+
+  @ApiProperty({ description: '이사 정보', type: DriverMoveInfoDetail })
+  moveInfo: DriverMoveInfoDetail;
+
+  @IsOptional()
+  @ApiProperty({ description: '지정 견적 요청 상태', enum: ['Active', 'Inactive'] })
+  designatedRequest: IsActivate;
 }
 
 class RejectMoveInfo {
