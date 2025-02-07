@@ -209,7 +209,7 @@ export class EstimationRepository implements IEstimationRepository {
     return this.estimation.count({
       where: {
         driverId,
-        price: { not: null }, // 가격이 없는 견적 제외
+        price: { not: null },
       },
     });
   }
@@ -322,8 +322,8 @@ export class EstimationRepository implements IEstimationRepository {
 
     return request ? IsActivate.Active : IsActivate.Inactive;
   }
-
-  // 드라이버 견적 상세 조회
+  
+    // 드라이버 견적 상세 조회
   async findEstimationDriverDetail(estimationId: string) {
     return this.prisma.estimation.findUnique({
       where: { id: estimationId },
@@ -333,6 +333,30 @@ export class EstimationRepository implements IEstimationRepository {
             owner: true,
           },
         },
+      },
+    });
+  }
+  
+   // 드라이버 반려 견적 조회
+  async findRejectedEstimationsByDriverId(driverId: string, page: number, pageSize: number) {
+    return this.estimation.findMany({
+      where: {
+        driverId,
+        price: null, // price가 없는게 → 반려된 견적
+      },
+      include: { moveInfo: { include: { owner: true } } },
+      orderBy: { createdAt: 'desc' },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    });
+  }
+
+  // 드라이버 반려 견적 토탈 카운트
+  async countRejectedEstimationsByDriverId(driverId: string): Promise<number> {
+    return this.estimation.count({
+      where: {
+        driverId,
+        price: null,
       },
     });
   }
