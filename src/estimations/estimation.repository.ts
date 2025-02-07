@@ -311,19 +311,6 @@ export class EstimationRepository implements IEstimationRepository {
     });
   }
 
-  // 유저 견적 상세조회 2
-  async findByEstimationId(estimationId: string) {
-    const estimation = await this.estimation.findUnique({
-      where: { id: estimationId },
-      include: {
-        moveInfo: true,
-        driver: true,
-      },
-    });
-
-    return estimation;
-  }
-
   // 유저 견적 상세 조회 지정요청 여부
   async findDesignatedStatus(moveInfoId: string, driverId: string): Promise<IsActivate> {
     const request = await this.prisma.request.findFirst({
