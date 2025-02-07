@@ -6,6 +6,7 @@ import {
   ReviewableListDTO,
   UserEstimationListWithCountDTO,
   DriverEstimationsListDTO,
+  UserEstimationDetailDTO,
 } from '#estimations/estimation.types.js';
 import { Injectable, Options } from '@nestjs/common';
 import { IStorage } from '#types/common.types.js';
@@ -13,7 +14,7 @@ import { AsyncLocalStorage } from 'async_hooks';
 import { MoveRepository } from '#move/move.repository.js';
 import { RequestRepository } from '#requests/request.repository.js';
 import { IMoveInfo } from '#move/types/move.types.js';
-import { EstimateAlreadyExistsException, MoveRequestNotFoundException } from './estimation.exception.js';
+import { EstimateAlreadyExistsException } from './estimation.exception.js';
 import { RequestRejectedException } from './estimation.exception.js';
 import { DriverNotFoundException, DriverUnauthorizedException } from '#drivers/driver.exception.js';
 import { MoveInfoNotFoundException } from '#move/move.exception.js';
@@ -121,7 +122,6 @@ export class EstimationService implements IEstimationService {
 
     const { estimations: generalEstimations, totalCount: generalTotalCount } =
       await this.estimationRepository.findEstimationsByUserId(userId, page, pageSize);
-
 
     const { estimations: specificEstimations, totalCount: specificTotalCount } =
       await this.estimationRepository.findSpecificEstimations(userId, page, pageSize);
@@ -284,5 +284,45 @@ export class EstimationService implements IEstimationService {
     );
 
     return { estimations: estimationData, totalCount };
+  }
+
+  // 견적 상세 조회 - 유저
+  async getUserEstimationDetail(estimationId: string): Promise<UserEstimationDetailDTO> {
+    const { userId } = this.als.getStore(); // 유저 ID 가져오기
+    if (!userId) {
+      throw new UnauthorizedException();
+    }
+
+    const estimation = await this.estimationRepository.findEstimationDetail(estimationId);
+    const driver = await this.driversService.findDriver(estimation.driverId);
+    const isLiked = await this.driversService.isLikedDriver(estimation.driverId);
+    const designatedRequest = await this.estimationRepository.findDesignatedStatus(estimation.moveInfoId, estimation.driverId);
+
+    return {
+      driver: {
+        image: driver.image,
+        name: driver.name,
+        rating: driver.rating,
+        reviewCount: driver.reviewCount,
+        career: driver.career,
+        applyCount: driver.applyCount,
+        likedUsers: isLiked,
+        likeCount: driver.likeCount,
+      },
+      moveInfo: {
+        createdAt: estimation.moveInfo.createdAt,
+        date: estimation.moveInfo?.date ?? null,
+        serviceType: estimation.moveInfo?.serviceType,
+        fromAddress: estimation.moveInfo.fromAddress,
+        toAddress: estimation.moveInfo.toAddress,
+        progress: estimation.moveInfo.progress,
+      },
+      estimation: {
+        comment: estimation.comment,
+        id: estimation.id,
+        price: estimation.price,
+      },
+      designatedRequest,
+    };
   }
 }

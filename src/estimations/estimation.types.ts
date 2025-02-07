@@ -82,8 +82,9 @@ export class EstimationOutputDTO {
 }
 
 class DriverDTO {
-  @ApiProperty({ description: '드라이버 프로필 사진', type: Boolean })
-  image: Boolean; // 이미지 없으면 "image": null,
+  @ApiProperty({ description: '드라이버 프로필 이미지', type: String, nullable: true })
+  @IsOptional()
+  image?: string;
 
   @ApiProperty({ description: '드라이버 이름', type: String })
   name: string;
@@ -153,8 +154,9 @@ export class UserEstimationListWithCountDTO {
 }
 
 class DriveList {
-  @ApiProperty({ description: '드라이버 프로필 사진', type: Boolean })
-  image: Boolean; // 이미지 없으면 "image": null,
+  @ApiProperty({ description: '드라이버 프로필 이미지', type: String, nullable: true })
+  @IsOptional()
+  image?: string;
 
   @ApiProperty({ description: '드라이버 이름', type: String })
   name: string;
@@ -224,4 +226,52 @@ export class DriverEstimationsListDTO {
 
   @ApiProperty({ description: '이사정보 상태', type: String })
   progress: Progress;
+}
+
+class MoveInfoDetail {
+  @ApiProperty({ description: '작성 날짜', type: String, format: 'date-time' })
+  createdAt: Date;
+
+  @ApiProperty({ description: '이사 날짜', type: String, format: 'date-time' })
+  date: Date;
+
+  @ApiProperty({ description: '서비스 타입', type: String })
+  serviceType: string; // ServiceType이 제대로 정의되어 있다면 그 타입으로 사용
+
+  @ApiProperty({ description: '출발지', type: String })
+  fromAddress: string;
+
+  @ApiProperty({ description: '도착지', type: String })
+  toAddress: string;
+
+  @ApiProperty({ description: '이사정보 상태', type: String })
+  progress: string; // progress 타입을 맞추세요
+}
+
+class EstimationDetail {
+  @IsString()
+  @ApiProperty({ description: '견적 코멘트', type: String })
+  comment: string;
+
+  @ApiProperty({ description: '견적 ID', type: String })
+  id: string;
+
+  @ApiProperty({ description: '견적 가격', type: Number, nullable: true })
+  price?: number;
+}
+
+// 유저 상세조회
+export class UserEstimationDetailDTO {
+  @ApiProperty({ description: '드라이버 정보', type: DriverDTO })
+  driver: DriverDTO;
+
+  @ApiProperty({ description: '이사 정보', type: MoveInfoDetail })
+  moveInfo: MoveInfoDetail;
+
+  @ApiProperty({ description: '견적 정보', type: EstimationDetail })
+  estimation: EstimationDetail;
+
+  @IsOptional()
+  @ApiProperty({ description: '지정 견적 요청 상태', enum: ['Active', 'Inactive'] })
+  designatedRequest: IsActivate; //'Active': 지정 요청 견적, 'Inactive': 일반 견적
 }

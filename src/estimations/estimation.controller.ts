@@ -6,6 +6,7 @@ import {
   EstimationOutputDTO,
   ReviewableListDTO,
   ReviewableListResponseDTO,
+  UserEstimationDetailDTO,
   UserEstimationListWithCountDTO,
 } from '#estimations/estimation.types.js';
 import { IEstimationController } from '#estimations/interfaces/estimation.controller.interface.js';
@@ -58,6 +59,20 @@ export class EstimationController implements IEstimationController {
       estimations,
       totalCount,
     };
+  }
+
+  @Get('user/:estimationId')
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth('accessToken')
+  @ApiOperation({ summary: '유저 - 견적 상세 조회' })
+  @ApiParam({ name: 'estimationId', description: '견적 ID', type: 'string' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: UserEstimationDetailDTO,
+  })
+  async getUserEstimationDetail(@Param('estimationId') estimationId: string) {
+    const estimation = await this.estimationService.getUserEstimationDetail(estimationId);
+    return estimation;
   }
 
   @Get('driver')

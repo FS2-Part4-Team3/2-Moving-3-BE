@@ -1,4 +1,4 @@
-import { EstimationInputDTO, Estimation, IsActivate } from '#estimations/estimation.types.js';
+import { EstimationInputDTO, Estimation, IsActivate, UserEstimationDetailDTO } from '#estimations/estimation.types.js';
 import { IEstimationRepository } from '#estimations/interfaces/estimation.repository.interface.js';
 import { PrismaService } from '#global/prisma.service.js';
 import { FindOptions, SortOrder } from '#types/options.type.js';
@@ -286,5 +286,40 @@ export class EstimationRepository implements IEstimationRepository {
 
     // 지정요청이면 'Active', 일반요청이면 'Inactive'
     return estimation?.moveInfo.requests.length > 0 ? IsActivate.Active : IsActivate.Inactive;
+  }
+
+  // 유저 견적 상세조회
+  async findEstimationDetail(estimationId: string) {
+    return await this.estimation.findUnique({
+      where: { id: estimationId },
+      select: {
+        id: true,
+        price: true,
+        comment: true,
+        createdAt: true,
+        driverId: true,
+        moveInfo: {
+          select: {
+            date: true,
+            serviceType: true,
+            fromAddress: true,
+            toAddress: true,
+            progress: true,
+          },
+        },
+      },
+    });
+  }
+
+  // 유저 견적 상세 조회 지정요청 여부
+  async findDesignatedStatus(moveInfoId: string, driverId: string): Promise<IsActivate> {
+    const request = await this.prisma.request.findFirst({
+      where: {
+        moveInfoId,
+        driverId,
+      },
+    });
+
+    return request ? IsActivate.Active : IsActivate.Inactive;
   }
 }
