@@ -322,4 +322,18 @@ export class EstimationRepository implements IEstimationRepository {
 
     return request ? IsActivate.Active : IsActivate.Inactive;
   }
+
+  // 드라이버 견적 상세 조회
+  async findEstimationDriverDetail(estimationId: string) {
+    return this.prisma.estimation.findUnique({
+      where: { id: estimationId },
+      include: {
+        moveInfo: {
+          include: {
+            owner: true,
+          },
+        },
+      },
+    });
+  }
 }

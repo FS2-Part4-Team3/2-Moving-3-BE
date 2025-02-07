@@ -1,5 +1,5 @@
 import ExceptionMessages from '#exceptions/exception.messages.js';
-import { BadRequestException, NotFoundException } from '#exceptions/http.exception.js';
+import { BadRequestException, ForbiddenException, NotFoundException } from '#exceptions/http.exception.js';
 
 export class EstimationNotFoundException extends NotFoundException {
   constructor() {
@@ -39,5 +39,11 @@ export class MoveRequestNotFoundException extends BadRequestException {
 export class ConfirmedEstimationException extends BadRequestException {
   constructor() {
     super(ExceptionMessages.ESTIMATION_ALREADY_CONFIRMED);
+  }
+}
+
+export class EstimationAccessForbiddenException extends ForbiddenException {
+  constructor() {
+    super(ExceptionMessages.ESTIMATION_ACCESS_FORBIDDEN);
   }
 }
