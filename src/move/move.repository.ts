@@ -159,7 +159,7 @@ export class MoveRepository implements IMoveRepository {
     return list;
   }
 
-  async findByMoveInfoId(moveInfoId: string): Promise<IMoveInfo> {
+  async findByMoveInfoId(moveInfoId: string) {
     const moveInfo = await this.moveInfo.findUnique({
       where: { id: moveInfoId },
       include: {

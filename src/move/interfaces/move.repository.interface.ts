@@ -1,5 +1,4 @@
-import { filterCountDTO, MoveInfo, MoveInfoInputDTO, MoveInfoWithEstimationsDTO } from '#move/move.types.js';
-import { IMoveInfo } from '#move/types/move.types.js';
+import { filterCountDTO, IMoveInfo, MoveInfo, MoveInfoInputDTO, MoveInfoWithEstimationsDTO } from '#move/move.types.js';
 import { OffsetPaginationOptions } from '#types/options.type.js';
 import { MoveInfoGetQueries } from '#types/queries.type.js';
 import { Area } from '@prisma/client';

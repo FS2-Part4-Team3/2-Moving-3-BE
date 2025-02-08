@@ -1,6 +1,5 @@
-import { EstimationOutputDTO } from '#estimations/estimation.types.js';
 import { IRequest } from '#requests/request.types.js';
-import { ModelBase, Progress, ServiceType } from '#types/common.types.js';
+import { ModelBase, Progress, ProgressEnum, ServiceType, ServiceTypeEnum } from '#types/common.types.js';
 import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { $Enums, MoveInfo as PrismaMoveInfo } from '@prisma/client';
 import { IsDate, IsEnum, IsNotEmpty, IsString } from 'class-validator';
@@ -18,11 +17,11 @@ export interface IMoveInfo {
   updatedAt: Date;
   deletedAt?: Date;
 
-  serviceType: ServiceType;
+  serviceType: ServiceTypeEnum;
   date: Date;
   fromAddress: string;
   toAddress: string;
-  progress: Progress;
+  progress: ProgressEnum;
 
   confirmedEstimationId: string;
 
