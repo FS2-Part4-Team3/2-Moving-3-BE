@@ -70,7 +70,7 @@ export class ReviewController implements IReviewController {
     status: HttpStatus.OK,
     type: ReviewOutputDTO,
   })
-  async patchReview(@Param('reviewId') reviewId: string, @Body() body: PatchReviewDTO) {
+  async patchReview(@Param('reviewId') reviewId: string, @Body() body: Partial<PatchReviewDTO>) {
     const review = await this.reviewService.patchReview(reviewId, body);
 
     return review;
