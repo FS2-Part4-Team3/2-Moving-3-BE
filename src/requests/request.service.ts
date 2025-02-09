@@ -76,6 +76,9 @@ export class RequestService implements IRequestService {
   async deleteRequest(requestId: string) {
     const { userId } = this.als.getStore();
     const requestInfo = await this.requestRepository.findById(requestId);
+    if (!requestInfo) {
+      throw new RequestNotFoundException();
+    }
     if (requestInfo.moveInfo.ownerId !== userId) {
       throw new ForbiddenException();
     }

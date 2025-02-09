@@ -26,7 +26,7 @@ export const sensitiveKeys = Object.keys(new SensitiveData());
 
 export type ServiceType = 'SMALL' | 'HOME' | 'OFFICE';
 
-enum ServiceTypeEnum {
+export enum ServiceTypeEnum {
   SMALL = 'SMALL',
   HOME = 'HOME',
   OFFICE = 'OFFICE',
