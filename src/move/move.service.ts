@@ -29,6 +29,7 @@ export class MoveService implements IMoveService {
 
   private async getFilteredDriverData(driverId: string) {
     const driver = await this.driverService.findDriver(driverId);
+    const isliked = await this.driverService.isLikedDriver(driverId);
 
     return {
       id: driver.id,
@@ -39,6 +40,7 @@ export class MoveService implements IMoveService {
       rating: driver.rating,
       reviewCount: driver.reviewCount,
       career: driver.career,
+      isliked: isliked,
     };
   }
 
