@@ -5,7 +5,7 @@ import { FilteredUserOutputDTO } from '#auth/types/filtered.user.dto.js';
 import { GoogleAuthType, KakaoAuthType, NaverAuthType } from '#auth/types/provider.types.js';
 import { SignInDTO, SignUpDTO } from '#auth/types/sign.dto.js';
 import { UpdatePasswordDTO } from '#auth/types/update-password.dto.js';
-import { BadRequestException } from '#exceptions/http.exception.js';
+import { BadRequestException, UnauthorizedException } from '#exceptions/http.exception.js';
 import { EnumValidationPipe } from '#global/pipes/enum.validation.pipe.js';
 import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { HashPasswordGuard } from '#guards/hash-password.guard.js';
@@ -27,6 +27,17 @@ import { Response } from 'express';
 @Controller('auth')
 export class AuthController implements IAuthController {
   constructor(private readonly authService: AuthService) {}
+
+  private setAccessToken(res: Response, token: string) {
+    const maxAge = token ? 1000 * 60 * 60 : 0;
+
+    res.cookie('accessToken', token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge,
+    });
+  }
 
   private setRefreshToken(res: Response, token: string) {
     const maxAge = token ? 1000 * 60 * 60 * 24 * 14 : 0;
@@ -133,6 +144,21 @@ export class AuthController implements IAuthController {
     const person = await this.authService.getMe();
 
     return person;
+  }
+
+  @Get('isLoggedIn')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: '로그인 상태 조회' })
+  @ApiResponse({ status: HttpStatus.NO_CONTENT, description: '로그인 상태' })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: '비로그인 상태' })
+  async isLoggedIn(@Req() req) {
+    const accessToken = req.cookies['accessToken'];
+
+    if (!accessToken) {
+      throw new UnauthorizedException('로그인 상태가 아닙니다.');
+    }
+
+    return;
   }
 
   @Post('refresh')
