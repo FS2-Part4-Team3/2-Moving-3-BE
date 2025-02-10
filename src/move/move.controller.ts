@@ -9,7 +9,6 @@ import {
   MoveInfo,
   MoveInfoInputDTO,
   MoveInfoResponseDTO,
-  MoveInfoWithEstimationsDTO,
   MoveInfoWithEstimationsResponseDTO,
   MoveInputDTO,
   MovePatchInputDTO,
