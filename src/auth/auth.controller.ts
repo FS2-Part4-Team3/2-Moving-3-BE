@@ -127,6 +127,7 @@ export class AuthController implements IAuthController {
     status: HttpStatus.NO_CONTENT,
   })
   async signOut(@Res({ passthrough: true }) response: Response) {
+    this.setAccessToken(response, '');
     this.setRefreshToken(response, '');
   }
 
