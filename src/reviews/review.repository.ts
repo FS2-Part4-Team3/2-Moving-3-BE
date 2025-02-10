@@ -2,6 +2,7 @@ import { PrismaService } from '#global/prisma.service.js';
 import { IReviewRepository } from '#reviews/interfaces/review.repository.interface.js';
 import { CreateReviewDTO, PatchReviewDTO } from '#reviews/review.types.js';
 import { FindOptions, SortOrder } from '#types/options.type.js';
+import { GetQueries } from '#types/queries.type.js';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
@@ -17,9 +18,11 @@ export class ReviewRepository implements IReviewRepository {
       _avg: { score: true },
     });
 
+    const newRating = rating._avg?.score ? Number(rating._avg.score.toFixed(2)) : 0;
+
     await tx.driver.update({
       where: { id: driverId },
-      data: { rating: Number(rating._avg.score.toFixed(2)) || 0 },
+      data: { rating: newRating },
     });
   }
 
@@ -30,7 +33,7 @@ export class ReviewRepository implements IReviewRepository {
     return totalCount;
   }
 
-  async findManyMyReviews(userId: string, options: FindOptions) {
+  async findManyMyReviews(userId: string, options: GetQueries) {
     const { page, pageSize, orderBy } = options;
 
     const sort = orderBy === SortOrder.Recent ? { createdAt: 'desc' } : { createdAt: 'asc' };
@@ -82,7 +85,7 @@ export class ReviewRepository implements IReviewRepository {
     return addedList;
   }
 
-  async findManyDriverReviews(driverId: string, options: FindOptions) {
+  async findManyDriverReviews(driverId: string, options: GetQueries) {
     const { page, pageSize, orderBy } = options;
 
     const sort = orderBy === SortOrder.Recent ? { createdAt: 'desc' } : { createdAt: 'asc' };
@@ -138,7 +141,7 @@ export class ReviewRepository implements IReviewRepository {
     return review;
   }
 
-  async update(id: string, data: PatchReviewDTO) {
+  async update(id: string, data: Partial<PatchReviewDTO>) {
     const review = await this.prisma.$transaction(async tx => {
       const review = await tx.review.update({
         where: { id },
