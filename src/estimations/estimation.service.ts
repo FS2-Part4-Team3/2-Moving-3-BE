@@ -267,7 +267,6 @@ export class EstimationService implements IEstimationService {
 
     const estimation = await this.estimationRepository.findEstimationDetail(estimationId);
     const driver = await this.driversService.findDriver(estimation.driverId);
-    const isLiked = await this.driversService.isLikedDriver(estimation.driverId);
     const designatedRequest = await this.estimationRepository.findDesignatedStatus(estimation.moveInfoId, estimation.driverId);
 
     return {

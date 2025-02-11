@@ -280,11 +280,6 @@ class EstimationDetail {
   price?: number;
 }
 
-class UserEstimation {
-  @ApiProperty({ description: '드라이버 아이디', type: String })
-  driverId: string;
-}
-
 // 유저 상세조회
 export class UserEstimationDetailDTO {
   @ApiProperty({ description: '드라이버 아이디', type: String })
