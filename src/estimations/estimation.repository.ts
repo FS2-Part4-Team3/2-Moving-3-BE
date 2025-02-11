@@ -42,7 +42,7 @@ export class EstimationRepository implements IEstimationRepository {
     return count > 0;
   }
 
-  // 대기중 견적 조회 합치기..?
+  // 대기중 견적 조회
   async findUserEstimations(
     userId: string,
     page: number,
@@ -107,116 +107,6 @@ export class EstimationRepository implements IEstimationRepository {
     });
 
     return { estimations, totalCount };
-  }
-
-  // 일반 견적 조회
-  async findEstimationsByUserId(
-    userId: string,
-    page: number,
-    pageSize: number,
-  ): Promise<{ estimations: Estimation[]; totalCount: number }> {
-    const moveInfos = await this.prisma.moveInfo.findMany({
-      where: { ownerId: userId },
-      select: { id: true },
-    });
-
-    const moveInfoIds = moveInfos.map(info => info.id);
-
-    const totalCount = await this.prisma.estimation.count({
-      where: {
-        moveInfoId: { in: moveInfoIds },
-        moveInfo: {
-          progress: Progress.OPEN,
-          requests: {
-            none: {},
-          },
-        },
-      },
-    });
-
-    const estimations = await this.prisma.estimation.findMany({
-      where: {
-        moveInfoId: { in: moveInfoIds },
-        moveInfo: {
-          progress: Progress.OPEN,
-          requests: {
-            none: {},
-          },
-        },
-      },
-      include: {
-        driver: true,
-        moveInfo: true,
-      },
-      skip: (page - 1) * pageSize,
-      take: pageSize,
-    });
-    return { estimations, totalCount };
-  }
-
-  // 지정 견적 조회
-  async findSpecificEstimations(
-    userId: string,
-    page: number,
-    pageSize: number,
-  ): Promise<{ estimations: Estimation[]; totalCount: number }> {
-    const moveInfos = await this.prisma.moveInfo.findMany({
-      where: { ownerId: userId },
-      select: { id: true },
-    });
-    const moveInfoIds = moveInfos.map(info => info.id);
-
-    const totalCount = await this.prisma.estimation.count({
-      where: {
-        moveInfoId: { in: moveInfoIds },
-        moveInfo: {
-          requests: {
-            some: {
-              status: Status.PENDING,
-            },
-          },
-        },
-      },
-    });
-
-    const estimations = await this.prisma.estimation.findMany({
-      where: {
-        moveInfoId: { in: moveInfoIds },
-        moveInfo: {
-          requests: {
-            some: {
-              status: Status.PENDING,
-            },
-          },
-        },
-      },
-      include: {
-        driver: true,
-        moveInfo: {
-          include: {
-            requests: true,
-          },
-        },
-      },
-      skip: (page - 1) * pageSize,
-      take: pageSize,
-    });
-    return { estimations, totalCount };
-  }
-
-  // 대기중인 견적 목록 토탈 카운트
-  async findTotalCountByUserId(userId: string): Promise<number> {
-    const moveInfos = await this.prisma.moveInfo.findMany({
-      where: { ownerId: userId },
-      select: { id: true },
-    });
-    const moveInfoIds = moveInfos.map(info => info.id);
-
-    return this.prisma.estimation.count({
-      where: {
-        moveInfoId: { in: moveInfoIds },
-      },
-    });
   }
 
   // 리뷰 가능한 견적 목록 토탈 카운트

@@ -165,95 +165,6 @@ export class EstimationService implements IEstimationService {
     return { estimations: estimationsWithInfo, totalCount };
   }
 
-  // // 대기중 견적 목록 조회
-  // async getUserEstimationList(options: EstimationGetQueries): Promise<UserEstimationListWithCountDTO> {
-  //   const { userId } = this.als.getStore(); // 유저 ID 가져오기
-
-  //   if (!userId) {
-  //     throw new UnauthorizedException();
-  //   }
-  //   const { page, pageSize } = options;
-
-  //   const { estimations: generalEstimations, totalCount: generalTotalCount } =
-  //     await this.estimationRepository.findEstimationsByUserId(userId, page, pageSize);
-
-  //   const { estimations: specificEstimations, totalCount: specificTotalCount } =
-  //     await this.estimationRepository.findSpecificEstimations(userId, page, pageSize);
-
-  //   const specificEstimationsWithInfo = await Promise.all(
-  //     specificEstimations.map(async estimation => {
-  //       const driver = await this.driversService.findDriver(estimation.driverId);
-  //       const isLiked = await this.driversService.isLikedDriver(estimation.driverId);
-  //       const moveInfo = await this.moveRepository.findByMoveInfoId(estimation.moveInfoId);
-
-  //       return {
-  //         driver: {
-  //           image: driver.image,
-  //           name: driver.name,
-  //           rating: driver.rating,
-  //           reviewCount: driver.reviewCount,
-  //           career: driver.career,
-  //           applyCount: driver.applyCount,
-  //           likedUsers: isLiked,
-  //           likeCount: driver.likeCount,
-  //         },
-  //         moveInfo: {
-  //           moveInfoId: moveInfo?.moveInfoId,
-  //           date: moveInfo?.date ?? null,
-  //           serviceType: moveInfo?.serviceType,
-  //           fromAddress: moveInfo.fromAddress,
-  //           toAddress: moveInfo.toAddress,
-  //         },
-  //         estimationInfo: {
-  //           estimationId: estimation.id,
-  //           price: estimation.price ?? null,
-  //         },
-  //         designatedRequest: IsActivate.Active, //지정견적
-  //       };
-  //     }),
-  //   );
-
-  //   //일반 견적
-  //   const generalEstimationsWithInfo = await Promise.all(
-  //     generalEstimations.map(async estimation => {
-  //       const driver = await this.driversService.findDriver(estimation.driverId);
-  //       const isLiked = await this.driversService.isLikedDriver(estimation.driverId);
-  //       const moveInfo = await this.moveRepository.findByMoveInfoId(estimation.moveInfoId);
-
-  //       return {
-  //         driver: {
-  //           image: driver.image,
-  //           name: driver.name,
-  //           rating: driver.rating,
-  //           reviewCount: driver.reviewCount,
-  //           career: driver.career,
-  //           applyCount: driver.applyCount,
-  //           likedUsers: isLiked,
-  //           likeCount: driver.likeCount,
-  //         },
-  //         moveInfo: {
-  //           moveInfoId: moveInfo?.moveInfoId,
-  //           date: moveInfo?.date ?? null,
-  //           serviceType: moveInfo?.serviceType,
-  //           fromAddress: moveInfo.fromAddress,
-  //           toAddress: moveInfo.toAddress,
-  //         },
-  //         estimationInfo: {
-  //           estimationId: estimation.id,
-  //           price: estimation.price ?? null,
-  //         },
-  //         designatedRequest: IsActivate.Inactive, //일반견적
-  //       };
-  //     }),
-  //   );
-  //   const totalCount = generalTotalCount + specificTotalCount;
-
-  //   return {
-  //     estimations: [...generalEstimationsWithInfo, ...specificEstimationsWithInfo],
-  //     totalCount,
-  //   };
-  // }
-
   // 작성 가능한 리뷰 목록 조회
   async getReviewableEstimations(
     options: ReviewableGetQueries,
@@ -374,7 +285,7 @@ export class EstimationService implements IEstimationService {
         toAddress: estimation.moveInfo.toAddress,
         progress: estimation.moveInfo.progress,
       },
-      estimation: {
+      estimationInfo: {
         comment: estimation.comment,
         id: estimation.id,
         price: estimation.price,

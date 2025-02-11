@@ -272,7 +272,7 @@ export class UserEstimationDetailDTO {
   moveInfo: MoveInfoDetail;
 
   @ApiProperty({ description: '견적 정보', type: EstimationDetail })
-  estimation: EstimationDetail;
+  estimationInfo: EstimationDetail;
 
   @IsOptional()
   @ApiProperty({ description: '지정 견적 요청 상태', enum: ['Active', 'Inactive'] })
@@ -327,7 +327,7 @@ class RejectMoveInfo {
 
 class RejectEstimation {
   @ApiProperty({ description: '견적 ID', type: String })
-  id: string;
+  estimationId: string;
 }
 export class RejectedEstimationsListDTO {
   @ApiProperty({ description: '이사 정보', type: RejectMoveInfo })
@@ -337,5 +337,5 @@ export class RejectedEstimationsListDTO {
   user: UserList;
 
   @ApiProperty({ description: '견적 정보', type: RejectEstimation })
-  estimation: RejectEstimation;
+  estimationInfo: RejectEstimation;
 }
