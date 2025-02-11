@@ -31,8 +31,19 @@ export class EstimationRepository implements IEstimationRepository {
     });
   }
 
-  // 일반 견적 조회
-  async findEstimationsByUserId(
+  // 대기중 지정 여부
+  async isSpecificEstimation(moveInfoId: string): Promise<boolean> {
+    const count = await this.prisma.request.count({
+      where: {
+        moveInfoId: moveInfoId,
+        status: Status.PENDING, // 지정 요청이 있는지 확인
+      },
+    });
+    return count > 0;
+  }
+
+  // 대기중 견적 조회
+  async findUserEstimations(
     userId: string,
     page: number,
     pageSize: number,
@@ -47,82 +58,54 @@ export class EstimationRepository implements IEstimationRepository {
     const totalCount = await this.prisma.estimation.count({
       where: {
         moveInfoId: { in: moveInfoIds },
-        moveInfo: {
-          progress: Progress.OPEN,
-          requests: {
-            none: {},
+        OR: [
+          {
+            moveInfo: {
+              progress: Progress.OPEN,
+              requests: { none: {} },
+            },
           },
-        },
+          {
+            moveInfo: {
+              requests: {
+                some: { status: Status.PENDING },
+              },
+            },
+          },
+        ],
       },
     });
 
     const estimations = await this.prisma.estimation.findMany({
       where: {
         moveInfoId: { in: moveInfoIds },
-        moveInfo: {
-          progress: Progress.OPEN,
-          requests: {
-            none: {},
+        OR: [
+          {
+            moveInfo: {
+              progress: Progress.OPEN,
+              requests: { none: {} },
+            },
           },
-        },
+          {
+            moveInfo: {
+              requests: {
+                some: { status: Status.PENDING },
+              },
+            },
+          },
+        ],
       },
       include: {
         driver: true,
         moveInfo: true,
       },
-      skip: (page - 1) * pageSize,
-      take: pageSize,
-    });
-    return { estimations, totalCount };
-  }
-
-  // 지정 견적 조회
-  async findSpecificEstimations(
-    userId: string,
-    page: number,
-    pageSize: number,
-  ): Promise<{ estimations: Estimation[]; totalCount: number }> {
-    const moveInfos = await this.prisma.moveInfo.findMany({
-      where: { ownerId: userId },
-      select: { id: true },
-    });
-    const moveInfoIds = moveInfos.map(info => info.id);
-
-    const totalCount = await this.prisma.estimation.count({
-      where: {
-        moveInfoId: { in: moveInfoIds },
-        moveInfo: {
-          requests: {
-            some: {
-              status: Status.PENDING,
-            },
-          },
-        },
-      },
-    });
-
-    const estimations = await this.prisma.estimation.findMany({
-      where: {
-        moveInfoId: { in: moveInfoIds },
-        moveInfo: {
-          requests: {
-            some: {
-              status: Status.PENDING,
-            },
-          },
-        },
-      },
-      include: {
-        driver: true,
-        moveInfo: {
-          include: {
-            requests: true,
-          },
-        },
+      orderBy: {
+        createdAt: 'desc',
       },
       skip: (page - 1) * pageSize,
       take: pageSize,
     });
+
     return { estimations, totalCount };
   }
 
@@ -298,6 +281,7 @@ export class EstimationRepository implements IEstimationRepository {
         comment: true,
         createdAt: true,
         driverId: true,
+        moveInfoId: true,
         moveInfo: {
           select: {
             date: true,
@@ -305,6 +289,7 @@ export class EstimationRepository implements IEstimationRepository {
             fromAddress: true,
             toAddress: true,
             progress: true,
+            createdAt: true,
           },
         },
       },
@@ -322,8 +307,8 @@ export class EstimationRepository implements IEstimationRepository {
 
     return request ? IsActivate.Active : IsActivate.Inactive;
   }
-  
-    // 드라이버 견적 상세 조회
+
+  // 드라이버 견적 상세 조회
   async findEstimationDriverDetail(estimationId: string) {
     return this.prisma.estimation.findUnique({
       where: { id: estimationId },
@@ -336,8 +321,8 @@ export class EstimationRepository implements IEstimationRepository {
       },
     });
   }
-  
-   // 드라이버 반려 견적 조회
+
+  // 드라이버 반려 견적 조회
   async findRejectedEstimationsByDriverId(driverId: string, page: number, pageSize: number) {
     return this.estimation.findMany({
       where: {
