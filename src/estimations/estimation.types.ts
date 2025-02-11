@@ -282,41 +282,13 @@ class EstimationDetail {
 
 class UserEstimation {
   @ApiProperty({ description: '드라이버 아이디', type: String })
-  id: string;
-
-  @ApiProperty({ description: '드라이버 프로필 이미지', type: String, nullable: true })
-  @IsOptional()
-  image?: string;
-
-  @ApiProperty({ description: '드라이버 이름', type: String })
-  name: string;
-
-  @ApiProperty({ description: '서비스 타입', type: String })
-  serviceType: string;
-
-  @ApiProperty({ description: '드라이버 별점', type: Number })
-  rating: number;
-
-  @ApiProperty({ description: '드라이버 리뷰 개수', type: Number })
-  reviewCount: number;
-
-  @ApiProperty({ description: '드라이버 경력(연차)', type: Number })
-  career: number;
-
-  @ApiProperty({ description: '확정 건수', type: Number })
-  applyCount: number;
-
-  @ApiProperty({ description: '드라이버 찜 여부', type: Boolean })
-  likedUsers: boolean;
-
-  @ApiProperty({ description: '찜 숫자', type: Number })
-  likeCount: number;
+  driverId: string;
 }
 
 // 유저 상세조회
 export class UserEstimationDetailDTO {
-  @ApiProperty({ description: '드라이버 정보', type: UserEstimation })
-  driver: UserEstimation;
+  @ApiProperty({ description: '드라이버 아이디', type: String })
+  driverId: string;
 
   @ApiProperty({ description: '이사 정보', type: MoveInfoDetail })
   moveInfo: MoveInfoDetail;
