@@ -1,6 +1,6 @@
 import { IReviewService } from '#reviews/interfaces/review.service.interface.js';
 import { IStorage } from '#types/common.types.js';
-import { FindOptions } from '#types/options.type.js';
+
 import { Injectable } from '@nestjs/common';
 import { AsyncLocalStorage } from 'async_hooks';
 import { ReviewRepository } from './review.repository.js';
@@ -8,6 +8,7 @@ import { ReviewBodyDTO, PatchReviewDTO } from './review.types.js';
 import { ForbiddenException } from '#exceptions/http.exception.js';
 import { ReviewAlreadyExistsException, ReviewNotFoundException } from './review.exception.js';
 import { EstimationRepository } from '#estimations/estimation.repository.js';
+import { GetQueries } from '#types/queries.type.js';
 
 @Injectable()
 export class ReviewService implements IReviewService {
@@ -17,8 +18,9 @@ export class ReviewService implements IReviewService {
     private readonly als: AsyncLocalStorage<IStorage>,
   ) {}
 
-  async getMyReviews(options: FindOptions) {
-    const { userId } = this.als.getStore();
+  async getMyReviews(options: GetQueries) {
+    const store = this.als.getStore();
+    const userId = store?.userId;
 
     if (!userId) {
       throw new ForbiddenException();
@@ -30,7 +32,7 @@ export class ReviewService implements IReviewService {
     return { totalCount, list };
   }
 
-  async getDriverReviews(driverId: string, options: FindOptions) {
+  async getDriverReviews(driverId: string, options: GetQueries) {
     const list = await this.reviewRepository.findManyDriverReviews(driverId, options);
     const totalCount = await this.reviewRepository.totalCount(driverId, 'driver');
     const ratingStats = await this.reviewRepository.getDriverRatingStats(driverId);
@@ -49,10 +51,11 @@ export class ReviewService implements IReviewService {
   }
 
   async postReview(estimationId: string, body: ReviewBodyDTO) {
-    const { userId } = this.als.getStore();
+    const store = this.als.getStore();
+    const userId = store?.userId;
     const { comment, score } = body;
 
-    const { driverId, reviews } = await this.estimationRepository.findById(estimationId);
+    const { driverId, reviews = [] } = await this.estimationRepository.findById(estimationId);
     const existingReview = reviews.find(review => review.estimationId === estimationId && review.ownerId === userId);
 
     if (existingReview) {
@@ -66,8 +69,9 @@ export class ReviewService implements IReviewService {
     return review;
   }
 
-  async patchReview(reviewId: string, body: PatchReviewDTO) {
-    const { userId } = this.als.getStore();
+  async patchReview(reviewId: string, body: Partial<PatchReviewDTO>) {
+    const store = this.als.getStore();
+    const userId = store?.userId;
     const reviewInfo = await this.reviewRepository.findByReviewId(reviewId);
     if (!reviewInfo) {
       throw new ReviewNotFoundException();
@@ -82,7 +86,8 @@ export class ReviewService implements IReviewService {
   }
 
   async deleteReview(reviewId: string) {
-    const { userId } = this.als.getStore();
+    const store = this.als.getStore();
+    const userId = store?.userId;
     const reviewInfo = await this.reviewRepository.findByReviewId(reviewId);
     if (!reviewInfo) {
       throw new ReviewNotFoundException();

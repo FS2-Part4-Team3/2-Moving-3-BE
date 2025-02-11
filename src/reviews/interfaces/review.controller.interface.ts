@@ -5,6 +5,6 @@ export interface IReviewController {
   getMyReviews: (options: FindOptions) => Promise<MyReviewResponseDTO>;
   getDriverReviews: (driverId: string, options: FindOptions) => Promise<DriverReviewResponseDTO>;
   postReview: (estimationId: string, body: ReviewBodyDTO) => Promise<IReivew>;
-  patchReview: (reviewId: string, body: PatchReviewDTO) => Promise<IReivew>;
+  patchReview: (reviewId: string, body: Partial<PatchReviewDTO>) => Promise<IReivew>;
   deleteReview: (reviewId: string) => Promise<IReivew>;
 }
