@@ -135,7 +135,6 @@ export class EstimationService implements IEstimationService {
 
         const isSpecific = await this.estimationRepository.isSpecificEstimation(estimation.moveInfoId);
 
-        console.log('moveInfo:', moveInfo);
         return {
           driver: {
             image: driver.image,
