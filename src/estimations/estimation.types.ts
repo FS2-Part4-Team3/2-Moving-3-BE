@@ -179,6 +179,12 @@ class EstimationInfoList {
 
   @ApiProperty({ description: '견적 가격', type: Number, nullable: true })
   price?: number;
+
+  @ApiProperty({ description: '작성 날짜', type: String, format: 'date-time' })
+  createdAt: Date;
+
+  @ApiProperty({ description: '수정 날짜', type: String, format: 'date-time' })
+  updatedAt: Date;
 }
 
 // 리뷰 작성 가능한 목록 조회 DTO

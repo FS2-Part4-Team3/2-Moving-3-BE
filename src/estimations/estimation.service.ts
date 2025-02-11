@@ -205,6 +205,8 @@ export class EstimationService implements IEstimationService {
           estimationInfo: {
             estimationId: estimation.id,
             price: estimation.price,
+            createdAt: estimation.createdAt,
+            updatedAt: estimation.updatedAt,
           },
           designatedRequest,
         };
@@ -234,6 +236,8 @@ export class EstimationService implements IEstimationService {
           estimationInfo: {
             estimationId: estimation.id,
             price: estimation.price,
+            createdAt: estimation.createdAt,
+            updatedAt: estimation.updatedAt,
           },
           moveInfo: {
             moveInfoId: estimation.moveInfo.moveInfoId,
@@ -315,6 +319,8 @@ export class EstimationService implements IEstimationService {
       estimationInfo: {
         estimationId: estimation.id,
         price: estimation.price,
+        createdAt: estimation.createdAt,
+        updatedAt: estimation.updatedAt,
       },
       moveInfo: {
         createdAt: estimation.moveInfo.createdAt,
