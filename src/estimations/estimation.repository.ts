@@ -281,6 +281,7 @@ export class EstimationRepository implements IEstimationRepository {
         comment: true,
         createdAt: true,
         driverId: true,
+        moveInfoId: true,
         moveInfo: {
           select: {
             date: true,
@@ -288,6 +289,7 @@ export class EstimationRepository implements IEstimationRepository {
             fromAddress: true,
             toAddress: true,
             progress: true,
+            createdAt: true,
           },
         },
       },

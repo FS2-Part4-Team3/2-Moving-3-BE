@@ -135,6 +135,7 @@ export class EstimationService implements IEstimationService {
 
         const isSpecific = await this.estimationRepository.isSpecificEstimation(estimation.moveInfoId);
 
+        console.log('moveInfo:', moveInfo);
         return {
           driver: {
             image: driver.image,
@@ -147,7 +148,7 @@ export class EstimationService implements IEstimationService {
             likeCount: driver.likeCount,
           },
           moveInfo: {
-            moveInfoId: moveInfo?.moveInfoId,
+            moveInfoId: estimation.moveInfoId,
             date: moveInfo?.date ?? null,
             serviceType: moveInfo?.serviceType,
             fromAddress: moveInfo.fromAddress,
@@ -240,7 +241,7 @@ export class EstimationService implements IEstimationService {
             updatedAt: estimation.updatedAt,
           },
           moveInfo: {
-            moveInfoId: estimation.moveInfo.moveInfoId,
+            moveInfoId: estimation.moveInfoId,
             date: estimation.moveInfo.date,
             serviceType: estimation.moveInfo.serviceType,
             fromAddress: estimation.moveInfo.fromAddress,
@@ -282,6 +283,7 @@ export class EstimationService implements IEstimationService {
         likeCount: driver.likeCount,
       },
       moveInfo: {
+        moveInfoId: estimation.moveInfoId,
         createdAt: estimation.moveInfo.createdAt,
         date: estimation.moveInfo?.date ?? null,
         serviceType: estimation.moveInfo?.serviceType,

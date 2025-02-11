@@ -246,6 +246,9 @@ export class DriverEstimationsList {
 }
 
 class MoveInfoDetail {
+  @ApiProperty({ description: '이사 정보 ID', type: String })
+  moveInfoId: string;
+
   @ApiProperty({ description: '작성 날짜', type: String, format: 'date-time' })
   createdAt: Date;
 
