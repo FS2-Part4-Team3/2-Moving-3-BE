@@ -152,6 +152,7 @@ export class EstimationService implements IEstimationService {
             likeCount: driver.likeCount,
           },
           moveInfo: {
+            moveInfoId: moveInfo?.moveInfoId,
             date: moveInfo?.date ?? null,
             serviceType: moveInfo?.serviceType,
             fromAddress: moveInfo.fromAddress,
@@ -185,6 +186,7 @@ export class EstimationService implements IEstimationService {
             likeCount: driver.likeCount,
           },
           moveInfo: {
+            moveInfoId: moveInfo?.moveInfoId,
             date: moveInfo?.date ?? null,
             serviceType: moveInfo?.serviceType,
             fromAddress: moveInfo.fromAddress,
@@ -277,6 +279,7 @@ export class EstimationService implements IEstimationService {
             price: estimation.price,
           },
           moveInfo: {
+            moveInfoId: estimation.moveInfo.moveInfoId,
             date: estimation.moveInfo.date,
             serviceType: estimation.moveInfo.serviceType,
             fromAddress: estimation.moveInfo.fromAddress,

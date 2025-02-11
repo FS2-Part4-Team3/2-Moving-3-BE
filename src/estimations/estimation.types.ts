@@ -109,6 +109,9 @@ class DriverDTO {
 }
 
 class MoveInfoDTO {
+  @ApiProperty({ description: '이사 정보 ID', type: String })
+  moveInfoId: string;
+
   @ApiProperty({ description: '이사 날짜', type: String, format: 'date-time' })
   date: Date;
 
