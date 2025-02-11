@@ -98,6 +98,21 @@ export class EstimationController implements IEstimationController {
     return estimations;
   }
 
+  @Get('rejected')
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth('accessToken')
+  @ApiOperation({ summary: '드라이버 - 반려 견적 조회' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: RejectedEstimationsListDTO,
+  })
+  async getRejectedRequests(@Query() query: DriverRejectedEstimations) {
+    const { page = 1, pageSize = 10 } = query;
+    const options = { page, pageSize };
+    const estimations = await this.estimationService.getRejectedEstimations(options);
+    return estimations;
+  }
+
   @Get('driver/:estimationId')
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth('accessToken')
@@ -159,20 +174,5 @@ export class EstimationController implements IEstimationController {
     const question = await this.questionService.createQuestion(id, body);
 
     return question;
-  }
-
-  @Get('rejected')
-  @UseGuards(AccessTokenGuard)
-  @ApiBearerAuth('accessToken')
-  @ApiOperation({ summary: '드라이버 - 반려 견적 조회' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    type: RejectedEstimationsListDTO,
-  })
-  async getRejectedRequests(@Query() query: DriverRejectedEstimations) {
-    const { page = 1, pageSize = 10 } = query;
-    const options = { page, pageSize };
-    const estimations = await this.estimationService.getRejectedEstimations(options);
-    return estimations;
   }
 }
