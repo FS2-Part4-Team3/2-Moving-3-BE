@@ -237,6 +237,14 @@ export class DriverEstimationsListDTO {
   progress: Progress;
 }
 
+export class DriverEstimationsList {
+  @ApiProperty({ description: '견적 정보', type: [DriverEstimationsListDTO] })
+  estimations: DriverEstimationsListDTO[];
+
+  @ApiProperty({ description: '총 견적 개수', type: Number })
+  totalCount: number;
+}
+
 class MoveInfoDetail {
   @ApiProperty({ description: '작성 날짜', type: String, format: 'date-time' })
   createdAt: Date;

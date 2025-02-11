@@ -2,6 +2,7 @@ import { DriverService } from '#drivers/driver.service.js';
 import { EstimationService } from '#estimations/estimation.service.js';
 import {
   DriverEstimationDetailDTO,
+  DriverEstimationsList,
   DriverEstimationsListDTO,
   EstimationInputDTO,
   EstimationOutputDTO,
@@ -89,7 +90,7 @@ export class EstimationController implements IEstimationController {
   @ApiOperation({ summary: '드라이버 - 보낸 견적 조회' })
   @ApiResponse({
     status: HttpStatus.OK,
-    type: DriverEstimationsListDTO,
+    type: DriverEstimationsList,
   })
   async getDriverEstimations(@Query() query: DriverEstimationsGetQueries) {
     const { page = 1, pageSize = 10 } = query;
