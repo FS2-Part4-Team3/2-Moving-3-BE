@@ -272,8 +272,10 @@ export class EstimationService implements IEstimationService {
 
     return {
       driver: {
+        id: driver.id,
         image: driver.image,
         name: driver.name,
+        serviceType: driver.serviceType,
         rating: driver.rating,
         reviewCount: driver.reviewCount,
         career: driver.career,
