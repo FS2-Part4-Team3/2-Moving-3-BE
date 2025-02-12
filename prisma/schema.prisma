@@ -72,7 +72,7 @@ model Driver {
   likedUsers      User[]
   questions       Question[]
   notifications   Notification[]
-  aiReviewSummary AIReviewSummary?
+  aiReviewSummary aiReviewSummary?
 }
 
 model MoveInfo {
@@ -206,7 +206,7 @@ model Notification {
   @@index([createdAt])
 }
 
-model AIReviewSummary {
+model aiReviewSummary {
   id        String    @id @default(uuid())
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -234,7 +234,7 @@ enum Area {
   SEOUL
   GYEONGGI
   INCHEON
-  GAGNWON
+  GANGWON
   CHUNGBUK
   CHUNGNAM
   SEJONG
