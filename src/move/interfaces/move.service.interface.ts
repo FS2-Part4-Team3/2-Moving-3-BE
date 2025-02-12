@@ -1,6 +1,8 @@
 import {
   filterCountDTO,
+  IsMoveInfoEditableDTO,
   MoveInfo,
+  MoveInfoIdDTO,
   MoveInfoInputDTO,
   MoveInfoWithEstimationsDTO,
   MoveInfoWithEstimationsResponseDTO,
@@ -10,8 +12,10 @@ import { MoveInfoGetQueries, moveInfoWithEstimationsGetQueries } from '#types/qu
 export interface IMoveService {
   getMoveInfos: (options: MoveInfoGetQueries) => Promise<{ totalCount: number; counts: filterCountDTO; list: MoveInfo[] }>;
   getMoveInfo: (moveInfoId: string) => Promise<MoveInfo>;
+  getUserMoveInfoId: () => Promise<MoveInfoIdDTO>;
   checkMoveInfoExistence: () => Promise<MoveInfo[]>;
+  getIsMoveInfoEditable: (moveInfoId: string) => Promise<IsMoveInfoEditableDTO>;
   getReceivedEstimations: (options: moveInfoWithEstimationsGetQueries) => Promise<MoveInfoWithEstimationsResponseDTO>;
   postMoveInfo: (moveData: MoveInfoInputDTO) => Promise<MoveInfo>;
-  patchMoveInfo: (moveId: string, body: Partial<MoveInfoInputDTO>) => Promise<MoveInfo>;
+  patchMoveInfo: (moveInfoId: string, body: Partial<MoveInfoInputDTO>) => Promise<MoveInfo>;
 }

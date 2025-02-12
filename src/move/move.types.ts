@@ -44,6 +44,11 @@ export interface IEstimation {
   confirmedForId: string;
 }
 
+export class MoveInfoIdDTO {
+  @ApiProperty({ description: '이사정보 ID', type: String })
+  id: string;
+}
+
 export class MoveInputDTO {
   @IsEnum($Enums.ServiceType, { message: '서비스 타입이 유효하지 않습니다.' })
   @IsNotEmpty({ message: '서비스 타입을 선택해주세요.' })
@@ -229,4 +234,9 @@ export class MoveInfoWithEstimationsResponseDTO {
 
   @ApiProperty({ description: '이사 정보 목록', type: [MoveInfoWithEstimationsDTO] })
   list: MoveInfoWithEstimationsDTO[];
+}
+
+export class IsMoveInfoEditableDTO {
+  @ApiProperty({ description: '이사정보 변경(수정, 삭제) 가능여부', type: Boolean })
+  isMoveInfoEditable: Boolean;
 }
