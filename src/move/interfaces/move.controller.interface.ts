@@ -1,5 +1,6 @@
 import {
   filterCountDTO,
+  IsMoveInfoEditableDTO,
   MoveInfo,
   MoveInfoIdDTO,
   MoveInfoInputDTO,
@@ -13,6 +14,7 @@ export interface IMoveController {
   checkMoveInfoExistence: () => Promise<MoveInfo[]>;
   getReceivedEstimations: (query: moveInfoWithEstimationsGetQueries) => Promise<MoveInfoWithEstimationsResponseDTO>;
   getMoveInfo: (moveInfoId: string) => Promise<MoveInfo>;
+  getIsMoveInfoEditable: (moveInfoId: string) => Promise<IsMoveInfoEditableDTO>;
   postMoveInfo: (moveData: MoveInfoInputDTO) => Promise<MoveInfo>;
   patchMoveInfo: (moveId: string, body: Partial<MoveInfoInputDTO>) => Promise<MoveInfo>;
 }
