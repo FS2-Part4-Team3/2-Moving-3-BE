@@ -311,6 +311,9 @@ class DriverMoveInfoDetail {
 
   @ApiProperty({ description: '도착지', type: String })
   toAddress: string;
+
+  @ApiProperty({ description: '이사정보 상태', type: String })
+  progress: string;
 }
 //견적 상세 조회
 export class DriverEstimationDetailDTO {

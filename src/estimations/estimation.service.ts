@@ -319,6 +319,7 @@ export class EstimationService implements IEstimationService {
         serviceType: estimation.moveInfo.serviceType,
         fromAddress: estimation.moveInfo.fromAddress,
         toAddress: estimation.moveInfo.toAddress,
+        progress: estimation.moveInfo.progress,
       },
       designatedRequest,
     };
