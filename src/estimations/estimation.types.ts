@@ -282,8 +282,8 @@ class EstimationDetail {
 
 // 유저 상세조회
 export class UserEstimationDetailDTO {
-  @ApiProperty({ description: '드라이버 정보', type: DriverDTO })
-  driver: DriverDTO;
+  @ApiProperty({ description: '드라이버 아이디', type: String })
+  driverId: string;
 
   @ApiProperty({ description: '이사 정보', type: MoveInfoDetail })
   moveInfo: MoveInfoDetail;
