@@ -1,6 +1,7 @@
 import {
   filterCountDTO,
   MoveInfo,
+  MoveInfoIdDTO,
   MoveInfoInputDTO,
   MoveInfoWithEstimationsDTO,
   MoveInfoWithEstimationsResponseDTO,
@@ -10,6 +11,7 @@ import { MoveInfoGetQueries, moveInfoWithEstimationsGetQueries } from '#types/qu
 export interface IMoveService {
   getMoveInfos: (options: MoveInfoGetQueries) => Promise<{ totalCount: number; counts: filterCountDTO; list: MoveInfo[] }>;
   getMoveInfo: (moveInfoId: string) => Promise<MoveInfo>;
+  getUserMoveInfoId: () => Promise<MoveInfoIdDTO>;
   checkMoveInfoExistence: () => Promise<MoveInfo[]>;
   getReceivedEstimations: (options: moveInfoWithEstimationsGetQueries) => Promise<MoveInfoWithEstimationsResponseDTO>;
   postMoveInfo: (moveData: MoveInfoInputDTO) => Promise<MoveInfo>;

@@ -7,9 +7,9 @@ import { MoveService } from './move.service.js';
 import {
   BaseMoveInfoOutputDTO,
   MoveInfo,
+  MoveInfoIdDTO,
   MoveInfoInputDTO,
   MoveInfoResponseDTO,
-  MoveInfoWithEstimationsDTO,
   MoveInfoWithEstimationsResponseDTO,
   MoveInputDTO,
   MovePatchInputDTO,
@@ -50,6 +50,20 @@ export class MoveController implements IMoveController {
     const moveInfo = await this.moveService.getMoveInfos(query);
 
     return moveInfo;
+  }
+
+  @Get('userMoveInfoId')
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth('accessToken')
+  @ApiOperation({ summary: '유저의 이사정보ID 조회' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: MoveInfoIdDTO,
+  })
+  async getUserMoveInfoId() {
+    const moveInfoId = await this.moveService.getUserMoveInfoId();
+
+    return moveInfoId;
   }
 
   @Get('check')

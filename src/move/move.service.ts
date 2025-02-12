@@ -142,8 +142,25 @@ export class MoveService implements IMoveService {
     if (!moveInfo) {
       throw new MoveInfoNotFoundException();
     }
+    const { requests, estimations, ...pureMoveInfo } = moveInfo;
+    const moveInfoData = { ...pureMoveInfo };
 
-    return moveInfo;
+    return moveInfoData;
+  }
+
+  async getUserMoveInfoId() {
+    const store = this.als.getStore();
+    const userId = store?.userId;
+
+    const moveInfo = await this.moveRepository.findByUserId(userId);
+
+    if (!moveInfo || moveInfo.length === 0) {
+      throw new MoveInfoNotFoundException();
+    }
+    const { id } = moveInfo[0];
+    const moveInfoId = { id };
+
+    return moveInfoId;
   }
 
   async checkMoveInfoExistence() {
