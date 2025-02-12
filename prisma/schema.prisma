@@ -66,12 +66,13 @@ model Driver {
   provider   String?
   providerId String?
 
-  reviews       Review[]
-  requests      Request[]
-  estimations   Estimation[]
-  likedUsers    User[]
-  questions     Question[]
-  notifications Notification[]
+  reviews         Review[]
+  requests        Request[]
+  estimations     Estimation[]
+  likedUsers      User[]
+  questions       Question[]
+  notifications   Notification[]
+  aiReviewSummary AIReviewSummary?
 }
 
 model MoveInfo {
@@ -201,6 +202,20 @@ model Notification {
   estimationId String?
   question     Question?   @relation(fields: [questionId], references: [id])
   questionId   String?
+
+  @@index([createdAt])
+}
+
+model AIReviewSummary {
+  id        String    @id @default(uuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  summaryReview String
+
+  driver   Driver @relation(fields: [driverId], references: [id])
+  driverId String @unique
 
   @@index([createdAt])
 }
