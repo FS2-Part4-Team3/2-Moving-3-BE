@@ -235,3 +235,8 @@ export class MoveInfoWithEstimationsResponseDTO {
   @ApiProperty({ description: '이사 정보 목록', type: [MoveInfoWithEstimationsDTO] })
   list: MoveInfoWithEstimationsDTO[];
 }
+
+export class IsMoveInfoEditableDTO {
+  @ApiProperty({ description: '이사정보 변경(수정, 삭제) 가능여부', type: Boolean })
+  isMoveInfoEditable: Boolean;
+}

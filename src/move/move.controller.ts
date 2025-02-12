@@ -6,6 +6,7 @@ import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse }
 import { MoveService } from './move.service.js';
 import {
   BaseMoveInfoOutputDTO,
+  IsMoveInfoEditableDTO,
   MoveInfo,
   MoveInfoIdDTO,
   MoveInfoInputDTO,
@@ -107,6 +108,21 @@ export class MoveController implements IMoveController {
   async getMoveInfo(@Param('moveInfoId') moveInfoId: string) {
     const moveInfo = await this.moveService.getMoveInfo(moveInfoId);
     return moveInfo;
+  }
+
+  @Get(':moveInfoId/editability')
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth('accessToken')
+  @ApiOperation({ summary: '이사정보 변경(수정, 삭제) 가능여부 조회' })
+  @ApiParam({ name: 'moveInfoId', description: '이사정보 ID', type: 'string' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: IsMoveInfoEditableDTO,
+  })
+  async getIsMoveInfoEditable(@Param('moveInfoId') moveInfoId: string) {
+    const isMoveInfoEditable = await this.moveService.getIsMoveInfoEditable(moveInfoId);
+
+    return isMoveInfoEditable;
   }
 
   @Post()
