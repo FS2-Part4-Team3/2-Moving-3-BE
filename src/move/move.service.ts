@@ -136,8 +136,8 @@ export class MoveService implements IMoveService {
     return moveInfo;
   }
 
-  async getMoveInfo(moveId: string) {
-    const moveInfo = await this.moveRepository.findByMoveInfoId(moveId);
+  async getMoveInfo(moveInfoId: string) {
+    const moveInfo = await this.moveRepository.findByMoveInfoId(moveInfoId);
 
     if (!moveInfo) {
       throw new MoveInfoNotFoundException();
@@ -174,7 +174,7 @@ export class MoveService implements IMoveService {
     return moveInfo;
   }
 
-  async getIsMoveInfoEditable(moveId: string) {
+  async getIsMoveInfoEditable(moveInfoId: string) {
     const store = this.als.getStore();
     const userId = store?.userId;
     const type = store?.type;
@@ -182,7 +182,7 @@ export class MoveService implements IMoveService {
       throw new DriverInvalidTokenException();
     }
 
-    const moveInfo = await this.moveRepository.findByMoveInfoId(moveId);
+    const moveInfo = await this.moveRepository.findByMoveInfoId(moveInfoId);
     if (!moveInfo) {
       throw new MoveInfoNotFoundException();
     }
@@ -248,9 +248,9 @@ export class MoveService implements IMoveService {
     return moveInfo;
   }
 
-  async patchMoveInfo(moveId: string, body: Partial<MoveInfoInputDTO>) {
+  async patchMoveInfo(moveInfoId: string, body: Partial<MoveInfoInputDTO>) {
     const { userId } = this.als.getStore();
-    const moveInfo = await this.moveRepository.findByMoveInfoId(moveId);
+    const moveInfo = await this.moveRepository.findByMoveInfoId(moveInfoId);
 
     if (!moveInfo) {
       throw new MoveInfoNotFoundException();
@@ -262,14 +262,14 @@ export class MoveService implements IMoveService {
       throw new ReceivedEstimationException();
     }
 
-    const updatedMoveInfo = await this.moveRepository.update(moveId, body);
+    const updatedMoveInfo = await this.moveRepository.update(moveInfoId, body);
 
     return updatedMoveInfo;
   }
 
-  async softDeleteMoveInfo(moveId: string) {
+  async softDeleteMoveInfo(moveInfoId: string) {
     const { userId } = this.als.getStore();
-    const moveInfo = await this.moveRepository.findByMoveInfoId(moveId);
+    const moveInfo = await this.moveRepository.findByMoveInfoId(moveInfoId);
 
     if (!moveInfo) {
       throw new MoveInfoNotFoundException();
@@ -278,7 +278,7 @@ export class MoveService implements IMoveService {
       throw new ForbiddenException();
     }
 
-    const softDeleteMoveInfo = await this.moveRepository.softDeleteMoveInfo(moveId);
+    const softDeleteMoveInfo = await this.moveRepository.softDeleteMoveInfo(moveInfoId);
 
     return softDeleteMoveInfo;
   }

@@ -138,29 +138,29 @@ export class MoveController implements IMoveController {
     return moveInfo;
   }
 
-  @Patch(':moveId')
+  @Patch(':moveInfoId')
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth('accessToken')
   @ApiOperation({ summary: '이사 정보 수정' })
-  @ApiParam({ name: 'moveId', description: '이사정보 ID', type: 'string' })
+  @ApiParam({ name: 'moveInfoId', description: '이사정보 ID', type: 'string' })
   @ApiBody({ type: MovePatchInputDTO })
   @ApiResponse({
     status: HttpStatus.OK,
     type: BaseMoveInfoOutputDTO,
   })
-  async patchMoveInfo(@Param('moveId') moveId: string, @Body() body: Partial<MoveInfoInputDTO>) {
-    const moveInfo = await this.moveService.patchMoveInfo(moveId, body);
+  async patchMoveInfo(@Param('moveInfoId') moveInfoId: string, @Body() body: Partial<MoveInfoInputDTO>) {
+    const moveInfo = await this.moveService.patchMoveInfo(moveInfoId, body);
 
     return moveInfo;
   }
 
-  @Delete(':moveId')
+  @Delete(':moveInfoId')
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth('accessToken')
   @ApiOperation({ summary: '이사 정보 삭제' })
-  @ApiParam({ name: 'moveId', description: '이사정보 ID', type: 'string' })
-  async deleteMoveInfo(@Param('moveId') moveId: string) {
-    const moveInfo = await this.moveService.softDeleteMoveInfo(moveId);
+  @ApiParam({ name: 'moveInfoId', description: '이사정보 ID', type: 'string' })
+  async deleteMoveInfo(@Param('moveInfoId') moveInfoId: string) {
+    const moveInfo = await this.moveService.softDeleteMoveInfo(moveInfoId);
 
     return moveInfo;
   }

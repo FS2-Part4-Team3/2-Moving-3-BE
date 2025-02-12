@@ -17,5 +17,5 @@ export interface IMoveService {
   getIsMoveInfoEditable: (moveInfoId: string) => Promise<IsMoveInfoEditableDTO>;
   getReceivedEstimations: (options: moveInfoWithEstimationsGetQueries) => Promise<MoveInfoWithEstimationsResponseDTO>;
   postMoveInfo: (moveData: MoveInfoInputDTO) => Promise<MoveInfo>;
-  patchMoveInfo: (moveId: string, body: Partial<MoveInfoInputDTO>) => Promise<MoveInfo>;
+  patchMoveInfo: (moveInfoId: string, body: Partial<MoveInfoInputDTO>) => Promise<MoveInfo>;
 }
