@@ -143,8 +143,6 @@ export class AuthController implements IAuthController {
     return person;
   }
 
-<<<<<<< Updated upstream
-=======
   @Get('isLoggedIn')
   @ApiOperation({ summary: '로그인 상태 조회' })
   @ApiResponse({
@@ -193,7 +191,6 @@ export class AuthController implements IAuthController {
     return { isAccessTokenValid, isRefreshTokenValid, userType };
   }
 
->>>>>>> Stashed changes
   @Post('refresh')
   @UseGuards(RefreshTokenGuard)
   @ApiOperation({ summary: '토큰 재발급' })
