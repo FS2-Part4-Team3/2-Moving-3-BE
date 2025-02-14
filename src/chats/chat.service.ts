@@ -23,7 +23,8 @@ export class ChatService implements IChatService {
     const validId = type === UserType.User ? userId : driverId;
 
     const totalCount = await this.chatRepository.countList(validId, type);
-    const list = await this.chatRepository.findList(validId, type, options);
+    const driverIds = await this.chatRepository.findList(validId, type, options);
+    const list = driverIds.map(record => record.driverId);
 
     return { totalCount, list };
   }
@@ -69,5 +70,19 @@ export class ChatService implements IChatService {
     chat.uploadUrl = url;
 
     return chat;
+  }
+
+  async markChatAsRead(targetId: string, chatIds: string[], isRead: boolean = true) {
+    const { type, userId, driverId } = this.als.getStore();
+
+    const chats =
+      type === UserType.User
+        ? await this.chatRepository.updateManyAsRead(userId, targetId, chatIds, isRead)
+        : await this.chatRepository.updateManyAsRead(targetId, driverId, chatIds, isRead);
+
+    const validId = type === UserType.User ? userId : driverId;
+    this.websocketGateway.sendNotification(validId, { type: 'CHATS_READ', data: chats });
+
+    return chats;
   }
 }

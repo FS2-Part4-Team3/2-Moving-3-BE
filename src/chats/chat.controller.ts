@@ -7,11 +7,11 @@ import { Body, Controller, Get, HttpStatus, Param, Post, Query, UseGuards } from
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @Controller('chats')
+@UseGuards(AccessTokenGuard)
 export class ChatController implements IChatController {
   constructor(private readonly chatService: ChatService) {}
 
   @Get()
-  @UseGuards(AccessTokenGuard)
   @ApiOperation({ summary: '채팅 목록 조회' })
   @ApiResponse({ status: HttpStatus.OK, type: ChatListDTO })
   async getList(@Query() query: ChatGetQueries) {
@@ -21,7 +21,6 @@ export class ChatController implements IChatController {
   }
 
   @Get(':targetId')
-  @UseGuards(AccessTokenGuard)
   @ApiOperation({ summary: '채팅 내용 조회' })
   @ApiResponse({ status: HttpStatus.OK, type: ChatListDTO })
   async getChats(@Param('targetId') targetId: string, @Query() query: ChatGetQueries) {
@@ -31,10 +30,16 @@ export class ChatController implements IChatController {
   }
 
   @Post(':targetId')
-  @UseGuards(AccessTokenGuard)
   @ApiOperation({ summary: '채팅 전송' })
   @ApiResponse({ status: HttpStatus.OK, type: ChatDTO })
   async postChat(@Param('targetId') targetId: string, @Body() body: ChatPostDTO) {
     return await this.chatService.createChat(targetId, body);
+  }
+
+  @Post(':targetId/read')
+  @ApiOperation({ summary: '채팅 읽음 처리' })
+  @ApiResponse({ status: HttpStatus.OK, type: [ChatDTO] })
+  async readNotifications(@Param('targetId') targetId: string, @Body() ids: string[]) {
+    return await this.chatService.markChatAsRead(targetId, ids);
   }
 }

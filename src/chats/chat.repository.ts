@@ -14,8 +14,15 @@ export class ChatRepository implements IChatRepository {
 
   async countList(id: string, userType: UserType) {
     const where = userType === UserType.User ? { userId: id } : { driverId: id };
+    const distinctField = userType === UserType.User ? 'driverId' : 'userId';
 
-    return await this.chat.count({ where });
+    const uniqueDrivers = await this.chat.findMany({
+      where,
+      distinct: [distinctField],
+      select: { [distinctField]: true },
+    });
+
+    return uniqueDrivers.length;
   }
 
   async countChats(userId: string, driverId: string) {
@@ -29,14 +36,19 @@ export class ChatRepository implements IChatRepository {
 
   async findList(id: string, userType: UserType, options: OffsetPaginationOptions) {
     const where = userType === UserType.User ? { userId: id } : { driverId: id };
+    const distinctField = userType === UserType.User ? 'driverId' : 'userId';
     const { page, pageSize } = options;
 
-    return await this.chat.findMany({
+    const uniqueDrivers = await this.chat.findMany({
       where,
       orderBy: { createdAt: 'desc' },
       take: pageSize,
       skip: (page - 1) * pageSize,
+      distinct: [distinctField],
+      select: { [distinctField]: true },
     });
+
+    return uniqueDrivers;
   }
 
   async findChats(userId: string, driverId: string, options: OffsetPaginationOptions) {
@@ -55,5 +67,14 @@ export class ChatRepository implements IChatRepository {
 
   async create(data: ChatCreateDTO) {
     return await this.chat.create({ data });
+  }
+
+  async updateManyAsRead(userId: string, driverId: string, chatIds: string[], isRead: boolean) {
+    const chats = this.chat.updateManyAndReturn({
+      where: { id: { in: chatIds }, userId, driverId },
+      data: { isRead },
+    });
+
+    return chats;
   }
 }

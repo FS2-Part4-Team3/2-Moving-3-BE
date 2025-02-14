@@ -9,4 +9,5 @@ export interface IChatRepository {
   findList(id: string, userType: UserType, options: OffsetPaginationOptions): Promise<string[]>;
   findChats(userId: string, driverId: string, options: OffsetPaginationOptions): Promise<Chat[]>;
   create(data: ChatCreateDTO): Promise<Chat>;
+  updateManyAsRead(userId: string, driverId: string, chatIds: string[], isRead: boolean): Promise<Chat>;
 }
