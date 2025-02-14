@@ -3,6 +3,7 @@ import { Driver } from '#drivers/types/driver.types.js';
 import { WsJwtGuard } from '#guards/ws-jwt.guard.js';
 import { User } from '#users/types/user.types.js';
 import { IWebsocketGateway } from '#websockets/interfaces/websocket.gateway.interface.js';
+import { WebsocketNotification } from '#websockets/types/websocket.type.js';
 import { UseGuards } from '@nestjs/common';
 import { ConnectedSocket, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
@@ -40,7 +41,7 @@ export class WebsocketGateway implements IWebsocketGateway {
     });
   }
 
-  sendNotification(id: string, notification: any) {
+  sendNotification(id: string, notification: WebsocketNotification) {
     const sockets = this.getSockets(id);
     if (sockets) {
       sockets.forEach(socket => socket.emit('notification', notification));
