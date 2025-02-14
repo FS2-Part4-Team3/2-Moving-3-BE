@@ -37,6 +37,7 @@ model User {
   likeDrivers   Driver[]
   questions     Question[]
   notifications Notification[]
+  Chat          Chat[]
 }
 
 model Driver {
@@ -66,12 +67,14 @@ model Driver {
   provider   String?
   providerId String?
 
-  reviews         Review[]
-  requests        Request[]
-  estimations     Estimation[]
-  likedUsers      User[]
-  questions       Question[]
-  notifications   Notification[]
+
+  reviews       Review[]
+  requests      Request[]
+  estimations   Estimation[]
+  likedUsers    User[]
+  questions     Question[]
+  notifications Notification[]
+  Chat          Chat[]
   aiReviewSummary aiReviewSummary?
 }
 
@@ -206,6 +209,25 @@ model Notification {
   @@index([createdAt])
 }
 
+model Chat {
+  id        String    @id @default(uuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  
+  user     User   @relation(fields: [userId], references: [id])
+  userId   String
+  driver   Driver @relation(fields: [driverId], references: [id])
+  driverId String
+  
+  direction ChatDirection
+  message   String
+  image     String?
+  isRead    Boolean       @default(false)
+
+  @@index([createdAt])
+ }
+ 
 model aiReviewSummary {
   id        String    @id @default(uuid())
   createdAt DateTime  @default(now())
@@ -277,4 +299,9 @@ enum NotificationType {
   D_7
   D_1
   D_DAY
+}
+
+enum ChatDirection {
+  USER_TO_DRIVER
+  DRIVER_TO_USER
 }

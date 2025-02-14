@@ -1,3 +1,4 @@
+import { Chat } from '#chats/types/chat.types.js';
 import { Driver } from '#drivers/types/driver.types.js';
 import { User } from '#users/types/user.types.js';
 import { generatePresignedDownloadUrl } from '#utils/S3/generate-presigned-download-url.js';
@@ -12,6 +13,20 @@ export async function generateS3DownloadUrl(person: User | Driver) {
 
   const downloadUrl = await generatePresignedDownloadUrl(s3Key);
   person.image = downloadUrl;
+
+  return downloadUrl;
+}
+
+export async function generateS3DownloadUrlForChat(ownerId: string, chat: Chat) {
+  if (!chat.image) {
+    return;
+  }
+
+  const uniqueFileName = chat.image;
+  const s3Key = `image/${ownerId}/${uniqueFileName}`;
+
+  const downloadUrl = await generatePresignedDownloadUrl(s3Key);
+  chat.image = downloadUrl;
 
   return downloadUrl;
 }

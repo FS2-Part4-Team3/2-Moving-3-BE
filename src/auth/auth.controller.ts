@@ -37,6 +37,17 @@ export class AuthController implements IAuthController {
     private readonly guardService: GuardService,
   ) {}
 
+  private setAccessToken(res: Response, token: string) {
+    const maxAge = token ? 1000 * 60 * 60 : 0;
+
+    res.cookie('accessToken', token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge,
+    });
+  }
+
   private setRefreshToken(res: Response, token: string) {
     const maxAge = token ? 1000 * 60 * 60 * 24 * 14 : 0;
 
