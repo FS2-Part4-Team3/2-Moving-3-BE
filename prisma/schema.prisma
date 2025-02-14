@@ -205,7 +205,7 @@ model Notification {
   @@index([createdAt])
 }
 
-model Chatting {
+model Chat {
   id        String    @id @default(uuid())
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
