@@ -274,10 +274,22 @@ export class EstimationRepository implements IEstimationRepository {
       where: {
         moveInfo: {
           ownerId: userId,
+          progress: Progress.OPEN,
+          confirmedEstimationId: null,
         },
         price: { not: null },
       },
     });
+  }
+
+  // 대기중 지정 견적인지 아닌지 확인하는거.. 근데이건 아닌가..?
+  async isDesignatedEstimation(estimationId: string): Promise<boolean> {
+    const estimation = await this.prisma.estimation.findUnique({
+      where: { id: estimationId },
+      select: { confirmedForId: true },
+    });
+
+    return estimation?.confirmedForId !== null;
   }
 
   // 대기중 견적 조회 리스트

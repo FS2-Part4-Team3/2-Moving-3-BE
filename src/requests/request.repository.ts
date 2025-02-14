@@ -42,6 +42,7 @@ export class RequestRepository implements IRequestRepository {
     return request;
   }
 
+  // 지정여부 확인하기 ( 리퀘스트 테이블에서 apply인거만 )
   async DesignatedRequest(moveInfoId: string, driverId: string): Promise<IsActivate> {
     const requestCount = await this.prisma.request.count({
       where: {

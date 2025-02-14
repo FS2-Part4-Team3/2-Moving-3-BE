@@ -9,6 +9,7 @@ import {
   UserEstimationDetailDTO,
   RejectedEstimationsListDTO,
   DriverEstimationDetailDTO,
+  IsActivate,
 } from '#estimations/estimation.types.js';
 import { Injectable } from '@nestjs/common';
 import { IStorage } from '#types/common.types.js';
@@ -137,7 +138,8 @@ export class EstimationService implements IEstimationService {
         const isLiked = await this.driversService.isLikedDriver(estimation.driverId);
         const moveInfo = await this.moveRepository.findByMoveInfoId(estimation.moveInfoId);
 
-        const designatedRequest = await this.requestRepository.DesignatedRequest(estimation.moveInfoId, estimation.driverId);
+        // const designatedRequest = await this.requestRepository.DesignatedRequest(estimation.moveInfoId, estimation.driverId);
+        const designatedRequest = await this.estimationRepository.isDesignatedEstimation(estimation.id);
         console.log('Designated~~~~~~~~~~~~~~~~~~~', estimation.id, designatedRequest);
         console.log(`견적 ${estimation.id} - 지정 견적 여부: ${designatedRequest}`);
 
@@ -163,7 +165,7 @@ export class EstimationService implements IEstimationService {
             estimationId: estimation.id,
             price: estimation.price ?? null,
           },
-          designatedRequest, // //'Active': 지정 요청 견적, 'Inactive': 일반 견적
+          designatedRequest: designatedRequest ? IsActivate.Active : IsActivate.Inactive, // //'Active': 지정 요청 견적, 'Inactive': 일반 견적
         };
       }),
     );
