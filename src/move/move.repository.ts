@@ -8,7 +8,6 @@ import { getDayEnd, getDayStart } from '#utils/dateUtils.js';
 import { Injectable } from '@nestjs/common';
 import { Area, Progress } from '@prisma/client';
 import { IMoveInfo } from './types/move.types.js';
-import { UserInvalidTokenException } from '#users/user.exception.js';
 
 @Injectable()
 export class MoveRepository implements IMoveRepository {

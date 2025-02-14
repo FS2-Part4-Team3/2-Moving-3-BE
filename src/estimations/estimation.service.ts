@@ -119,21 +119,31 @@ export class EstimationService implements IEstimationService {
     return this.estimationRepository.create(data);
   }
 
-  // 대기중 견적 목록 조회 수정
+  // 대기중 견적 목록 조회 새로
   async getUserEstimationList(options: EstimationGetQueries): Promise<UserEstimationListWithCountDTO> {
     const { userId } = this.als.getStore();
     if (!userId) throw new UnauthorizedException();
+    console.log('ususususu', userId);
 
     const { page, pageSize } = options;
-    const { estimations, totalCount } = await this.estimationRepository.findUserEstimations(userId, page, pageSize);
 
+    const totalCount = await this.estimationRepository.getTotalCountForUserEstimations(userId);
+    console.log('~~~~~~~~~~~~Total Count:', totalCount);
+
+    const estimations = await this.estimationRepository.findUserGetEstimations(userId, page, pageSize);
+    console.log('~~~~~~~~~~~~~~~~~~~~~!!!!Estimations:', estimations);
+
+    // 견적 정보를 추가적으로 조회하고 변환 -> 위에꺼랑 같이..? 안에넣어서??
     const estimationsWithInfo = await Promise.all(
       estimations.map(async estimation => {
         const driver = await this.driversService.findDriver(estimation.driverId);
         const isLiked = await this.driversService.isLikedDriver(estimation.driverId);
         const moveInfo = await this.moveRepository.findByMoveInfoId(estimation.moveInfoId);
 
-        const isSpecific = await this.estimationRepository.isSpecificEstimation(estimation.moveInfoId);
+        // const designatedRequest = await this.estimationRepository.DesignatedRequest(estimation.moveInfoId);
+        const designatedRequest = await this.requestRepository.DesignatedRequest(estimation.moveInfoId, estimation.driverId);
+        console.log('Designated~~~~~~~~~~~~~~~~~~~', estimation.id, designatedRequest);
+        console.log(`견적 ${estimation.id} - 지정 견적 여부: ${designatedRequest}`);
 
         return {
           driver: {
@@ -157,13 +167,122 @@ export class EstimationService implements IEstimationService {
             estimationId: estimation.id,
             price: estimation.price ?? null,
           },
-          designatedRequest: isSpecific ? IsActivate.Active : IsActivate.Inactive, // 지정/일반 여부
+          designatedRequest, // 지정/일반 여부
         };
       }),
     );
 
     return { estimations: estimationsWithInfo, totalCount };
   }
+
+  /// 대기중 견적 목록 조회 수정 0213
+  // async getUserEstimationList(options: EstimationGetQueries): Promise<UserEstimationListWithCountDTO> {
+  //   const { userId } = this.als.getStore();
+  //   if (!userId) throw new UnauthorizedException();
+
+  //   const { page, pageSize } = options;
+
+  //   const moveInfos = await this.moveRepository.findByUserId(userId);
+  //   console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~', moveInfos);
+  //   const moveInfoId = moveInfos.map(info => info.id);
+  //   console.log('~~~~~~~~~~~~moveinfo:', moveInfoId);
+
+  //   const totalCount = await this.estimationRepository.getTotalCountForUserEstimations(moveInfoId);
+  //   console.log('~~~~~~~~~~~~Total Count:', totalCount);
+
+  //   const estimations = await this.estimationRepository.findUserGetEstimations(moveInfoId[0], page, pageSize);
+  //   console.log('~~~~~~~~~~~~~~~~~~~~~!!!!Estimations:', estimations);
+
+  //   // 견적 정보를 추가적으로 조회하고 변환 -> 위에꺼랑 같이..? 안에넣어서??
+  //   const estimationsWithInfo = await Promise.all(
+  //     estimations.map(async estimation => {
+  //       const driver = await this.driversService.findDriver(estimation.driverId);
+  //       const isLiked = await this.driversService.isLikedDriver(estimation.driverId);
+  //       const moveInfo = moveInfos[0];
+  //       // await this.moveRepository.findByMoveInfoId(estimation.moveInfoId);
+
+  //       const designatedRequest = await this.estimationRepository.findUserDesignated(estimation.moveInfoId, estimation.driverId);
+  //       console.log('Designated~~~~~~~~~~~~~~~~~~~', estimation.id, designatedRequest); // 확인해보기
+
+  //       return {
+  //         driver: {
+  //           image: driver.image,
+  //           name: driver.name,
+  //           rating: driver.rating,
+  //           reviewCount: driver.reviewCount,
+  //           career: driver.career,
+  //           applyCount: driver.applyCount,
+  //           likedUsers: isLiked,
+  //           likeCount: driver.likeCount,
+  //         },
+  //         moveInfo: {
+  //           moveInfoId: estimation.moveInfoId,
+  //           date: moveInfo?.date ?? null,
+  //           serviceType: moveInfo?.serviceType,
+  //           fromAddress: moveInfo.fromAddress,
+  //           toAddress: moveInfo.toAddress,
+  //         },
+  //         estimationInfo: {
+  //           estimationId: estimation.id,
+  //           price: estimation.price ?? null,
+  //         },
+  //         designatedRequest, // 지정/일반 여부
+  //       };
+  //     }),
+  //   );
+
+  //   return { estimations: estimationsWithInfo, totalCount };
+  // }
+
+  // 대기중 견적 목록 조회 수정
+  // async getUserEstimationList(options: EstimationGetQueries): Promise<UserEstimationListWithCountDTO> {
+  //   const { userId } = this.als.getStore();
+  //   if (!userId) throw new UnauthorizedException();
+
+  //   const { page, pageSize } = options;
+  //   const { estimations, totalCount } = await this.estimationRepository.findUserEstimations(userId, page, pageSize);
+
+  //   // 지정 여부
+  //   const designatedStatuses = await this.estimationRepository.getDesignatedStatusesByMoveInfoId(estimations[0].moveInfoId);
+
+  //   const estimationsWithInfo = await Promise.all(
+  //     estimations.map(async estimation => {
+  //       const driver = await this.driversService.findDriver(estimation.driverId);
+  //       const isLiked = await this.driversService.isLikedDriver(estimation.driverId);
+  //       const moveInfo = await this.moveRepository.findByMoveInfoId(estimation.moveInfoId);
+
+  //       const isSpecific =
+  //         designatedStatuses.find(status => status.estimationId === estimation.id)?.status || IsActivate.Inactive;
+
+  //       return {
+  //         driver: {
+  //           image: driver.image,
+  //           name: driver.name,
+  //           rating: driver.rating,
+  //           reviewCount: driver.reviewCount,
+  //           career: driver.career,
+  //           applyCount: driver.applyCount,
+  //           likedUsers: isLiked,
+  //           likeCount: driver.likeCount,
+  //         },
+  //         moveInfo: {
+  //           moveInfoId: estimation.moveInfoId,
+  //           date: moveInfo?.date ?? null,
+  //           serviceType: moveInfo?.serviceType,
+  //           fromAddress: moveInfo.fromAddress,
+  //           toAddress: moveInfo.toAddress,
+  //         },
+  //         estimationInfo: {
+  //           estimationId: estimation.id,
+  //           price: estimation.price ?? null,
+  //         },
+  //         designatedRequest: isSpecific, // 지정/일반 여부
+  //       };
+  //     }),
+  //   );
+
+  //   return { estimations: estimationsWithInfo, totalCount };
+  // }
 
   // 작성 가능한 리뷰 목록 조회
   async getReviewableEstimations(

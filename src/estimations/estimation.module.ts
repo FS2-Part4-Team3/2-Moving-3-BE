@@ -10,7 +10,14 @@ import { RequestModule } from '#requests/request.module.js';
 import { forwardRef, Module } from '@nestjs/common';
 
 @Module({
-  imports: [DBModule, GuardModule, forwardRef(() => QuestionModule), forwardRef(() => MoveModule), RequestModule, DriverModule],
+  imports: [
+    DBModule,
+    GuardModule,
+    forwardRef(() => QuestionModule),
+    forwardRef(() => MoveModule),
+    forwardRef(() => RequestModule),
+    DriverModule,
+  ],
   controllers: [EstimationController],
   providers: [EstimationService, EstimationRepository],
   exports: [EstimationRepository],
