@@ -6,11 +6,13 @@ import { AiReviewSummaryService } from '#aiReviewSummary/aiReviewSummary.service
 import { AiReviewSummaryRepository } from '#aiReviewSummary/aiReviewSummary.repository.js';
 import { GoogleGeminiService } from '#global/ai-services/gemini.service.js';
 import { ReviewModule } from '#reviews/review.module.js';
+import { DriverModule } from '#drivers/driver.module.js';
+import { AiReviewSummaryScheduler } from './aiReviewSummary.scheduler.js';
 
 @Module({
-  imports: [DBModule, GuardModule, ReviewModule],
+  imports: [DBModule, GuardModule, ReviewModule, DriverModule],
   controllers: [AiReviewSummaryController],
-  providers: [AiReviewSummaryService, AiReviewSummaryRepository, GoogleGeminiService],
+  providers: [AiReviewSummaryService, AiReviewSummaryRepository, GoogleGeminiService, AiReviewSummaryScheduler],
   exports: [AiReviewSummaryRepository],
 })
 export class AiReviewSummaryModule {}
