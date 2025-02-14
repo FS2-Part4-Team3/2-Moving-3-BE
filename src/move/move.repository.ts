@@ -216,39 +216,82 @@ export class MoveRepository implements IMoveRepository {
   }
 
   // MoveInfo의 상태를 업데이트하는 메서드
-  async updateMoveInfoProgress(currentStatus: string, newStatus: string, now: Date) {
-    const result = await this.prisma.moveInfo.updateMany({
-      where: {
-        progress: Progress.CONFIRMED, // 현재 상태
-        date: {
-          lt: now, // 현재 시간보다 이전
-        },
-        confirmedEstimationId: currentStatus === 'CONFIRMED' ? { not: null } : undefined, // 상태가 'CONFIRMED'인 경우만
-      },
-      data: {
-        progress: newStatus, //Progress.COMPLETE,  // 완료됨상태
-      },
-    });
+  // async updateMoveInfoProgress(currentStatus: string, newStatus: string, now: Date) {
+  //   const result = await this.prisma.moveInfo.updateMany({
+  //     where: {
+  //       progress: Progress.CONFIRMED, // 현재 상태
+  //       date: {
+  //         lt: now, // 현재 시간보다 이전
+  //       },
+  //       confirmedEstimationId: currentStatus === 'CONFIRMED' ? { not: null } : undefined, // 상태가 'CONFIRMED'인 경우만
+  //     },
+  //     // data: {
+  //     //   progress: newStatus, //Progress.COMPLETE,  // 완료됨상태
+  //     // },
+  //   });
 
-    return result.count;
-  }
+  //   return result.count;
+  // }
 
   // 'EXPIRED' 상태의 MoveInfo에 연결된 Request를 'EXPIRED'로 변경하기
-  async updateRequestsStatus() {
-    const expiredMoveInfos = await this.prisma.moveInfo.findMany({
-      where: { progress: 'EXPIRED' },
-      select: { id: true },
-    });
+  // async updateRequestsStatus() {
+  //   const expiredMoveInfos = await this.prisma.moveInfo.findMany({
+  //     where: { progress: 'EXPIRED' },
+  //     select: { id: true },
+  //   });
 
-    const result = await this.prisma.request.updateMany({
+  //   const result = await this.prisma.request.updateMany({
+  //     where: {
+  //       moveInfoId: { in: expiredMoveInfos.map(move => move.id) },
+  //     },
+  //     data: {
+  //       status: 'EXPIRED',
+  //     },
+  //   });
+
+  //   return result.count;
+  // }
+  // //
+
+  async updateToComplete(now: Date) {
+    return this.prisma.moveInfo.updateMany({
       where: {
-        moveInfoId: { in: expiredMoveInfos.map(move => move.id) },
+        progress: 'CONFIRMED',
+        date: { lt: now },
+        confirmedEstimationId: { not: null },
       },
       data: {
-        status: 'EXPIRED',
+        progress: 'COMPLETE', // 'COMPLETE'로 변경
       },
     });
+  }
 
-    return result.count;
+  async updateToExpired(now: Date) {
+    return this.prisma.moveInfo.updateMany({
+      where: {
+        progress: 'OPEN', // 'OPEN' 상태
+        confirmedEstimationId: null,
+        date: { lt: now },
+      },
+      data: {
+        progress: 'EXPIRED', // 'EXPIRED'로 변경
+      },
+    });
+  }
+
+  async updateToRequestExpired() {
+    return this.prisma.request.updateMany({
+      where: {
+        moveInfoId: {
+          in: (
+            await this.prisma.moveInfo.findMany({
+              where: { progress: 'EXPIRED' },
+              select: { id: true },
+            })
+          ).map(move => move.id), // EXPIRED 상태가 된 moveInfo ID 목록 추출
+        },
+      },
+      data: { status: 'EXPIRED' },
+    });
   }
 }

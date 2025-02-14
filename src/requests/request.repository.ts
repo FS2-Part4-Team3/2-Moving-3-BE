@@ -40,4 +40,20 @@ export class RequestRepository implements IRequestRepository {
 
     return request;
   }
+
+  async updateToRequestExpired() {
+    return this.prisma.request.updateMany({
+      where: {
+        moveInfoId: {
+          in: (
+            await this.prisma.moveInfo.findMany({
+              where: { progress: 'EXPIRED' },
+              select: { id: true },
+            })
+          ).map(move => move.id), // EXPIRED 상태가 된 moveInfo ID 목록 추출
+        },
+      },
+      data: { status: 'EXPIRED' },
+    });
+  }
 }

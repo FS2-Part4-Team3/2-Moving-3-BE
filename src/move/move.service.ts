@@ -34,55 +34,13 @@ export class MoveService implements IMoveService {
     const now = new Date();
 
     // 'CONFIRMED' 상태에서 진행된 이사는 'COMPLETE'로 바꾸기
-    const updatedComplete = await this.prisma.moveInfo.updateMany({
-      where: {
-        progress: 'CONFIRMED',
-        date: {
-          lt: now, // 날짜가 현재 시간보다 이전인 경우에..?
-        },
-        confirmedEstimationId: {
-          not: null, // 확정된 견적이 있는 경우만
-        },
-      },
-      data: {
-        progress: 'COMPLETE', // 'COMPLETE'로 변경
-      },
-    });
+    const updatedComplete = await this.moveRepository.updateToComplete(now);
 
     // 확정되지 않은 'OPEN' 상태의 이사 요청을 'EXPIRED'로 바꾸기
-    const updatedMoveExpired = await this.prisma.moveInfo.updateMany({
-      where: {
-        progress: 'OPEN', // 'OPEN' 상태
-        confirmedEstimationId: null, // 확정된 견적이 없는 경우
-        date: {
-          lt: now, // 시간이 지난 경우
-        },
-      },
-      data: {
-        progress: 'EXPIRED', // 'EXPIRED'로 변경
-      },
-    });
+    const updatedMoveExpired = await this.moveRepository.updateToExpired(now);
 
     // 'EXPIRED'인 MoveInfo에 연결된 Request들도 'EXPIRED'로 변경
-    const updatedRequestsExpired = await this.prisma.request.updateMany({
-      where: {
-        moveInfoId: {
-          in: await this.prisma.moveInfo
-            .findMany({
-              where: {
-                progress: 'EXPIRED', // progress가 'EXPIRED'인 경우
-              },
-              select: {
-                id: true, // MoveInfo의 ID만
-              },
-            })
-            .then(result => result.map(move => move.id)),
-        },
-      },
-      data: {
-        status: 'EXPIRED', // Request의 상태를 'EXPIRED'로 변경
-      },
-    });
+    const updatedRequestsExpired = await this.requestRepository.updateToRequestExpired();
 
     // 로그 출력
     this.logger.log(`Auto-completed ${updatedComplete.count} moves to COMPLETE.`);
