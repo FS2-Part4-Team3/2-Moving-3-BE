@@ -26,6 +26,7 @@
       "#exceptions/*": ["./src/exceptions/*"],
       "#global/*": ["./src/global/*"],
       "#utils/*": ["./src/utils/*"],
+      "#websockets/*": ["./src/websockets/*"],
       "#guards/*": ["./src/guards/*"],
       "#decorators/*": ["./src/decorators/*"],
       "#swagger/*": ["./src/swagger/*"],

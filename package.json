@@ -12,6 +12,7 @@
     "#exceptions/*": "./dist/exceptions/*",
     "#global/*": "./dist/global/*",
     "#utils/*": "./dist/utils/*",
+    "#websockets/*": "./dist/websockets/*",
     "#guards/*": "./dist/guards/*",
     "#decorators/*": "./dist/decorators/*",
     "#swagger/*": "./dist/swagger/*",
