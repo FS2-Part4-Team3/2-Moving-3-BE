@@ -205,6 +205,21 @@ model Notification {
   @@index([createdAt])
 }
 
+model Chatting {
+  id        String    @id @default(uuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  userId   String
+  driverId String
+
+  direction ChatDirection
+  message   String
+
+  @@index([createdAt])
+}
+
 /**
  * ******************************************************* enum *********************************************
  */
@@ -262,4 +277,9 @@ enum NotificationType {
   D_7
   D_1
   D_DAY
+}
+
+enum ChatDirection {
+  USER_TO_DRIVER
+  DRIVER_TO_USER
 }
