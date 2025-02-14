@@ -1,4 +1,4 @@
-import { IRequest } from '#requests/request.types.js';
+import { IRequest } from '#requests/types/request.types.js';
 import { ModelBase, Progress, ProgressEnum, ServiceType, ServiceTypeEnum } from '#types/common.types.js';
 import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { $Enums, MoveInfo as PrismaMoveInfo } from '@prisma/client';

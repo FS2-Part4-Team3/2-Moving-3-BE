@@ -1,7 +1,7 @@
 import { PrismaService } from '#global/prisma.service.js';
 import { IRequestRepository } from '#requests/interfaces/request.repository.interface.js';
-import { CreateRequestDTO, PatchRequestDTO } from '#requests/request.types.js';
 import { Injectable } from '@nestjs/common';
+import { CreateRequestDTO, PatchRequestDTO } from './types/request.dto.js';
 
 @Injectable()
 export class RequestRepository implements IRequestRepository {

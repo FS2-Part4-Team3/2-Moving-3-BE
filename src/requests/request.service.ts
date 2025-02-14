@@ -7,7 +7,7 @@ import { AlreadyRequestedException, RequestNotFoundException } from './request.e
 import { ForbiddenException } from '#exceptions/http.exception.js';
 import { RequestRepository } from './request.repository.js';
 import { MoveInfoNotFoundException } from '#move/move.exception.js';
-import { CreateRequestDTO } from './request.types.js';
+import { CreateRequestDTO } from './types/request.dto.js';
 
 @Injectable()
 export class RequestService implements IRequestService {
