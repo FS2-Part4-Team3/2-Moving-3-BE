@@ -1,6 +1,6 @@
 import { ProviderCreateDTO } from '#auth/types/provider.types.js';
 import { SignUpDTO } from '#auth/types/sign.dto.js';
-import { DriverUpdateDTO } from '#drivers/types/driver.dto.js';
+import { DriverIdDTO, DriverUpdateDTO } from '#drivers/types/driver.dto.js';
 import { Driver } from '#drivers/types/driver.types.js';
 import { DriversFindOptions } from '#types/options.type.js';
 
@@ -15,4 +15,5 @@ export interface IDriverRepository {
   delete: (id: string) => void;
   like: (driverId: string, userId: string) => Promise<Driver>;
   unlike: (driverId: string, userId: string) => Promise<Driver>;
+  findAllDriverIds: () => Promise<DriverIdDTO>;
 }

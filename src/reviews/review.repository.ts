@@ -131,6 +131,12 @@ export class ReviewRepository implements IReviewRepository {
     return review;
   }
 
+  async findByDriverId(driverId: string) {
+    const review = await this.review.findMany({ where: { driverId } });
+
+    return review;
+  }
+
   async create(data: CreateReviewDTO) {
     const review = await this.prisma.$transaction(async tx => {
       const review = await tx.review.create({ data });

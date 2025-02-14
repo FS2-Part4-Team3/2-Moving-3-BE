@@ -11,6 +11,11 @@ export class DriversListDTO {
   list: FilteredDriverOutputDTO[];
 }
 
+export class DriverIdDTO {
+  @ApiProperty({ description: '기사 ID' })
+  id: string[];
+}
+
 const omitKeys = [...modelBaseKeys, ...sensitiveKeys] as (keyof DriverEntity)[];
 export class DriverPatchDTO extends PartialType(OmitType(DriverEntity, omitKeys)) {}
 export interface DriverUpdateDTO extends Partial<Omit<Driver, keyof ModelBase>> {}

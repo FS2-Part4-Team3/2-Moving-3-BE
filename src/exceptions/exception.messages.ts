@@ -35,6 +35,7 @@ enum ExceptionMessages {
 
   REVIEW_NOT_FOUND = '찾을 수 없는 리뷰입니다.',
   REVIEW_ALREADY_SUBMITTED = '이미 리뷰를 작성하였습니다.',
+  AI_REVIEWS_SUMMARY_NOT_FOUND = 'AI 리뷰 요약이 존재하지 않습니다.',
 
   REQUEST_NOT_FOUND = '찾을 수 없는 지정견적요청입니다.',
   ALREADY_REQUESTED = '이미 지정견적요청을 하였습니다.',

@@ -80,7 +80,7 @@ export type AreaType =
   | 'SEOUL'
   | 'GYEONGGI'
   | 'INCHEON'
-  | 'GAGNWON'
+  | 'GANGWON'
   | 'CHUNGBUK'
   | 'CHUNGNAM'
   | 'SEJONG'
@@ -99,7 +99,7 @@ export enum AreaTypeEnum {
   SEOUL = 'SEOUL',
   GYEONGGI = 'GYEONGGI',
   INCHEON = 'INCHEON',
-  GAGNWON = 'GAGNWON',
+  GANGWON = 'GANGWON',
   CHUNGBUK = 'CHUNGBUK',
   CHUNGNAM = 'CHUNGNAM',
   SEJONG = 'SEJONG',

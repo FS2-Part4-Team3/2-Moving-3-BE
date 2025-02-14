@@ -38,6 +38,7 @@
       "#requests/*": ["./src/requests/*"],
       "#reviews/*": ["./src/reviews/*"],
       "#users/*": ["./src/users/*"],
+      "#aiReviewSummary/*": ["./src/aiReviewSummary/*"],
       "#prisma/*": ["./prisma/*"]
     }
   },
