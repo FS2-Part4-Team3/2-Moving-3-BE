@@ -37,6 +37,7 @@ model User {
   likeDrivers   Driver[]
   questions     Question[]
   notifications Notification[]
+  Chat          Chat[]
 }
 
 model Driver {
@@ -72,6 +73,7 @@ model Driver {
   likedUsers    User[]
   questions     Question[]
   notifications Notification[]
+  Chat          Chat[]
 }
 
 model MoveInfo {
@@ -211,7 +213,9 @@ model Chat {
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
+  user     User   @relation(fields: [userId], references: [id])
   userId   String
+  driver   Driver @relation(fields: [driverId], references: [id])
   driverId String
 
   direction ChatDirection
