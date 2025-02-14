@@ -1,4 +1,6 @@
+import { AiReviewSummaryModule } from '#aiReviewSummary/aiReviewSummary.module.js';
 import { AuthModule } from '#auth/auth.module.js';
+import { ChatModule } from '#chats/chat.module.js';
 import { nodeEnv } from '#configs/common.config.js';
 import jwtConfig from '#configs/jwt.config.js';
 import { postgresConfig } from '#configs/postgres.config.js';
@@ -41,8 +43,10 @@ if (nodeEnv === 'development') {
     ReviewModule,
     EstimationModule,
     UserModule,
+    ChatModule,
     SwaggerModule,
     StorageModule,
+    AiReviewSummaryModule,
     ConfigModule.forRoot({ isGlobal: true, load: [jwtConfig, postgresConfig], envFilePath: '.env' }),
     ScheduleModule.forRoot(),
   ],

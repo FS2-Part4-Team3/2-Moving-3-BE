@@ -4,11 +4,11 @@ import {
   NotificationInvalidTargetException,
   NotificationInvalidTypeException,
 } from '#notifications/notification.exception.js';
-import { NotificationGateway } from '#notifications/notification.gateway.js';
 import { NotificationRepository } from '#notifications/notification.repository.js';
 import { notificationMessages } from '#notifications/notifications.messages.js';
 import { NotificationCreateDTO } from '#notifications/types/notification.dto.js';
 import { IStorage, UserType } from '#types/common.types.js';
+import { WebsocketGateway } from '#websockets/websocket.gateway.js';
 import { Injectable } from '@nestjs/common';
 import { NotificationType } from '@prisma/client';
 import { AsyncLocalStorage } from 'async_hooks';
@@ -17,7 +17,7 @@ import { AsyncLocalStorage } from 'async_hooks';
 export class NotificationService implements INotificationService {
   constructor(
     private readonly notificationRepository: NotificationRepository,
-    private readonly notificationGateway: NotificationGateway,
+    private readonly websocketGateway: WebsocketGateway,
     private readonly als: AsyncLocalStorage<IStorage>,
   ) {}
 
@@ -114,7 +114,7 @@ export class NotificationService implements INotificationService {
     const notification = await this.notificationRepository.create(data);
 
     const validId = notification.userId || notification.driverId;
-    this.notificationGateway.sendNotification(validId, { type: 'NEW_NOTIFICATION', data: notification });
+    this.websocketGateway.sendNotification(validId, { type: 'NEW_NOTIFICATION', data: notification });
 
     return notification;
   }
@@ -125,7 +125,7 @@ export class NotificationService implements INotificationService {
     const validId = type === UserType.User ? userId : driverId;
     const notifications = await this.notificationRepository.updateManyAsRead(type, validId, notificationIds);
 
-    this.notificationGateway.sendNotification(validId, { type: 'NOTIFICATIONS_READ', data: notifications });
+    this.websocketGateway.sendNotification(validId, { type: 'NOTIFICATIONS_READ', data: notifications });
 
     return notifications;
   }

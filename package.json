@@ -12,6 +12,7 @@
     "#exceptions/*": "./dist/exceptions/*",
     "#global/*": "./dist/global/*",
     "#utils/*": "./dist/utils/*",
+    "#websockets/*": "./dist/websockets/*",
     "#guards/*": "./dist/guards/*",
     "#decorators/*": "./dist/decorators/*",
     "#swagger/*": "./dist/swagger/*",
@@ -20,10 +21,12 @@
     "#estimations/*": "./dist/estimations/*",
     "#move/*": "./dist/move/*",
     "#notifications/*": "./dist/notifications/*",
+    "#chats/*": "./dist/chats/*",
     "#questions/*": "./dist/questions/*",
     "#requests/*": "./dist/requests/*",
     "#reviews/*": "./dist/reviews/*",
-    "#users/*": "./dist/users/*"
+    "#users/*": "./dist/users/*",
+    "#aiReviewSummary/*": "./dist/aiReviewSummary/*"
   },
   "scripts": {
     "build": "nest build",
@@ -46,6 +49,7 @@
     "@aws-sdk/client-s3": "^3.729.0",
     "@aws-sdk/s3-request-presigner": "^3.729.0",
     "@faker-js/faker": "^9.3.0",
+    "@google/generative-ai": "^0.21.0",
     "@nestjs/common": "^11.0.5",
     "@nestjs/config": "^4.0.0",
     "@nestjs/core": "^11.0.3",

@@ -1,8 +1,9 @@
 import { WSPerson } from '#decorators/ws-person.decorator.js';
 import { Driver } from '#drivers/types/driver.types.js';
 import { WsJwtGuard } from '#guards/ws-jwt.guard.js';
-import { INotificationGateway } from '#notifications/interfaces/notification.gateway.interface.js';
 import { User } from '#users/types/user.types.js';
+import { IWebsocketGateway } from '#websockets/interfaces/websocket.gateway.interface.js';
+import { WebsocketNotification } from '#websockets/types/websocket.type.js';
 import { UseGuards } from '@nestjs/common';
 import { ConnectedSocket, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
@@ -13,7 +14,7 @@ import { Server, Socket } from 'socket.io';
     credentials: true,
   },
 })
-export class NotificationGateway implements INotificationGateway {
+export class WebsocketGateway implements IWebsocketGateway {
   @WebSocketServer()
   server: Server;
 
@@ -38,12 +39,27 @@ export class NotificationGateway implements INotificationGateway {
         sockets.filter(socket => socket.id !== client.id),
       );
     });
+
+    client.on('typing', ({ targetId }) => {
+      this.sendTypingStatus(id, targetId, 'typing');
+    });
+
+    client.on('stopped_typing', ({ targetId }) => {
+      this.sendTypingStatus(id, targetId, 'stopped_typing');
+    });
   }
 
-  sendNotification(id: string, notification: any) {
+  sendNotification(id: string, notification: WebsocketNotification) {
     const sockets = this.getSockets(id);
     if (sockets) {
       sockets.forEach(socket => socket.emit('notification', notification));
+    }
+  }
+
+  sendTypingStatus(id: string, target: string, event: string) {
+    const sockets = this.getSockets(target);
+    if (sockets) {
+      sockets.forEach(socket => socket.emit(event, { id }));
     }
   }
 }

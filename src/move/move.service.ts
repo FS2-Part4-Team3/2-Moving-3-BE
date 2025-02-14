@@ -142,8 +142,25 @@ export class MoveService implements IMoveService {
     if (!moveInfo) {
       throw new MoveInfoNotFoundException();
     }
+    const { requests, estimations, ...pureMoveInfo } = moveInfo;
+    const moveInfoData = { ...pureMoveInfo };
 
-    return moveInfo;
+    return moveInfoData;
+  }
+
+  async getUserMoveInfoId() {
+    const store = this.als.getStore();
+    const userId = store?.userId;
+
+    const moveInfo = await this.moveRepository.findByUserId(userId);
+
+    if (!moveInfo || moveInfo.length === 0) {
+      throw new MoveInfoNotFoundException();
+    }
+    const { id } = moveInfo[0];
+    const moveInfoId = { id };
+
+    return moveInfoId;
   }
 
   async checkMoveInfoExistence() {
@@ -155,6 +172,27 @@ export class MoveService implements IMoveService {
     const moveInfo = await this.moveRepository.findByUserId(userId);
 
     return moveInfo;
+  }
+
+  async getIsMoveInfoEditable(moveInfoId: string) {
+    const store = this.als.getStore();
+    const userId = store?.userId;
+    const type = store?.type;
+    if (type !== UserType.User) {
+      throw new DriverInvalidTokenException();
+    }
+
+    const moveInfo = await this.moveRepository.findByMoveInfoId(moveInfoId);
+    if (!moveInfo) {
+      throw new MoveInfoNotFoundException();
+    }
+    if (userId !== moveInfo.ownerId) {
+      throw new ForbiddenException();
+    }
+
+    const isMoveInfoEditable = moveInfo.estimations.length === 0 ? true : false;
+
+    return { isMoveInfoEditable };
   }
 
   async getReceivedEstimations(options: moveInfoWithEstimationsGetQueries) {
@@ -210,9 +248,9 @@ export class MoveService implements IMoveService {
     return moveInfo;
   }
 
-  async patchMoveInfo(moveId: string, body: Partial<MoveInfoInputDTO>) {
+  async patchMoveInfo(moveInfoId: string, body: Partial<MoveInfoInputDTO>) {
     const { userId } = this.als.getStore();
-    const moveInfo = await this.moveRepository.findByMoveInfoId(moveId);
+    const moveInfo = await this.moveRepository.findByMoveInfoId(moveInfoId);
 
     if (!moveInfo) {
       throw new MoveInfoNotFoundException();
@@ -224,14 +262,14 @@ export class MoveService implements IMoveService {
       throw new ReceivedEstimationException();
     }
 
-    const updatedMoveInfo = await this.moveRepository.update(moveId, body);
+    const updatedMoveInfo = await this.moveRepository.update(moveInfoId, body);
 
     return updatedMoveInfo;
   }
 
-  async softDeleteMoveInfo(moveId: string) {
+  async softDeleteMoveInfo(moveInfoId: string) {
     const { userId } = this.als.getStore();
-    const moveInfo = await this.moveRepository.findByMoveInfoId(moveId);
+    const moveInfo = await this.moveRepository.findByMoveInfoId(moveInfoId);
 
     if (!moveInfo) {
       throw new MoveInfoNotFoundException();
@@ -240,7 +278,7 @@ export class MoveService implements IMoveService {
       throw new ForbiddenException();
     }
 
-    const softDeleteMoveInfo = await this.moveRepository.softDeleteMoveInfo(moveId);
+    const softDeleteMoveInfo = await this.moveRepository.softDeleteMoveInfo(moveInfoId);
 
     return softDeleteMoveInfo;
   }

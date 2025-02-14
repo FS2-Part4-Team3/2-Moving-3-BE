@@ -10,5 +10,6 @@ import { Module } from '@nestjs/common';
   imports: [DBModule, GuardModule, EstimationModule],
   controllers: [ReviewController],
   providers: [ReviewService, ReviewRepository],
+  exports: [ReviewRepository],
 })
 export class ReviewModule {}

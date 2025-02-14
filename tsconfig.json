@@ -26,6 +26,7 @@
       "#exceptions/*": ["./src/exceptions/*"],
       "#global/*": ["./src/global/*"],
       "#utils/*": ["./src/utils/*"],
+      "#websockets/*": ["./src/websockets/*"],
       "#guards/*": ["./src/guards/*"],
       "#decorators/*": ["./src/decorators/*"],
       "#swagger/*": ["./src/swagger/*"],
@@ -34,10 +35,12 @@
       "#estimations/*": ["./src/estimations/*"],
       "#move/*": ["./src/move/*"],
       "#notifications/*": ["./src/notifications/*"],
+      "#chats/*": ["./src/chats/*"],
       "#questions/*": ["./src/questions/*"],
       "#requests/*": ["./src/requests/*"],
       "#reviews/*": ["./src/reviews/*"],
       "#users/*": ["./src/users/*"],
+      "#aiReviewSummary/*": ["./src/aiReviewSummary/*"],
       "#prisma/*": ["./prisma/*"]
     }
   },

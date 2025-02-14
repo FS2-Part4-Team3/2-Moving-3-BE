@@ -6,7 +6,9 @@ import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse }
 import { MoveService } from './move.service.js';
 import {
   BaseMoveInfoOutputDTO,
+  IsMoveInfoEditableDTO,
   MoveInfo,
+  MoveInfoIdDTO,
   MoveInfoInputDTO,
   MoveInfoResponseDTO,
   MoveInfoWithEstimationsResponseDTO,
@@ -49,6 +51,20 @@ export class MoveController implements IMoveController {
     const moveInfo = await this.moveService.getMoveInfos(query);
 
     return moveInfo;
+  }
+
+  @Get('userMoveInfoId')
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth('accessToken')
+  @ApiOperation({ summary: '유저의 이사정보ID 조회' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: MoveInfoIdDTO,
+  })
+  async getUserMoveInfoId() {
+    const moveInfoId = await this.moveService.getUserMoveInfoId();
+
+    return moveInfoId;
   }
 
   @Get('check')
@@ -94,6 +110,21 @@ export class MoveController implements IMoveController {
     return moveInfo;
   }
 
+  @Get(':moveInfoId/editability')
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth('accessToken')
+  @ApiOperation({ summary: '이사정보 변경(수정, 삭제) 가능여부 조회' })
+  @ApiParam({ name: 'moveInfoId', description: '이사정보 ID', type: 'string' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: IsMoveInfoEditableDTO,
+  })
+  async getIsMoveInfoEditable(@Param('moveInfoId') moveInfoId: string) {
+    const isMoveInfoEditable = await this.moveService.getIsMoveInfoEditable(moveInfoId);
+
+    return isMoveInfoEditable;
+  }
+
   @Post()
   @UseGuards(AccessTokenGuard)
   @ApiOperation({ summary: '이사 정보 생성' })
@@ -107,29 +138,29 @@ export class MoveController implements IMoveController {
     return moveInfo;
   }
 
-  @Patch(':moveId')
+  @Patch(':moveInfoId')
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth('accessToken')
   @ApiOperation({ summary: '이사 정보 수정' })
-  @ApiParam({ name: 'moveId', description: '이사정보 ID', type: 'string' })
+  @ApiParam({ name: 'moveInfoId', description: '이사정보 ID', type: 'string' })
   @ApiBody({ type: MovePatchInputDTO })
   @ApiResponse({
     status: HttpStatus.OK,
     type: BaseMoveInfoOutputDTO,
   })
-  async patchMoveInfo(@Param('moveId') moveId: string, @Body() body: Partial<MoveInfoInputDTO>) {
-    const moveInfo = await this.moveService.patchMoveInfo(moveId, body);
+  async patchMoveInfo(@Param('moveInfoId') moveInfoId: string, @Body() body: Partial<MoveInfoInputDTO>) {
+    const moveInfo = await this.moveService.patchMoveInfo(moveInfoId, body);
 
     return moveInfo;
   }
 
-  @Delete(':moveId')
+  @Delete(':moveInfoId')
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth('accessToken')
   @ApiOperation({ summary: '이사 정보 삭제' })
-  @ApiParam({ name: 'moveId', description: '이사정보 ID', type: 'string' })
-  async deleteMoveInfo(@Param('moveId') moveId: string) {
-    const moveInfo = await this.moveService.softDeleteMoveInfo(moveId);
+  @ApiParam({ name: 'moveInfoId', description: '이사정보 ID', type: 'string' })
+  async deleteMoveInfo(@Param('moveInfoId') moveInfoId: string) {
+    const moveInfo = await this.moveService.softDeleteMoveInfo(moveInfoId);
 
     return moveInfo;
   }
