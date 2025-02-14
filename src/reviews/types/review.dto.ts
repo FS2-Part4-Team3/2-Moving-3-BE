@@ -1,28 +1,5 @@
-import { ModelBase } from '#types/common.types.js';
 import { ApiProperty } from '@nestjs/swagger';
-import { Review as PrismaReview } from '@prisma/client';
 import { IsNotEmpty, IsOptional, IsPositive, IsString, IsUUID } from 'class-validator';
-
-interface PrismaReviewBase extends Omit<PrismaReview, keyof ModelBase> {}
-interface ReviewBase extends PrismaReviewBase {}
-
-export interface Review extends ReviewBase, ModelBase {}
-
-export interface ReviewInputDTO extends Omit<Review, keyof ModelBase> {}
-
-export interface IReivew {
-  id: string;
-  createdAt: Date;
-  updatedAt: Date;
-  deletedAt?: Date;
-
-  comment: string;
-  score: number;
-
-  driverId: string;
-  ownerId: string;
-  estimationId: string;
-}
 
 export class ReviewOutputDTO {
   @ApiProperty({ description: '리뷰 ID', type: String })
