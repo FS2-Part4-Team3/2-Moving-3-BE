@@ -10,7 +10,7 @@ import {
   RejectedEstimationsListDTO,
   DriverEstimationDetailDTO,
 } from '#estimations/estimation.types.js';
-import { Injectable, Options } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { IStorage } from '#types/common.types.js';
 import { AsyncLocalStorage } from 'async_hooks';
 import { MoveRepository } from '#move/move.repository.js';
@@ -18,11 +18,10 @@ import { RequestRepository } from '#requests/request.repository.js';
 import { IMoveInfo } from '#move/types/move.types.js';
 import { EstimateAlreadyExistsException, EstimationAccessForbiddenException } from './estimation.exception.js';
 import { RequestRejectedException } from './estimation.exception.js';
-import { DriverNotFoundException, DriverUnauthorizedException } from '#drivers/driver.exception.js';
+import { DriverNotFoundException } from '#drivers/driver.exception.js';
 import { MoveInfoNotFoundException } from '#move/move.exception.js';
 import { DriverService } from '#drivers/driver.service.js';
 import { UnauthorizedException } from '#exceptions/http.exception.js';
-import { IsActivate, OffsetPaginationOptions } from '#types/options.type.js';
 import {
   DriverEstimationsGetQueries,
   DriverRejectedEstimations,
