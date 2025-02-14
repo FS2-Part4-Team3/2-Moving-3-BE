@@ -220,6 +220,8 @@ model Chat {
 
   direction ChatDirection
   message   String
+  image     String?
+  isRead    Boolean       @default(false)
 
   @@index([createdAt])
 }
