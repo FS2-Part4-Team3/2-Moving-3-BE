@@ -1,3 +1,4 @@
+import { IsActivate, Status } from '#estimations/estimation.types.js';
 import { PrismaService } from '#global/prisma.service.js';
 import { IRequestRepository } from '#requests/interfaces/request.repository.interface.js';
 import { CreateRequestDTO, PatchRequestDTO } from '#requests/request.types.js';
@@ -39,5 +40,17 @@ export class RequestRepository implements IRequestRepository {
     const request = await this.request.delete({ where: { id } });
 
     return request;
+  }
+
+  async DesignatedRequest(moveInfoId: string, driverId: string): Promise<IsActivate> {
+    const requestCount = await this.prisma.request.count({
+      where: {
+        moveInfoId,
+        driverId,
+        status: Status.APPLY,
+      },
+    });
+
+    return requestCount > 0 ? IsActivate.Active : IsActivate.Inactive;
   }
 }
