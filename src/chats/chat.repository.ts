@@ -12,14 +12,14 @@ export class ChatRepository implements IChatRepository {
     this.chat = prisma.chat;
   }
 
-  countList(id: string, userType: UserType) {
+  async countList(id: string, userType: UserType) {
     const where = userType === UserType.User ? { userId: id } : { driverId: id };
 
-    return this.chat.count({ where });
+    return await this.chat.count({ where });
   }
 
-  countChats(userId: string, driverId: string) {
-    return this.chat.count({
+  async countChats(userId: string, driverId: string) {
+    return await this.chat.count({
       where: {
         userId,
         driverId,
@@ -27,11 +27,11 @@ export class ChatRepository implements IChatRepository {
     });
   }
 
-  findList(id: string, userType: UserType, options: OffsetPaginationOptions) {
+  async findList(id: string, userType: UserType, options: OffsetPaginationOptions) {
     const where = userType === UserType.User ? { userId: id } : { driverId: id };
     const { page, pageSize } = options;
 
-    return this.chat.findMany({
+    return await this.chat.findMany({
       where,
       orderBy: { createdAt: 'desc' },
       take: pageSize,
@@ -39,10 +39,10 @@ export class ChatRepository implements IChatRepository {
     });
   }
 
-  findChats(userId: string, driverId: string, options: OffsetPaginationOptions) {
+  async findChats(userId: string, driverId: string, options: OffsetPaginationOptions) {
     const { page, pageSize } = options;
 
-    return this.chat.findMany({
+    return await this.chat.findMany({
       where: {
         userId,
         driverId,
@@ -53,7 +53,7 @@ export class ChatRepository implements IChatRepository {
     });
   }
 
-  create(data: ChatCreateDTO) {
-    return this.chat.create({ data });
+  async create(data: ChatCreateDTO) {
+    return await this.chat.create({ data });
   }
 }
