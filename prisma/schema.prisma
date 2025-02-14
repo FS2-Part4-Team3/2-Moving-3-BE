@@ -67,6 +67,7 @@ model Driver {
   provider   String?
   providerId String?
 
+
   reviews       Review[]
   requests      Request[]
   estimations   Estimation[]
@@ -74,6 +75,7 @@ model Driver {
   questions     Question[]
   notifications Notification[]
   Chat          Chat[]
+  aiReviewSummary aiReviewSummary?
 }
 
 model MoveInfo {
@@ -212,16 +214,30 @@ model Chat {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
-
+  
   user     User   @relation(fields: [userId], references: [id])
   userId   String
   driver   Driver @relation(fields: [driverId], references: [id])
   driverId String
-
+  
   direction ChatDirection
   message   String
   image     String?
   isRead    Boolean       @default(false)
+
+  @@index([createdAt])
+ }
+ 
+model aiReviewSummary {
+  id        String    @id @default(uuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  summaryReview String
+
+  driver   Driver @relation(fields: [driverId], references: [id])
+  driverId String @unique
 
   @@index([createdAt])
 }
@@ -240,7 +256,7 @@ enum Area {
   SEOUL
   GYEONGGI
   INCHEON
-  GAGNWON
+  GANGWON
   CHUNGBUK
   CHUNGNAM
   SEJONG

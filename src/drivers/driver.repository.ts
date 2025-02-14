@@ -160,4 +160,10 @@ export class DriverRepository implements IDriverRepository {
 
     return !!driver;
   }
+
+  async findAllDriverIds() {
+    return this.driver.findMany({
+      select: { id: true },
+    });
+  }
 }

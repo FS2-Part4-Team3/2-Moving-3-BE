@@ -1,6 +1,6 @@
-import { Area } from '@prisma/client';
+import { AreaType } from '#types/common.types.js';
 
-export function areaToKeyword(area: Area): string {
+export function areaToKeyword(area: AreaType): string {
   switch (area) {
     case 'SEOUL':
       return '서울';
@@ -8,7 +8,7 @@ export function areaToKeyword(area: Area): string {
       return '경기';
     case 'INCHEON':
       return '인천';
-    case 'GAGNWON':
+    case 'GANGWON':
       return '강원';
     case 'CHUNGBUK':
       return '충북';
