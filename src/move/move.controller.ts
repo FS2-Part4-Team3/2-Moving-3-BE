@@ -165,7 +165,7 @@ export class MoveController implements IMoveController {
     return moveInfo;
   }
 
-  @Post(':moveId/confirm/:estimationId')
+  @Post(':moveInfoId/confirm/:estimationId')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth('accessToken')
@@ -173,9 +173,8 @@ export class MoveController implements IMoveController {
   @ApiResponse({
     status: HttpStatus.NO_CONTENT,
   })
-  async confirmEstimation(@Param('moveId') moveId: string, @Param('estimationId') estimationId: string) {
-    console.log(moveId);
-    await this.moveService.confirmEstimation(moveId, estimationId);
+  async confirmEstimation(@Param('moveInfoId') moveInfoId: string, @Param('estimationId') estimationId: string) {
+    await this.moveService.confirmEstimation(moveInfoId, estimationId);
     return;
   }
 }
