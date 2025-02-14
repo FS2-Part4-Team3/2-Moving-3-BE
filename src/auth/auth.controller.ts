@@ -5,6 +5,7 @@ import { FilteredUserOutputDTO } from '#auth/types/filtered.user.dto.js';
 import { GoogleAuthType, KakaoAuthType, NaverAuthType } from '#auth/types/provider.types.js';
 import { SignInDTO, SignUpDTO } from '#auth/types/sign.dto.js';
 import { UpdatePasswordDTO } from '#auth/types/update-password.dto.js';
+import { oauthRedirect } from '#configs/common.config.js';
 import { BadRequestException } from '#exceptions/http.exception.js';
 import { EnumValidationPipe } from '#global/pipes/enum.validation.pipe.js';
 import { AccessTokenGuard } from '#guards/access-token.guard.js';
@@ -236,8 +237,7 @@ export class AuthController implements IAuthController {
     const { person, accessToken, refreshToken } = await this.authService.googleAuth(redirectResult);
     this.setRefreshToken(response, refreshToken);
 
-    response.redirect(`http://localhost:3000/callback/google?accessToken=${accessToken}`);
-    // response.redirect(`https://www.moving.wiki/callback/google?accessToken=${accessToken}`);
+    response.redirect(`${oauthRedirect}/callback/google?accessToken=${accessToken}`);
   }
 
   @Get('kakao/:userType')
@@ -264,8 +264,7 @@ export class AuthController implements IAuthController {
     const { person, accessToken, refreshToken } = await this.authService.kakaoAuth(redirectResult);
     this.setRefreshToken(response, refreshToken);
 
-    response.redirect(`http://localhost:3000/callback/kakao?accessToken=${accessToken}`);
-    // response.redirect(`https://www.moving.wiki/callback/kakao?accessToken=${accessToken}`);
+    response.redirect(`${oauthRedirect}/callback/google?accessToken=${accessToken}`);
   }
 
   @Get('naver/:userType')
@@ -292,7 +291,6 @@ export class AuthController implements IAuthController {
     const { person, accessToken, refreshToken } = await this.authService.naverAuth(redirectResult);
     this.setRefreshToken(response, refreshToken);
 
-    response.redirect(`http://localhost:3000/callback/naver?accessToken=${accessToken}`);
-    // response.redirect(`https://www.moving.wiki/callback/kakao?accessToken=${accessToken}`);
+    response.redirect(`${oauthRedirect}/callback/google?accessToken=${accessToken}`);
   }
 }
