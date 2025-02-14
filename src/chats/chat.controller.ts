@@ -3,7 +3,7 @@ import { IChatController } from '#chats/interfaces/chat.controller.interface.js'
 import { ChatDTO, ChatListDTO, ChatPostDTO } from '#chats/types/chat.dto.js';
 import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { ChatGetQueries } from '#types/queries.type.js';
-import { Body, Controller, Get, HttpStatus, Param, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @Controller('chats')
@@ -30,8 +30,9 @@ export class ChatController implements IChatController {
   }
 
   @Post(':targetId')
+  @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: '채팅 전송' })
-  @ApiResponse({ status: HttpStatus.OK, type: ChatDTO })
+  @ApiResponse({ status: HttpStatus.CREATED, type: ChatDTO })
   async postChat(@Param('targetId') targetId: string, @Body() body: ChatPostDTO) {
     return await this.chatService.createChat(targetId, body);
   }
