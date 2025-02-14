@@ -1,14 +1,13 @@
 import { PrismaService } from '#global/prisma.service.js';
 import { IMoveRepository } from '#move/interfaces/move.repository.interface.js';
 import { MoveInfo, MoveInfoInputDTO } from '#move/move.types.js';
-import { IsActivate, MoveInfoSortOrder, OffsetPaginationOptions } from '#types/options.type.js';
+import { MoveInfoSortOrder, OffsetPaginationOptions } from '#types/options.type.js';
 import { MoveInfoGetQueries } from '#types/queries.type.js';
 import { areaToKeyword } from '#utils/address-utils.js';
 import { getDayEnd, getDayStart } from '#utils/dateUtils.js';
 import { Injectable } from '@nestjs/common';
 import { Area, Progress } from '@prisma/client';
 import { IMoveInfo } from './types/move.types.js';
-import { UserInvalidTokenException } from '#users/user.exception.js';
 
 @Injectable()
 export class MoveRepository implements IMoveRepository {
@@ -214,5 +213,42 @@ export class MoveRepository implements IMoveRepository {
         progress: Progress.CONFIRMED, // 상태를 CONFIRMED로 업데이트
       },
     });
+  }
+
+  // MoveInfo의 상태를 업데이트하는 메서드
+  async updateMoveInfoProgress(currentStatus: string, newStatus: string, now: Date) {
+    const result = await this.prisma.moveInfo.updateMany({
+      where: {
+        progress: Progress.CONFIRMED, // 현재 상태
+        date: {
+          lt: now, // 현재 시간보다 이전
+        },
+        confirmedEstimationId: currentStatus === 'CONFIRMED' ? { not: null } : undefined, // 상태가 'CONFIRMED'인 경우만
+      },
+      data: {
+        progress: newStatus, //Progress.COMPLETE,  // 완료됨상태
+      },
+    });
+
+    return result.count;
+  }
+
+  // 'EXPIRED' 상태의 MoveInfo에 연결된 Request를 'EXPIRED'로 변경하기
+  async updateRequestsStatus() {
+    const expiredMoveInfos = await this.prisma.moveInfo.findMany({
+      where: { progress: 'EXPIRED' },
+      select: { id: true },
+    });
+
+    const result = await this.prisma.request.updateMany({
+      where: {
+        moveInfoId: { in: expiredMoveInfos.map(move => move.id) },
+      },
+      data: {
+        status: 'EXPIRED',
+      },
+    });
+
+    return result.count;
   }
 }

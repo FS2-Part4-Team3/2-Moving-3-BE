@@ -18,4 +18,5 @@ export interface IMoveService {
   getReceivedEstimations: (options: moveInfoWithEstimationsGetQueries) => Promise<MoveInfoWithEstimationsResponseDTO>;
   postMoveInfo: (moveData: MoveInfoInputDTO) => Promise<MoveInfo>;
   patchMoveInfo: (moveInfoId: string, body: Partial<MoveInfoInputDTO>) => Promise<MoveInfo>;
+  autoCompleteMoves: () => Promise<void>;
 }

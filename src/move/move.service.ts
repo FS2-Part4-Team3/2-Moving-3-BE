@@ -1,24 +1,26 @@
 import { IMoveService } from '#move/interfaces/move.service.interface.js';
 import { AreaType, IStorage, UserType } from '#types/common.types.js';
 import { MoveInfoGetQueries, moveInfoWithEstimationsGetQueries } from '#types/queries.type.js';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { AsyncLocalStorage } from 'async_hooks';
 import { MoveRepository } from './move.repository.js';
 import { MoveInfoNotFoundException, ReceivedEstimationException } from './move.exception.js';
 import { Progress } from '@prisma/client';
 import { MoveInfo, MoveInfoInputDTO } from './move.types.js';
-import { ForbiddenException, InternalServerErrorException, NotFoundException } from '#exceptions/http.exception.js';
+import { ForbiddenException } from '#exceptions/http.exception.js';
 import { DriverInvalidTokenException } from '#drivers/driver.exception.js';
 import { DriverService } from '#drivers/driver.service.js';
 import { EstimationsFilter, IsActivate } from '#types/options.type.js';
 import { EstimationRepository } from '#estimations/estimation.repository.js';
 import { ConfirmedEstimationException, EstimationNotFoundException } from '#estimations/estimation.exception.js';
-import { PrismaService } from '#global/prisma.service.js';
 import { RequestRepository } from '#requests/request.repository.js';
 import { areaToKeyword } from '#utils/address-utils.js';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class MoveService implements IMoveService {
+  private readonly logger = new Logger(MoveService.name);
+
   constructor(
     private readonly driverService: DriverService,
     private readonly moveRepository: MoveRepository,
@@ -26,6 +28,67 @@ export class MoveService implements IMoveService {
     private readonly estimationRepository: EstimationRepository,
     private readonly requestRepository: RequestRepository,
   ) {}
+
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  async autoCompleteMoves() {
+    const now = new Date();
+
+    // 'CONFIRMED' 상태에서 진행된 이사는 'COMPLETE'로 바꾸기
+    const updatedComplete = await this.prisma.moveInfo.updateMany({
+      where: {
+        progress: 'CONFIRMED',
+        date: {
+          lt: now, // 날짜가 현재 시간보다 이전인 경우에..?
+        },
+        confirmedEstimationId: {
+          not: null, // 확정된 견적이 있는 경우만
+        },
+      },
+      data: {
+        progress: 'COMPLETE', // 'COMPLETE'로 변경
+      },
+    });
+
+    // 확정되지 않은 'OPEN' 상태의 이사 요청을 'EXPIRED'로 바꾸기
+    const updatedMoveExpired = await this.prisma.moveInfo.updateMany({
+      where: {
+        progress: 'OPEN', // 'OPEN' 상태
+        confirmedEstimationId: null, // 확정된 견적이 없는 경우
+        date: {
+          lt: now, // 시간이 지난 경우
+        },
+      },
+      data: {
+        progress: 'EXPIRED', // 'EXPIRED'로 변경
+      },
+    });
+
+    // 'EXPIRED'인 MoveInfo에 연결된 Request들도 'EXPIRED'로 변경
+    const updatedRequestsExpired = await this.prisma.request.updateMany({
+      where: {
+        moveInfoId: {
+          in: await this.prisma.moveInfo
+            .findMany({
+              where: {
+                progress: 'EXPIRED', // progress가 'EXPIRED'인 경우
+              },
+              select: {
+                id: true, // MoveInfo의 ID만
+              },
+            })
+            .then(result => result.map(move => move.id)),
+        },
+      },
+      data: {
+        status: 'EXPIRED', // Request의 상태를 'EXPIRED'로 변경
+      },
+    });
+
+    // 로그 출력
+    this.logger.log(`Auto-completed ${updatedComplete.count} moves to COMPLETE.`);
+    this.logger.log(`Auto-expired ${updatedMoveExpired.count} moves.`);
+    this.logger.log(`Auto-expired ${updatedRequestsExpired.count} requests.`);
+  }
 
   private async getFilteredDriverData(driverId: string) {
     const driver = await this.driverService.findDriver(driverId);
