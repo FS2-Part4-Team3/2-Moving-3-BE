@@ -8,10 +8,13 @@ import { UpdatePasswordDTO } from '#auth/types/update-password.dto.js';
 import { BadRequestException } from '#exceptions/http.exception.js';
 import { EnumValidationPipe } from '#global/pipes/enum.validation.pipe.js';
 import { AccessTokenGuard } from '#guards/access-token.guard.js';
+import { GuardService } from '#guards/guard.service.js';
 import { HashPasswordGuard } from '#guards/hash-password.guard.js';
 import { RefreshTokenGuard } from '#guards/refresh-token.guard.js';
 import { UserType } from '#types/common.types.js';
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 import { AuthGuard } from '@nestjs/passport';
 import {
   ApiBearerAuth,
@@ -26,7 +29,12 @@ import { Response } from 'express';
 
 @Controller('auth')
 export class AuthController implements IAuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly configService: ConfigService,
+    private readonly jwtService: JwtService,
+    private readonly guardService: GuardService,
+  ) {}
 
   private setRefreshToken(res: Response, token: string) {
     const maxAge = token ? 1000 * 60 * 60 * 24 * 14 : 0;
@@ -133,6 +141,54 @@ export class AuthController implements IAuthController {
     const person = await this.authService.getMe();
 
     return person;
+  }
+
+  @Get('isLoggedIn')
+  @ApiOperation({ summary: '로그인 상태 조회' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    schema: {
+      type: 'object',
+      properties: {
+        isAccessTokenValid: { type: 'boolean' },
+        isRefreshTokenValid: { type: 'boolean' },
+        userType: {
+          type: 'string',
+          enum: Object.values(UserType),
+        },
+      },
+    },
+  })
+  async isLoggedIn(@Req() req) {
+    let isAccessTokenValid = false;
+    let isRefreshTokenValid = false;
+    let userType = null;
+
+    const accessToken = req.cookies['accessToken'];
+    const refreshToken = req.cookies['refreshToken'];
+
+    if (accessToken) {
+      const jwtSecret = this.configService.get('jwtSecret');
+      const payload = await this.jwtService.verifyAsync(accessToken, { secret: jwtSecret });
+      const person = await this.guardService.validatePerson(payload.id, payload.type);
+
+      if (person) {
+        isAccessTokenValid = true;
+        userType = payload.type;
+      }
+    }
+
+    if (refreshToken) {
+      const jwtSecret = this.configService.get('jwtSecret');
+      const payload = await this.jwtService.verifyAsync(refreshToken, { secret: jwtSecret });
+      const person = await this.guardService.validatePerson(payload.id, payload.type);
+
+      if (person && person.refreshToken === refreshToken) {
+        isRefreshTokenValid = true;
+      }
+    }
+
+    return { isAccessTokenValid, isRefreshTokenValid, userType };
   }
 
   @Post('refresh')
