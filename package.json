@@ -21,6 +21,7 @@
     "#estimations/*": "./dist/estimations/*",
     "#move/*": "./dist/move/*",
     "#notifications/*": "./dist/notifications/*",
+    "#chats/*": "./dist/chats/*",
     "#questions/*": "./dist/questions/*",
     "#requests/*": "./dist/requests/*",
     "#reviews/*": "./dist/reviews/*",
