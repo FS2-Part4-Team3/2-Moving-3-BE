@@ -2,6 +2,7 @@ import { ChatRepository } from '#chats/chat.repository.js';
 import { IChatService } from '#chats/interfaces/chat.service.interface.js';
 import { IStorage, UserType } from '#types/common.types.js';
 import { OffsetPaginationOptions } from '#types/options.type.js';
+import { WebsocketGateway } from '#websockets/websocket.gateway.js';
 import { Injectable } from '@nestjs/common';
 import { ChatDirection } from '@prisma/client';
 import { AsyncLocalStorage } from 'async_hooks';
@@ -10,6 +11,7 @@ import { AsyncLocalStorage } from 'async_hooks';
 export class ChatService implements IChatService {
   constructor(
     private readonly chatRepository: ChatRepository,
+    private readonly websocketGateway: WebsocketGateway,
     private readonly als: AsyncLocalStorage<IStorage>,
   ) {}
 
@@ -45,6 +47,9 @@ export class ChatService implements IChatService {
         ? { userId, driverId: targetId, direction: ChatDirection.USER_TO_DRIVER, message }
         : { userId: targetId, driverId, direction: ChatDirection.DRIVER_TO_USER, message };
 
-    return this.chatRepository.create(data);
+    const chat = await this.chatRepository.create(data);
+    this.websocketGateway.sendNotification(targetId, { type: 'NEW_CHAT', data: chat });
+
+    return chat;
   }
 }
