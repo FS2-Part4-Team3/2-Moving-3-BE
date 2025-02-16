@@ -40,4 +40,19 @@ export class RequestRepository implements IRequestRepository {
 
     return request;
   }
+
+  // 지정여부 확인하기 ( 리퀘스트 테이블에서 apply인거만 )
+  async DesignatedRequest(moveInfoId: string, driverId: string): Promise<boolean> {
+    const [{ exists }] = await this.prisma.$queryRaw<{ exists: boolean }[]>` SELECT EXISTS(
+        SELECT 1
+        FROM "Request" AS r
+        LEFT JOIN "MoveInfo" AS m ON r."moveInfoId" = m.id
+        LEFT JOIN "Driver" AS d ON r."driverId" = d.id
+        WHERE r."moveInfoId" = ${moveInfoId}
+        AND r."driverId" = ${driverId}
+        AND r."status" IS NOT NULL
+        )`;
+    console.log('ddddddddddddddddddddddddddddd', exists);
+    return exists;
+  }
 }
