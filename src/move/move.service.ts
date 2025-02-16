@@ -304,7 +304,7 @@ export class MoveService implements IMoveService {
     return softDeleteMoveInfo;
   }
 
-  async confirmEstimation(moveInfoId: string, estimationId: string) {
+  async confirmEstimation(moveInfoId: string, estimationId: string): Promise<void> {
     const { userId } = this.als.getStore();
 
     // 1. 이사 정보 찾기
