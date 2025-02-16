@@ -123,15 +123,12 @@ export class EstimationService implements IEstimationService {
   async getUserEstimationList(options: EstimationGetQueries): Promise<UserEstimationListWithCountDTO> {
     const { userId } = this.als.getStore();
     if (!userId) throw new UnauthorizedException();
-    // console.log('ususususu', userId);
 
     const { page, pageSize } = options;
     const totalCount = await this.estimationRepository.getTotalCountForUser(userId);
-    // console.log('~~~~~~~~~~~~~~~~~~~!!!!!!!!!!Total Count:', totalCount);
 
     const estimations = await this.estimationRepository.findUserEstimations(userId, page, pageSize);
-    // console.log('~~~~~~~~~~~~~~~~~~~~~~~!!!!Estimations:', estimations);
-    console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ggggggggggg');
+
     const estimationsWithInfo = await Promise.all(
       estimations.map(async estimation => {
         const driver = await this.driversService.findDriver(estimation.driverId);
@@ -139,9 +136,6 @@ export class EstimationService implements IEstimationService {
         const moveInfo = await this.moveRepository.findByMoveInfoId(estimation.moveInfoId);
 
         const designatedRequest = await this.requestRepository.DesignatedRequest(estimation.moveInfoId, estimation.driverId);
-        //const designatedRequest = await this.estimationRepository.isDesignatedEstimation(estimation.id);
-        console.log('Designated~~~~~~~~~~~~~~~~~~~', estimation.id, designatedRequest);
-        console.log(`견적 ${estimation.id} - e지정 견적 여부: ${designatedRequest}`);
 
         return {
           driver: {
