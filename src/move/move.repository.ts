@@ -136,9 +136,6 @@ export class MoveRepository implements IMoveRepository {
   async findByUserId(userId: string) {
     const moveInfo = await this.moveInfo.findMany({
       where: { ownerId: userId, progress: ProgressEnum.OPEN },
-      include: {
-        requests: true,
-      },
     });
 
     return moveInfo;
