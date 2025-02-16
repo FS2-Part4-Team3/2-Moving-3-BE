@@ -6,16 +6,15 @@ import { AsyncLocalStorage } from 'async_hooks';
 import { MoveRepository } from './move.repository.js';
 import { MoveInfoNotFoundException, ReceivedEstimationException } from './move.exception.js';
 import { Progress } from '@prisma/client';
-import { MoveInfo, MoveInfoInputDTO } from './move.types.js';
-import { ForbiddenException, InternalServerErrorException, NotFoundException } from '#exceptions/http.exception.js';
+import { ForbiddenException } from '#exceptions/http.exception.js';
 import { DriverInvalidTokenException } from '#drivers/driver.exception.js';
 import { DriverService } from '#drivers/driver.service.js';
 import { EstimationsFilter, IsActivate } from '#types/options.type.js';
 import { EstimationRepository } from '#estimations/estimation.repository.js';
 import { ConfirmedEstimationException, EstimationNotFoundException } from '#estimations/estimation.exception.js';
-import { PrismaService } from '#global/prisma.service.js';
 import { RequestRepository } from '#requests/request.repository.js';
 import { areaToKeyword } from '#utils/address-utils.js';
+import { MoveInputDTO, MovePatchInputDTO } from './types/move.dto.js';
 
 @Injectable()
 export class MoveService implements IMoveService {
@@ -236,7 +235,7 @@ export class MoveService implements IMoveService {
     return { totalCount, list: processedMoveInfos };
   }
 
-  async postMoveInfo(moveData: MoveInfoInputDTO): Promise<MoveInfo> {
+  async postMoveInfo(moveData: MoveInputDTO) {
     const { userId } = this.als.getStore();
     const progress = Progress.OPEN;
     const moveInfo = await this.moveRepository.postMoveInfo({
@@ -248,7 +247,7 @@ export class MoveService implements IMoveService {
     return moveInfo;
   }
 
-  async patchMoveInfo(moveInfoId: string, body: Partial<MoveInfoInputDTO>) {
+  async patchMoveInfo(moveInfoId: string, body: MovePatchInputDTO) {
     const { userId } = this.als.getStore();
     const moveInfo = await this.moveRepository.findByMoveInfoId(moveInfoId);
 
