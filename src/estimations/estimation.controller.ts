@@ -2,7 +2,6 @@ import { EstimationService } from '#estimations/estimation.service.js';
 import {
   DriverEstimationDetailDTO,
   DriverEstimationsList,
-  DriverEstimationsListDTO,
   EstimationInputDTO,
   EstimationOutputDTO,
   RejectedEstimationsListDTO,
@@ -23,8 +22,8 @@ import {
   GetQueries,
   ReviewableGetQueries,
 } from '#types/queries.type.js';
-import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards, ValidationPipe } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @Controller('estimations')
 export class EstimationController implements IEstimationController {
