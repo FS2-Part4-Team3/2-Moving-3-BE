@@ -3,7 +3,7 @@ import { GuardService } from '#guards/guard.service.js';
 import { RequestController } from '#requests/request.controller.js';
 import { RequestNotFoundException } from '#requests/request.exception.js';
 import { RequestService } from '#requests/request.service.js';
-import { BaseRequestOutputDTO, checkRequestOutputDTO, RequestOutputDTO } from '#requests/request.types.js';
+import { BaseRequestOutputDTO, checkRequestOutputDTO, RequestOutputDTO } from '#requests/types/request.dto.js';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
