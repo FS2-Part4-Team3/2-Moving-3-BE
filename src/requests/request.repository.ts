@@ -86,11 +86,13 @@ export class RequestRepository implements IRequestRepository {
   async updateToRequestExpired(moveInfoIds: string[]) {
     if (moveInfoIds.length === 0) return { count: 0 };
 
-    return this.request.updateMany({
+    const updatedRequests = await this.request.updateMany({
       where: {
         moveInfoId: { in: moveInfoIds },
       },
       data: { status: 'EXPIRED' },
     });
+
+    return updatedRequests;
   }
 }

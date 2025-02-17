@@ -6,7 +6,7 @@ import { AsyncLocalStorage } from 'async_hooks';
 import { MoveRepository } from './move.repository.js';
 import { MoveInfoNotFoundException, ReceivedEstimationException } from './move.exception.js';
 import { Progress } from '@prisma/client';
-import { ForbiddenException } from '#exceptions/http.exception.js';
+import { ForbiddenException, InternalServerErrorException } from '#exceptions/http.exception.js';
 import { DriverInvalidTokenException } from '#drivers/driver.exception.js';
 import { DriverService } from '#drivers/driver.service.js';
 import { EstimationsFilter, IsActivate } from '#types/options.type.js';
@@ -29,21 +29,48 @@ export class MoveService implements IMoveService {
     private readonly requestRepository: RequestRepository,
   ) {}
 
-  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  // @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   async autoCompleteMoves() {
     const now = new Date();
 
-    // 'CONFIRMED' 상태에서 진행된 이사는 'COMPLETE'로 바꾸기
-    const updatedComplete = await this.moveRepository.updateToComplete(now);
-    this.logger.log(`Auto-completed ${updatedComplete.count} moves to COMPLETE.`);
+    console.log('자동만료~~~~~~~');
 
-    // 'OPEN' 상태에서 'EXPIRED'로 변경된 MoveInfo의 ID 목록을 바로 받아오기
-    const expiredMoveInfoIds = await this.moveRepository.updateToExpired(now);
-    this.logger.log(`Auto-expired ${expiredMoveInfoIds.length} moves.`);
+    try {
+      console.log('updateToComplete 실행 중...');
+      const updatedComplete = await this.moveRepository.updateToComplete(now);
+      this.logger.log(`완료된 이사 ${updatedComplete.count}건 업데이트`);
 
-    // 'EXPIRED'인 MoveInfo에 연결된 Request들도 'EXPIRED'로 변경
-    const updatedRequestsExpired = await this.requestRepository.updateToRequestExpired(expiredMoveInfoIds);
-    this.logger.log(`Auto-expired ${updatedRequestsExpired.count} requests.`);
+      console.log('updateToExpired 실행 중...');
+      const expiredMoveInfoIds = await this.moveRepository.updateToExpired(now);
+      this.logger.log(`만료된 이사 ${expiredMoveInfoIds.length}건`);
+
+      if (expiredMoveInfoIds.length > 0) {
+        console.log('updateToRequestExpired 실행 중...');
+        const updatedRequestsExpired = await this.requestRepository.updateToRequestExpired(expiredMoveInfoIds);
+        this.logger.log(`만료된 요청 ${updatedRequestsExpired.count}건`);
+      } else {
+        console.log('만료된 이사 없음 업데이트 불가능');
+      }
+    } catch (error) {
+      console.error('autoCompleteMoves:', error);
+      this.logger.error(`Error: ${error.message}`, error.stack);
+      throw new InternalServerErrorException('자동 완료 중 오류가 발생했습니다.');
+    }
+
+    // // 'CONFIRMED' 상태에서 진행된 이사는 'COMPLETE'로 바꾸기
+    // const updatedComplete = await this.moveRepository.updateToComplete(now);
+    // this.logger.log(`Auto-completed ${updatedComplete.count} moves to COMPLETE.`);
+    // console.log('updateToComplete 완료:', updatedComplete);
+
+    // // 'OPEN' 상태에서 'EXPIRED'로 변경된 MoveInfo의 ID 목록을 바로 받아오기
+    // const expiredMoveInfoIds = await this.moveRepository.updateToExpired(now);
+    // this.logger.log(`Auto-expired ${expiredMoveInfoIds.length} moves.`);
+    // console.log('findExpiredMoveInfoIds 완료:', expiredMoveInfoIds);
+
+    // // 'EXPIRED'인 MoveInfo에 연결된 Request들도 'EXPIRED'로 변경
+    // const updatedRequestsExpired = await this.requestRepository.updateToRequestExpired(expiredMoveInfoIds);
+    // this.logger.log(`Auto-expired ${updatedRequestsExpired.count} requests.`);
+    // console.log('updateToRequestExpired 완료:', updatedRequestsExpired);
   }
 
   private async getFilteredDriverData(driverId: string) {

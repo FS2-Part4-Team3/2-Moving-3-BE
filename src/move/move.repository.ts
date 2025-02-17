@@ -251,20 +251,20 @@ export class MoveRepository implements IMoveRepository {
   // //
 
   async updateToComplete(now: Date) {
-    return this.prisma.moveInfo.updateMany({
+    return this.moveInfo.updateMany({
       where: {
-        progress: ProgressEnum.CONFIRMED,
-        date: { lt: now },
-        confirmedEstimationId: { not: null },
+        progress: ProgressEnum.CONFIRMED, // 이사 진행 상태
+        date: { lt: now }, // 이사 날짜가 실행될 때 보다 이전에
+        confirmedEstimationId: { not: null }, // 확정된 견적 아이디가 있는지!
       },
       data: {
-        progress: ProgressEnum.COMPLETE, // 'COMPLETE'로 변경 ProgressEnum.OPEN
+        progress: ProgressEnum.COMPLETE, // 'COMPLETE'로 변경
       },
     });
   }
 
   async updateToExpired(now: Date): Promise<string[]> {
-    const updatedMoves = await this.moveInfo.updateMany({
+    await this.moveInfo.updateMany({
       where: {
         progress: 'OPEN',
         confirmedEstimationId: null,
@@ -272,16 +272,24 @@ export class MoveRepository implements IMoveRepository {
       },
       data: { progress: 'EXPIRED' }, // 'EXPIRED'로 변경
     });
-    return updatedMoves.count > 0 ? updatedMoves.ids : [];
+
+    const expiredMoves = await this.moveInfo.findMany({
+      where: {
+        progress: 'EXPIRED',
+        date: { lt: now }, // 만료된 ..
+      },
+      select: { id: true },
+    });
+
+    return expiredMoves.map(move => move.id);
   }
 
   // 자동만료 수정
   async findExpiredMoveInfoIds(): Promise<string[]> {
-    return this.moveInfo
-      .findMany({
-        where: { progress: 'EXPIRED' },
-        select: { id: true },
-      })
-      .then(moves => moves.flatMap(move => move.id));
+    const expiredMoves = await this.moveInfo.findMany({
+      where: { progress: 'EXPIRED' },
+      select: { id: true },
+    });
+    return expiredMoves.map(move => move.id);
   }
 }
