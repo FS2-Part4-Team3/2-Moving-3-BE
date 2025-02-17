@@ -20,6 +20,8 @@ import compareExp from '#utils/compareExp.js';
 import filterSensitiveData from '#utils/filterSensitiveData.js';
 import hashingPassword from '#utils/hashingPassword.js';
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 import { AsyncLocalStorage } from 'async_hooks';
 
 @Injectable()
@@ -29,6 +31,8 @@ export class AuthService implements IAuthService {
     private readonly userRepository: UserRepository,
     private readonly driverRepository: DriverRepository,
     private readonly jwtGenerateService: JwtGenerateService,
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
     private readonly als: AsyncLocalStorage<IStorage>,
   ) {}
 
@@ -135,6 +139,14 @@ export class AuthService implements IAuthService {
     const user = await this.authRepository.findByLoginId(id);
 
     if (user) {
+      // NOTE 리프레시 토큰이 만료되었을 경우
+      try {
+        const jwtSecret = this.configService.get('jwtSecret');
+        await this.jwtService.verifyAsync(user.refreshToken, { secret: jwtSecret });
+      } catch {
+        return { id, isOnline };
+      }
+
       isOnline = true;
     }
 

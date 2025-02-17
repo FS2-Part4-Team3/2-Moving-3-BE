@@ -22,6 +22,6 @@ export class AuthRepository implements IAuthRepository {
   }
 
   async delete(loginId: string) {
-    return await this.loggedInUsers.delete({ where: { loginId } });
+    return await this.loggedInUsers.delete({ where: { loginId }, forceDelete: true });
   }
 }
