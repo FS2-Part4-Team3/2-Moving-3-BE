@@ -1,9 +1,9 @@
 import { IChat } from '#chats/types/chat.types.js';
 import { IDriver } from '#drivers/types/driver.types.js';
-import { User } from '#users/types/user.types.js';
+import { IUser } from '#users/types/user.types.js';
 import { generatePresignedDownloadUrl } from '#utils/S3/generate-presigned-download-url.js';
 
-export async function generateS3DownloadUrl(person: User | IDriver) {
+export async function generateS3DownloadUrl(person: IUser | IDriver) {
   if (!person.image) {
     return;
   }

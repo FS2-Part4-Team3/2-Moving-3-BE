@@ -1,13 +1,23 @@
 import { PersonalInfo } from '#auth/types/filtered.types.js';
-import { ModelBase } from '#types/common.types.js';
+import { AreaType, ModelBase, ServiceType } from '#types/common.types.js';
 import { ApiProperty } from '@nestjs/swagger';
-import { $Enums, User as PrismaUser } from '@prisma/client';
+import { $Enums } from '@prisma/client';
 import { ArrayNotEmpty, IsIn } from 'class-validator';
 
-interface PrismaUserBase extends Omit<PrismaUser, keyof ModelBase> {}
-interface UserBase extends PrismaUserBase {}
+export interface IUser extends ModelBase {
+  email: string;
+  name: string;
+  phoneNumber?: string;
+  image?: string;
+  password?: string;
+  salt?: string;
+  refreshToken?: string;
+  serviceType: ServiceType[];
+  areas: AreaType[];
 
-export interface User extends UserBase, ModelBase {}
+  provider?: string;
+  providerId?: string;
+}
 
 export class UserEntity extends PersonalInfo {
   @ArrayNotEmpty({ message: '하나 이상의 지역을 선택해주세요' })
