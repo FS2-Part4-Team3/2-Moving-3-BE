@@ -19,6 +19,24 @@ import { InternalServerErrorException } from '#exceptions/http.exception.js';
 export class MoveController implements IMoveController {
   constructor(private readonly moveService: MoveService) {}
 
+  // @Get('test-auto-complete')
+  // async testAutoComplete() {
+  //   await this.moveService.autoCompleteMoves();
+  //   return 'Auto-complete moves triggered';
+  // }
+
+  @Get('test')
+  async testAutoComplete() {
+    console.log('컨트롤러');
+    try {
+      await this.moveService.autoCompleteMoves();
+      return 'Auto-complete moves triggered';
+    } catch (error) {
+      console.error('컨트롤러 에러', error);
+      throw new InternalServerErrorException('자동 완료 중 오류 발생');
+    }
+  }
+
   @Get()
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth('accessToken')
@@ -175,23 +193,5 @@ export class MoveController implements IMoveController {
   async confirmEstimation(@Param('moveInfoId') moveInfoId: string, @Param('estimationId') estimationId: string): Promise<void> {
     await this.moveService.confirmEstimation(moveInfoId, estimationId);
     return;
-  }
-
-  // @Get('test-auto-complete')
-  // async testAutoComplete() {
-  //   await this.moveService.autoCompleteMoves();
-  //   return 'Auto-complete moves triggered';
-  // }
-
-  @Get('test')
-  async testAutoComplete() {
-    console.log('컨트롤러');
-    try {
-      await this.moveService.autoCompleteMoves();
-      return 'Auto-complete moves triggered';
-    } catch (error) {
-      console.error('컨트롤러 에러', error);
-      throw new InternalServerErrorException('자동 완료 중 오류 발생');
-    }
   }
 }

@@ -93,6 +93,6 @@ export class RequestRepository implements IRequestRepository {
       data: { status: 'EXPIRED' },
     });
 
-    return updatedRequests;
+    return { count: updatedRequests.count };
   }
 }

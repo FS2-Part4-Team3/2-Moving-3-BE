@@ -266,16 +266,16 @@ export class MoveRepository implements IMoveRepository {
   async updateToExpired(now: Date): Promise<string[]> {
     await this.moveInfo.updateMany({
       where: {
-        progress: 'OPEN',
+        progress: ProgressEnum.OPEN,
         confirmedEstimationId: null,
         date: { lt: now },
       },
-      data: { progress: 'EXPIRED' }, // 'EXPIRED'로 변경
+      data: { progress: ProgressEnum.EXPIRED }, // 'EXPIRED'로 변경
     });
 
     const expiredMoves = await this.moveInfo.findMany({
       where: {
-        progress: 'EXPIRED',
+        progress: ProgressEnum.EXPIRED,
         date: { lt: now }, // 만료된 ..
       },
       select: { id: true },
