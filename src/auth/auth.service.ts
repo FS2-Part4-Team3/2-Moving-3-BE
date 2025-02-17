@@ -4,6 +4,7 @@ import {
   AuthWrongCredentialException,
   AuthWrongPasswordException,
 } from '#auth/auth.exception.js';
+import { AuthRepository } from '#auth/auth.repository.js';
 import { IAuthService } from '#auth/interfaces/auth.service.interface.js';
 import { JwtGenerateService } from '#auth/jwt-generate.service.js';
 import { GoogleCreateDTO, KakaoCreateDTO, NaverCreateDTO } from '#auth/types/provider.dto.js';
@@ -24,6 +25,7 @@ import { AsyncLocalStorage } from 'async_hooks';
 @Injectable()
 export class AuthService implements IAuthService {
   constructor(
+    private readonly authRepository: AuthRepository,
     private readonly userRepository: UserRepository,
     private readonly driverRepository: DriverRepository,
     private readonly jwtGenerateService: JwtGenerateService,
@@ -113,6 +115,17 @@ export class AuthService implements IAuthService {
     }
 
     return result;
+  }
+
+  async findLoggedInUser(id: string) {
+    let isOnline = false;
+    const user = await this.authRepository.findByLoginId(id);
+
+    if (user) {
+      isOnline = true;
+    }
+
+    return { id, isOnline };
   }
 
   async googleAuth(redirectResult: GoogleAuthType) {
