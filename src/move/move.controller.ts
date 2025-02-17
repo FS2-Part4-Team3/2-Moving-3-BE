@@ -171,7 +171,7 @@ export class MoveController implements IMoveController {
   @ApiResponse({
     status: HttpStatus.NO_CONTENT,
   })
-  async confirmEstimation(@Param('moveInfoId') moveInfoId: string, @Param('estimationId') estimationId: string): Promise<void> {
+  async confirmEstimation(@Param('moveInfoId') moveInfoId: string, @Param('estimationId') estimationId: string) {
     await this.moveService.confirmEstimation(moveInfoId, estimationId);
     return;
   }

@@ -16,10 +16,11 @@ import { RequestRepository } from '#requests/request.repository.js';
 import { areaToKeyword } from '#utils/address-utils.js';
 import { MoveInputDTO, MovePatchInputDTO } from './types/move.dto.js';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import logger from '#utils/logger.js';
 
 @Injectable()
 export class MoveService implements IMoveService {
-  private readonly logger = new Logger(MoveService.name);
+  private readonly logger = logger;
 
   constructor(
     private readonly driverService: DriverService,
@@ -35,14 +36,14 @@ export class MoveService implements IMoveService {
 
     try {
       const updatedComplete = await this.moveRepository.updateToComplete(now);
-      this.logger.log(`완료된 이사 ${updatedComplete.count}건 업데이트, 성공 여부: ${updatedComplete.success}`);
+      this.logger.info(`완료된 이사 ${updatedComplete.count}건 업데이트, 성공 여부: ${updatedComplete.success}`);
 
       const expiredMoveInfoIds = await this.moveRepository.updateToExpired(now);
-      this.logger.log(`만료된 이사 ${expiredMoveInfoIds.length}건`);
+      this.logger.info(`만료된 이사 ${expiredMoveInfoIds.length}건`);
 
       if (expiredMoveInfoIds.length > 0) {
         const updatedRequestsExpired = await this.requestRepository.updateToRequestExpired(expiredMoveInfoIds);
-        this.logger.log(`만료된 요청 ${updatedRequestsExpired.count}건,성공 여부: ${updatedRequestsExpired.success}`);
+        this.logger.info(`만료된 요청 ${updatedRequestsExpired.count}건,성공 여부: ${updatedRequestsExpired.success}`);
       }
     } catch (error) {
       this.logger.error(`Error: ${error.message}`, error.stack);
@@ -341,6 +342,6 @@ export class MoveService implements IMoveService {
     this.moveRepository.confirmEstimation(moveInfoId, estimationId);
     this.estimationRepository.confirmedForIdEstimation(estimationId, moveInfoId);
 
-    this.logger.log(`이사 정보(${moveInfoId})에 대해 견적(${estimationId})을 확정했습니다.`);
+    this.logger.info(`이사 정보(${moveInfoId})에 대해 견적(${estimationId})을 확정했습니다.`);
   }
 }
