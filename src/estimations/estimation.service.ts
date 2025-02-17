@@ -9,8 +9,9 @@ import {
   UserEstimationDetailDTO,
   RejectedEstimationsListDTO,
   DriverEstimationDetailDTO,
+  IsActivate,
 } from '#estimations/estimation.types.js';
-import { Injectable, Options } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { IStorage } from '#types/common.types.js';
 import { AsyncLocalStorage } from 'async_hooks';
 import { MoveRepository } from '#move/move.repository.js';
@@ -18,11 +19,10 @@ import { RequestRepository } from '#requests/request.repository.js';
 import { IMoveInfo } from '#move/types/move.types.js';
 import { EstimateAlreadyExistsException, EstimationAccessForbiddenException } from './estimation.exception.js';
 import { RequestRejectedException } from './estimation.exception.js';
-import { DriverNotFoundException, DriverUnauthorizedException } from '#drivers/driver.exception.js';
+import { DriverNotFoundException } from '#drivers/driver.exception.js';
 import { MoveInfoNotFoundException } from '#move/move.exception.js';
 import { DriverService } from '#drivers/driver.service.js';
 import { UnauthorizedException } from '#exceptions/http.exception.js';
-import { IsActivate, OffsetPaginationOptions } from '#types/options.type.js';
 import {
   DriverEstimationsGetQueries,
   DriverRejectedEstimations,
@@ -125,7 +125,9 @@ export class EstimationService implements IEstimationService {
     if (!userId) throw new UnauthorizedException();
 
     const { page, pageSize } = options;
-    const { estimations, totalCount } = await this.estimationRepository.findUserEstimations(userId, page, pageSize);
+    const totalCount = await this.estimationRepository.getTotalCountForUser(userId);
+
+    const estimations = await this.estimationRepository.findUserEstimations(userId, page, pageSize);
 
     const estimationsWithInfo = await Promise.all(
       estimations.map(async estimation => {
@@ -133,7 +135,7 @@ export class EstimationService implements IEstimationService {
         const isLiked = await this.driversService.isLikedDriver(estimation.driverId);
         const moveInfo = await this.moveRepository.findByMoveInfoId(estimation.moveInfoId);
 
-        const isSpecific = await this.estimationRepository.isSpecificEstimation(estimation.moveInfoId);
+        const designatedRequest = await this.requestRepository.DesignatedRequest(estimation.moveInfoId, estimation.driverId);
 
         return {
           driver: {
@@ -157,7 +159,7 @@ export class EstimationService implements IEstimationService {
             estimationId: estimation.id,
             price: estimation.price ?? null,
           },
-          designatedRequest: isSpecific ? IsActivate.Active : IsActivate.Inactive, // 지정/일반 여부
+          designatedRequest: designatedRequest ? IsActivate.Active : IsActivate.Inactive, // //'Active': 지정 요청 견적, 'Inactive': 일반 견적
         };
       }),
     );
