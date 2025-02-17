@@ -1,6 +1,6 @@
 import { PrismaService } from '#global/prisma.service.js';
 import { IMoveRepository } from '#move/interfaces/move.repository.interface.js';
-import { IMoveInfo } from '#move/types/move.types.js';
+import { IMoveInfo, UpdateResponse } from '#move/types/move.types.js';
 import { AreaType, ProgressEnum } from '#types/common.types.js';
 import { MoveInfoSortOrder, OffsetPaginationOptions } from '#types/options.type.js';
 import { MoveInfoGetQueries } from '#types/queries.type.js';
@@ -212,8 +212,8 @@ export class MoveRepository implements IMoveRepository {
     });
   }
 
-  async updateToComplete(now: Date) {
-    return this.moveInfo.updateMany({
+  async updateToComplete(now: Date): Promise<UpdateResponse> {
+    const result = await this.moveInfo.updateMany({
       where: {
         progress: ProgressEnum.CONFIRMED,
         date: { lt: now },
@@ -223,6 +223,11 @@ export class MoveRepository implements IMoveRepository {
         progress: ProgressEnum.COMPLETE,
       },
     });
+
+    return {
+      count: result.count,
+      success: result.count > 0,
+    };
   }
 
   async updateToExpired(now: Date): Promise<string[]> {
@@ -243,15 +248,49 @@ export class MoveRepository implements IMoveRepository {
       select: { id: true },
     });
 
-    return expiredMoves.map(move => move.id);
+    return expiredMoves.map(move => move.id); // id 배열 반환
   }
 
   // 자동만료 수정
-  async findExpiredMoveInfoIds(): Promise<string[]> {
+  async findExpiredMoveInfoIds(): Promise<UpdateResponse> {
     const expiredMoves = await this.moveInfo.findMany({
-      where: { progress: 'EXPIRED' },
+      where: { progress: ProgressEnum.EXPIRED },
       select: { id: true },
     });
-    return expiredMoves.map(move => move.id);
+
+    return {
+      count: expiredMoves.length,
+      success: expiredMoves.length > 0,
+    };
   }
+
+  // async updateToExpired(now: Date): Promise<string[]> {
+  //   await this.moveInfo.updateMany({
+  //     where: {
+  //       progress: ProgressEnum.OPEN,
+  //       confirmedEstimationId: null,
+  //       date: { lt: now },
+  //     },
+  //     data: { progress: ProgressEnum.EXPIRED },
+  //   });
+
+  //   const expiredMoves = await this.moveInfo.findMany({
+  //     where: {
+  //       progress: ProgressEnum.EXPIRED,
+  //       date: { lt: now }, // 만료된 ..
+  //     },
+  //     select: { id: true },
+  //   });
+
+  //   return expiredMoves.map(move => move.id);
+  // }
+
+  // // 자동만료 수정
+  // async findExpiredMoveInfoIds(): Promise<string[]> {
+  //   const expiredMoves = await this.moveInfo.findMany({
+  //     where: { progress: 'EXPIRED' },
+  //     select: { id: true },
+  //   });
+  //   return expiredMoves.map(move => move.id);
+  // }
 }

@@ -20,4 +20,5 @@ export interface IMoveService {
   patchMoveInfo: (moveInfoId: string, body: MovePatchInputDTO) => Promise<IMoveInfo>;
   softDeleteMoveInfo: (id: string) => Promise<IMoveInfo>;
   autoCompleteMoves: () => Promise<void>;
+  confirmEstimation: (moveInfoId: string, estimationId: string) => Promise<void>;
 }
