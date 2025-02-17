@@ -2,6 +2,11 @@ import { INotification, NotificationType } from '#notifications/types/notificati
 import { ModelBase } from '#types/common.types.js';
 import { ApiProperty } from '@nestjs/swagger';
 
+export class NotificationReadInputDTO {
+  @ApiProperty({ description: '읽을 알림 ID 목록' })
+  ids: string[];
+}
+
 export interface NotificationCreateDTO extends Partial<Omit<INotification, keyof ModelBase>> {
   type: NotificationType;
   message: string;

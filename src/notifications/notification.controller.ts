@@ -1,8 +1,8 @@
 import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { NotificationService } from '#notifications/notification.service.js';
-import { NotificationListDTO, NotificationOutputDTO } from '#notifications/types/notification.dto.js';
+import { NotificationListDTO, NotificationOutputDTO, NotificationReadInputDTO } from '#notifications/types/notification.dto.js';
 import { Body, Controller, DefaultValuePipe, Get, HttpStatus, Param, ParseIntPipe, Post, Query, UseGuards } from '@nestjs/common';
-import { ApiExcludeEndpoint, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiBody, ApiExcludeEndpoint, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @Controller('notification')
 @UseGuards(AccessTokenGuard)
@@ -23,8 +23,9 @@ export class NotificationController {
 
   @Post('read')
   @ApiOperation({ summary: '알림 읽음 처리(목록)' })
+  @ApiBody({ type: NotificationReadInputDTO })
   @ApiResponse({ status: HttpStatus.OK, type: [NotificationOutputDTO] })
-  async readNotifications(@Body() ids: string[]) {
+  async readNotifications(@Body('ids') ids: string[]) {
     const notifications = await this.notificationService.markNotificationAsRead(ids);
 
     return notifications;

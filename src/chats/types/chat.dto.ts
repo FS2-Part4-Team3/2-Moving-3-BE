@@ -5,6 +5,11 @@ import { ApiProperty } from '@nestjs/swagger';
 import { ChatDirection } from '@prisma/client';
 import { IsOptional, IsString, Matches } from 'class-validator';
 
+export class ChatReadInputDTO {
+  @ApiProperty({ description: '읽을 알림 ID 목록' })
+  ids: string[];
+}
+
 export interface ChatCreateDTO {
   userId: string;
   driverId: string;

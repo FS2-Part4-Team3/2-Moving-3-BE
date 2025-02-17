@@ -1,10 +1,10 @@
 import { ChatService } from '#chats/chat.service.js';
 import { IChatController } from '#chats/interfaces/chat.controller.interface.js';
-import { ChatDTO, ChatListDTO, ChatPostDTO } from '#chats/types/chat.dto.js';
+import { ChatDTO, ChatListDTO, ChatPostDTO, ChatReadInputDTO } from '#chats/types/chat.dto.js';
 import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { ChatGetQueries } from '#types/queries.type.js';
 import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards } from '@nestjs/common';
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @Controller('chats')
 @UseGuards(AccessTokenGuard)
@@ -39,8 +39,9 @@ export class ChatController implements IChatController {
 
   @Post(':targetId/read')
   @ApiOperation({ summary: '채팅 읽음 처리' })
+  @ApiBody({ type: ChatReadInputDTO })
   @ApiResponse({ status: HttpStatus.OK, type: [ChatDTO] })
-  async readNotifications(@Param('targetId') targetId: string, @Body() ids: string[]) {
+  async readNotifications(@Param('targetId') targetId: string, @Body('ids') ids: string[]) {
     return await this.chatService.markChatAsRead(targetId, ids);
   }
 }
