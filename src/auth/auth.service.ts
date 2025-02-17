@@ -4,6 +4,7 @@ import {
   AuthWrongCredentialException,
   AuthWrongPasswordException,
 } from '#auth/auth.exception.js';
+import { AuthRepository } from '#auth/auth.repository.js';
 import { IAuthService } from '#auth/interfaces/auth.service.interface.js';
 import { JwtGenerateService } from '#auth/jwt-generate.service.js';
 import { GoogleCreateDTO, KakaoCreateDTO, NaverCreateDTO } from '#auth/types/provider.dto.js';
@@ -19,14 +20,19 @@ import compareExp from '#utils/compareExp.js';
 import filterSensitiveData from '#utils/filterSensitiveData.js';
 import hashingPassword from '#utils/hashingPassword.js';
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 import { AsyncLocalStorage } from 'async_hooks';
 
 @Injectable()
 export class AuthService implements IAuthService {
   constructor(
+    private readonly authRepository: AuthRepository,
     private readonly userRepository: UserRepository,
     private readonly driverRepository: DriverRepository,
     private readonly jwtGenerateService: JwtGenerateService,
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
     private readonly als: AsyncLocalStorage<IStorage>,
   ) {}
 
@@ -52,6 +58,8 @@ export class AuthService implements IAuthService {
     const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: person.id, type });
     person.type = type;
 
+    await this.authRepository.upsert(person.id, refreshToken);
+
     return { person: await filterSensitiveData(person), accessToken, refreshToken };
   }
 
@@ -69,6 +77,8 @@ export class AuthService implements IAuthService {
     const accessToken = await this.jwtGenerateService.generateAccessToken({ id: person.id, type });
     const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: person.id, type });
     person.type = type;
+
+    await this.authRepository.upsert(person.id, refreshToken);
 
     return { person: await filterSensitiveData(person), accessToken, refreshToken };
   }
@@ -89,6 +99,8 @@ export class AuthService implements IAuthService {
     const accessToken = await this.jwtGenerateService.generateAccessToken({ id: target.id, type });
     const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: target.id, type });
     target.type = type;
+
+    await this.authRepository.upsert(target.id, refreshToken);
 
     return { person: await filterSensitiveData(target), accessToken, refreshToken };
   }
@@ -113,6 +125,32 @@ export class AuthService implements IAuthService {
     }
 
     return result;
+  }
+
+  async signOut() {
+    const { userId, driverId, type } = this.als.getStore();
+    const id = type === UserType.User ? userId : driverId;
+
+    return await this.authRepository.delete(id);
+  }
+
+  async findLoggedInUser(id: string) {
+    let isOnline = false;
+    const user = await this.authRepository.findByLoginId(id);
+
+    if (user) {
+      // NOTE 리프레시 토큰이 만료되었을 경우
+      try {
+        const jwtSecret = this.configService.get('jwtSecret');
+        await this.jwtService.verifyAsync(user.refreshToken, { secret: jwtSecret });
+      } catch {
+        return { id, isOnline };
+      }
+
+      isOnline = true;
+    }
+
+    return { id, isOnline };
   }
 
   async googleAuth(redirectResult: GoogleAuthType) {

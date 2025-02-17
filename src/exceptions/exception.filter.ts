@@ -30,5 +30,14 @@ export class HttpExceptionFilter implements ExceptionFilter {
       timestamp: res.timestamp,
       path: res.path,
     });
+
+    logger.error('error info: ', {
+      statusCode: res.statusCode,
+      message: res.message,
+      timestamp: res.timestamp,
+      path: res.path,
+      name: res.name,
+      stack: res.stack,
+    });
   }
 }

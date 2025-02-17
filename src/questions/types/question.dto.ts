@@ -1,4 +1,4 @@
-import { Question, QuestionEntity } from '#questions/types/question.types.js';
+import { IQuestion, QuestionEntity } from '#questions/types/question.types.js';
 import { ModelBase } from '#types/common.types.js';
 import { ApiProperty, PartialType, PickType } from '@nestjs/swagger';
 
@@ -16,7 +16,7 @@ export class QuestionListDTO {
 }
 
 export class QuestionPostDTO extends PickType(QuestionEntity, ['content']) {}
-export interface QuestionCreateDTO extends Omit<Question, keyof (ModelBase & PersonIds)> {
+export interface QuestionCreateDTO extends Omit<IQuestion, keyof (ModelBase & PersonIds)> {
   userId?: string;
   driverId?: string;
 }

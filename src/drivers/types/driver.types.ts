@@ -1,13 +1,31 @@
 import { PersonalInfo } from '#auth/types/filtered.types.js';
 import { Review } from '#reviews/types/review.types.js';
-import { ModelBase } from '#types/common.types.js';
-import { $Enums, Driver as PrismaDriver } from '@prisma/client';
+import { AreaType, ModelBase, ServiceType } from '#types/common.types.js';
+import { $Enums } from '@prisma/client';
 import { ArrayNotEmpty, IsDate, IsIn, IsNotEmpty, IsString } from 'class-validator';
 
-interface PrismaDriverBase extends Omit<PrismaDriver, keyof ModelBase> {}
-interface DriverBase extends PrismaDriverBase {}
+export interface IDriver extends ModelBase {
+  email: string;
+  name: string;
+  nickname?: string;
+  image?: string;
+  password?: string;
+  salt?: string;
+  refreshToken?: string;
+  phoneNumber?: string;
+  introduce?: string;
+  description?: string;
+  serviceType?: ServiceType[];
+  availableAreas?: AreaType[];
+  startAt: Date;
 
-export interface Driver extends DriverBase, ModelBase {
+  applyCount: number;
+  likeCount: number;
+  rating: number;
+
+  provider?: string;
+  providerId?: string;
+
   reviews?: Review[];
 }
 
