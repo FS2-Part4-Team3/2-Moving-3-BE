@@ -1,6 +1,8 @@
 import { IAuthRepository } from '#auth/interfaces/auth.repository.interface.js';
 import { PrismaService } from '#global/prisma.service.js';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class AuthRepository implements IAuthRepository {
   private readonly loggedInUsers;
   constructor(private readonly prisma: PrismaService) {
