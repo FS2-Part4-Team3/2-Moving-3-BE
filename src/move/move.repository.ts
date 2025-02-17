@@ -212,53 +212,15 @@ export class MoveRepository implements IMoveRepository {
     });
   }
 
-  // MoveInfo의 상태를 업데이트하는 메서드
-  // async updateMoveInfoProgress(currentStatus: string, newStatus: string, now: Date) {
-  //   const result = await this.prisma.moveInfo.updateMany({
-  //     where: {
-  //       progress: Progress.CONFIRMED, // 현재 상태
-  //       date: {
-  //         lt: now, // 현재 시간보다 이전
-  //       },
-  //       confirmedEstimationId: currentStatus === 'CONFIRMED' ? { not: null } : undefined, // 상태가 'CONFIRMED'인 경우만
-  //     },
-  //     // data: {
-  //     //   progress: newStatus, //Progress.COMPLETE,  // 완료됨상태
-  //     // },
-  //   });
-
-  //   return result.count;
-  // }
-
-  // 'EXPIRED' 상태의 MoveInfo에 연결된 Request를 'EXPIRED'로 변경하기
-  // async updateRequestsStatus() {
-  //   const expiredMoveInfos = await this.prisma.moveInfo.findMany({
-  //     where: { progress: 'EXPIRED' },
-  //     select: { id: true },
-  //   });
-
-  //   const result = await this.prisma.request.updateMany({
-  //     where: {
-  //       moveInfoId: { in: expiredMoveInfos.map(move => move.id) },
-  //     },
-  //     data: {
-  //       status: 'EXPIRED',
-  //     },
-  //   });
-
-  //   return result.count;
-  // }
-  // //
-
   async updateToComplete(now: Date) {
     return this.moveInfo.updateMany({
       where: {
-        progress: ProgressEnum.CONFIRMED, // 이사 진행 상태
-        date: { lt: now }, // 이사 날짜가 실행될 때 보다 이전에
-        confirmedEstimationId: { not: null }, // 확정된 견적 아이디가 있는지!
+        progress: ProgressEnum.CONFIRMED,
+        date: { lt: now },
+        confirmedEstimationId: { not: null },
       },
       data: {
-        progress: ProgressEnum.COMPLETE, // 'COMPLETE'로 변경
+        progress: ProgressEnum.COMPLETE,
       },
     });
   }
@@ -270,7 +232,7 @@ export class MoveRepository implements IMoveRepository {
         confirmedEstimationId: null,
         date: { lt: now },
       },
-      data: { progress: ProgressEnum.EXPIRED }, // 'EXPIRED'로 변경
+      data: { progress: ProgressEnum.EXPIRED },
     });
 
     const expiredMoves = await this.moveInfo.findMany({
