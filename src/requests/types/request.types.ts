@@ -21,3 +21,8 @@ export interface IRequest {
 
   driverId: string;
 }
+
+interface UpdateResponse {
+  count: number;
+  success: boolean;
+}

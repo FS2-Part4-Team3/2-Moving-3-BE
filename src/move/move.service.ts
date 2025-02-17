@@ -42,7 +42,7 @@ export class MoveService implements IMoveService {
 
       if (expiredMoveInfoIds.length > 0) {
         const updatedRequestsExpired = await this.requestRepository.updateToRequestExpired(expiredMoveInfoIds);
-        this.logger.log(`만료된 요청 ${updatedRequestsExpired.count}건`);
+        this.logger.log(`만료된 요청 ${updatedRequestsExpired.count}건,성공 여부: ${updatedRequestsExpired.success}`);
       }
     } catch (error) {
       this.logger.error(`Error: ${error.message}`, error.stack);
