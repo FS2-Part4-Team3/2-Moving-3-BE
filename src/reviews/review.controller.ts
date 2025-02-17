@@ -1,10 +1,10 @@
 import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { IReviewController } from '#reviews/interfaces/review.controller.interface.js';
+import { SortOrder } from '#types/options.type.js';
+import { GetQueries } from '#types/queries.type.js';
 import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { ReviewService } from './review.service.js';
-import { GetQueries } from '#types/queries.type.js';
-import { SortOrder } from '#types/options.type.js';
 import {
   DriverReviewResponseDTO,
   MyReviewResponseDTO,

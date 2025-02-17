@@ -1,0 +1,8 @@
+nestjs
+nestjs/swagger
+nestjs/schedule
+nestjs/passport
+typescript
+winston
+jest
+prisma

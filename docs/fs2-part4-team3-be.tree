@@ -1,0 +1,264 @@
+fs2-part4-team3-be
+ ┣ .github
+ ┃ ┣ workflows
+ ┃ ┃ ┣ assign-issue-creater.yml
+ ┃ ┃ ┣ assign-random-reviewers.yml
+ ┃ ┃ ┣ deploy.yml
+ ┃ ┃ ┣ pr-trigger-test.yml
+ ┃ ┃ ┗ slack-alarm-webhook.yml
+ ┃ ┣ ISSUE_TEMPLATE.md
+ ┃ ┣ mention-to-slack.yml
+ ┃ ┗ pull_request_template.md
+ ┣ prisma
+ ┃ ┣ migrations
+ ┃ ┣ mock
+ ┃ ┃ ┗ mock.js
+ ┃ ┣ schema.prisma
+ ┃ ┗ seed.js
+ ┣ src
+ ┃ ┣ auth
+ ┃ ┃ ┣ interfaces
+ ┃ ┃ ┃ ┣ auth.controller.interface.ts
+ ┃ ┃ ┃ ┣ auth.service.interface.ts
+ ┃ ┃ ┃ ┗ jwt-generate.service.interface.ts
+ ┃ ┃ ┣ strategies
+ ┃ ┃ ┃ ┣ google.strategy.ts
+ ┃ ┃ ┃ ┣ kakao.strategy.ts
+ ┃ ┃ ┃ ┗ naver.strategy.ts
+ ┃ ┃ ┣ types
+ ┃ ┃ ┃ ┣ auth.types.ts
+ ┃ ┃ ┃ ┣ filtered.driver.dto.ts
+ ┃ ┃ ┃ ┣ filtered.types.ts
+ ┃ ┃ ┃ ┣ filtered.user.dto.ts
+ ┃ ┃ ┃ ┣ provider.dto.ts
+ ┃ ┃ ┃ ┣ provider.types.ts
+ ┃ ┃ ┃ ┣ sign.dto.ts
+ ┃ ┃ ┃ ┗ update-password.dto.ts
+ ┃ ┃ ┣ auth.controller.ts
+ ┃ ┃ ┣ auth.exception.ts
+ ┃ ┃ ┣ auth.module.ts
+ ┃ ┃ ┣ auth.service.ts
+ ┃ ┃ ┗ jwt-generate.service.ts
+ ┃ ┣ chats
+ ┃ ┃ ┣ interfaces
+ ┃ ┃ ┃ ┣ chat.controller.interface.ts
+ ┃ ┃ ┃ ┣ chat.repository.interface.ts
+ ┃ ┃ ┃ ┗ chat.service.interface.ts
+ ┃ ┃ ┣ types
+ ┃ ┃ ┃ ┣ chat.dto.ts
+ ┃ ┃ ┃ ┗ chat.types.ts
+ ┃ ┃ ┣ chat.controller.ts
+ ┃ ┃ ┣ chat.module.ts
+ ┃ ┃ ┣ chat.repository.ts
+ ┃ ┃ ┗ chat.service.ts
+ ┃ ┣ configs
+ ┃ ┃ ┣ aws.config.ts
+ ┃ ┃ ┣ common.config.ts
+ ┃ ┃ ┣ google.config.ts
+ ┃ ┃ ┣ jwt.config.ts
+ ┃ ┃ ┣ kakao.config.ts
+ ┃ ┃ ┣ naver.config.ts
+ ┃ ┃ ┣ postgres.config.ts
+ ┃ ┃ ┗ swagger.config.ts
+ ┃ ┣ decorators
+ ┃ ┃ ┗ ws-person.decorator.ts
+ ┃ ┣ drivers
+ ┃ ┃ ┣ interfaces
+ ┃ ┃ ┃ ┣ driver.controller.interface.ts
+ ┃ ┃ ┃ ┣ driver.repository.interface.ts
+ ┃ ┃ ┃ ┗ driver.service.interface.ts
+ ┃ ┃ ┣ test
+ ┃ ┃ ┃ ┣ driver.controller.spec.ts
+ ┃ ┃ ┃ ┣ driver.repository.spec.ts
+ ┃ ┃ ┃ ┗ driver.service.spec.ts
+ ┃ ┃ ┣ types
+ ┃ ┃ ┃ ┣ driver.dto.ts
+ ┃ ┃ ┃ ┗ driver.types.ts
+ ┃ ┃ ┣ driver.controller.ts
+ ┃ ┃ ┣ driver.exception.ts
+ ┃ ┃ ┣ driver.module.ts
+ ┃ ┃ ┣ driver.repository.ts
+ ┃ ┃ ┗ driver.service.ts
+ ┃ ┣ estimations
+ ┃ ┃ ┣ interfaces
+ ┃ ┃ ┃ ┣ estimation.controller.interface.ts
+ ┃ ┃ ┃ ┣ estimation.repository.interface.ts
+ ┃ ┃ ┃ ┗ estimation.service.interface.ts
+ ┃ ┃ ┣ estimation.controller.ts
+ ┃ ┃ ┣ estimation.exception.ts
+ ┃ ┃ ┣ estimation.module.ts
+ ┃ ┃ ┣ estimation.repository.ts
+ ┃ ┃ ┣ estimation.service.ts
+ ┃ ┃ ┗ estimation.types.ts
+ ┃ ┣ exceptions
+ ┃ ┃ ┣ base.exception.ts
+ ┃ ┃ ┣ common.exception.ts
+ ┃ ┃ ┣ exception.filter.ts
+ ┃ ┃ ┣ exception.messages.ts
+ ┃ ┃ ┣ http.exception.ts
+ ┃ ┃ ┣ test.exception.ts
+ ┃ ┃ ┗ ws.exception.ts
+ ┃ ┣ global
+ ┃ ┃ ┣ interceptors
+ ┃ ┃ ┃ ┗ log.interceptor.ts
+ ┃ ┃ ┣ middlewares
+ ┃ ┃ ┃ ┣ als.middleware.ts
+ ┃ ┃ ┃ ┗ softDelete.middleware.ts
+ ┃ ┃ ┣ pipes
+ ┃ ┃ ┃ ┣ enum.validation.pipe.ts
+ ┃ ┃ ┃ ┗ forbidden-field.validation.pipe.ts
+ ┃ ┃ ┣ app.controller.ts
+ ┃ ┃ ┣ app.module.ts
+ ┃ ┃ ┣ db.module.ts
+ ┃ ┃ ┣ dev.controller.ts
+ ┃ ┃ ┣ prisma.service.ts
+ ┃ ┃ ┗ storage.module.ts
+ ┃ ┣ guards
+ ┃ ┃ ┣ access-token.guard.ts
+ ┃ ┃ ┣ guard.module.ts
+ ┃ ┃ ┣ guard.service.ts
+ ┃ ┃ ┣ hash-password.guard.ts
+ ┃ ┃ ┣ refresh-token.guard.ts
+ ┃ ┃ ┗ ws-jwt.guard.ts
+ ┃ ┣ move
+ ┃ ┃ ┣ interfaces
+ ┃ ┃ ┃ ┣ move.controller.interface.ts
+ ┃ ┃ ┃ ┣ move.repository.interface.ts
+ ┃ ┃ ┃ ┗ move.service.interface.ts
+ ┃ ┃ ┣ types
+ ┃ ┃ ┃ ┗ move.types.ts
+ ┃ ┃ ┣ move.controller.ts
+ ┃ ┃ ┣ move.exception.ts
+ ┃ ┃ ┣ move.module.ts
+ ┃ ┃ ┣ move.repository.ts
+ ┃ ┃ ┣ move.service.ts
+ ┃ ┃ ┗ move.types.ts
+ ┃ ┣ notifications
+ ┃ ┃ ┣ interfaces
+ ┃ ┃ ┃ ┣ notification.controller.interface.ts
+ ┃ ┃ ┃ ┣ notification.repository.interface.ts
+ ┃ ┃ ┃ ┗ notification.service.interface.ts
+ ┃ ┃ ┣ types
+ ┃ ┃ ┃ ┣ notification.dto.ts
+ ┃ ┃ ┃ ┗ notification.types.ts
+ ┃ ┃ ┣ notification.controller.ts
+ ┃ ┃ ┣ notification.exception.ts
+ ┃ ┃ ┣ notification.module.ts
+ ┃ ┃ ┣ notification.repository.ts
+ ┃ ┃ ┣ notification.scheduler.ts
+ ┃ ┃ ┣ notification.service.ts
+ ┃ ┃ ┗ notifications.messages.ts
+ ┃ ┣ questions
+ ┃ ┃ ┣ interfaces
+ ┃ ┃ ┃ ┣ question.controller.interface.ts
+ ┃ ┃ ┃ ┣ question.repository.interface.ts
+ ┃ ┃ ┃ ┗ question.service.interface.ts
+ ┃ ┃ ┣ types
+ ┃ ┃ ┃ ┣ question.dto.ts
+ ┃ ┃ ┃ ┗ question.types.ts
+ ┃ ┃ ┣ question.controller.ts
+ ┃ ┃ ┣ question.exception.ts
+ ┃ ┃ ┣ question.module.ts
+ ┃ ┃ ┣ question.repository.ts
+ ┃ ┃ ┗ question.service.ts
+ ┃ ┣ requests
+ ┃ ┃ ┣ interfaces
+ ┃ ┃ ┃ ┣ request.controller.interface.ts
+ ┃ ┃ ┃ ┣ request.repository.interface.ts
+ ┃ ┃ ┃ ┗ request.service.interface.ts
+ ┃ ┃ ┣ test
+ ┃ ┃ ┃ ┣ request.controller.spec.ts
+ ┃ ┃ ┃ ┣ request.repository.spec.ts
+ ┃ ┃ ┃ ┗ request.service.spec.ts
+ ┃ ┃ ┣ request.controller.ts
+ ┃ ┃ ┣ request.exception.ts
+ ┃ ┃ ┣ request.module.ts
+ ┃ ┃ ┣ request.repository.ts
+ ┃ ┃ ┣ request.service.ts
+ ┃ ┃ ┗ request.types.ts
+ ┃ ┣ reviews
+ ┃ ┃ ┣ interfaces
+ ┃ ┃ ┃ ┣ review.controller.interface.ts
+ ┃ ┃ ┃ ┣ review.repository.interface.ts
+ ┃ ┃ ┃ ┗ review.service.interface.ts
+ ┃ ┃ ┣ test
+ ┃ ┃ ┃ ┣ review.controller.spec.ts
+ ┃ ┃ ┃ ┣ review.repository.spec.ts
+ ┃ ┃ ┃ ┗ review.service.spec.ts
+ ┃ ┃ ┣ review.controller.ts
+ ┃ ┃ ┣ review.exception.ts
+ ┃ ┃ ┣ review.module.ts
+ ┃ ┃ ┣ review.repository.ts
+ ┃ ┃ ┣ review.service.ts
+ ┃ ┃ ┗ review.types.ts
+ ┃ ┣ swagger
+ ┃ ┃ ┣ swagger.controller.ts
+ ┃ ┃ ┣ swagger.module.ts
+ ┃ ┃ ┗ swagger.service.ts
+ ┃ ┣ types
+ ┃ ┃ ┣ common.types.ts
+ ┃ ┃ ┣ conditions.type.ts
+ ┃ ┃ ┣ options.type.ts
+ ┃ ┃ ┣ queries.type.ts
+ ┃ ┃ ┗ socket.type.ts
+ ┃ ┣ users
+ ┃ ┃ ┣ interfaces
+ ┃ ┃ ┃ ┣ user.controller.interface.ts
+ ┃ ┃ ┃ ┣ user.repository.interface.ts
+ ┃ ┃ ┃ ┗ user.service.interface.ts
+ ┃ ┃ ┣ types
+ ┃ ┃ ┃ ┣ user.dto.ts
+ ┃ ┃ ┃ ┗ user.types.ts
+ ┃ ┃ ┣ user.controller.ts
+ ┃ ┃ ┣ user.exception.ts
+ ┃ ┃ ┣ user.module.ts
+ ┃ ┃ ┣ user.repository.ts
+ ┃ ┃ ┗ user.service.ts
+ ┃ ┣ utils
+ ┃ ┃ ┣ S3
+ ┃ ┃ ┃ ┣ generate-presigned-download-url.ts
+ ┃ ┃ ┃ ┣ generate-presigned-upload-url.ts
+ ┃ ┃ ┃ ┣ generate-s3-download-url.ts
+ ┃ ┃ ┃ ┗ generate-s3-upload-url.ts
+ ┃ ┃ ┣ address-utils.ts
+ ┃ ┃ ┣ assertExist.ts
+ ┃ ┃ ┣ assertUuid.ts
+ ┃ ┃ ┣ compareExp.ts
+ ┃ ┃ ┣ dateUtils.ts
+ ┃ ┃ ┣ filterProperties.ts
+ ┃ ┃ ┣ filterSensitiveData.ts
+ ┃ ┃ ┣ format-timestamp.ts
+ ┃ ┃ ┣ getRandomRecord.ts
+ ┃ ┃ ┣ hashingPassword.ts
+ ┃ ┃ ┣ isEmpty.ts
+ ┃ ┃ ┣ logger.ts
+ ┃ ┃ ┣ loggingError.ts
+ ┃ ┃ ┣ secToHMS.ts
+ ┃ ┃ ┗ stringifyJson.ts
+ ┃ ┣ websockets
+ ┃ ┃ ┣ interfaces
+ ┃ ┃ ┃ ┗ websocket.gateway.interface.ts
+ ┃ ┃ ┣ types
+ ┃ ┃ ┃ ┗ websocket.type.ts
+ ┃ ┃ ┣ websocket.gateway.ts
+ ┃ ┃ ┗ websocket.module.ts
+ ┃ ┗ main.ts
+ ┣ test
+ ┃ ┣ app.e2e-spec.ts
+ ┃ ┗ jest-e2e.json
+ ┣ .env
+ ┣ .gitignore
+ ┣ docker-compose.yml
+ ┣ docker-entrypoint.sh
+ ┣ Dockerfile
+ ┣ eslint.config.js
+ ┣ nest-cli.json
+ ┣ nginx.conf
+ ┣ nginx.init.conf
+ ┣ package-lock.json
+ ┣ package.json
+ ┣ prettier.config.mjs
+ ┣ README.md
+ ┣ restart-server.sh
+ ┣ tsconfig.build.json
+ ┗ tsconfig.json

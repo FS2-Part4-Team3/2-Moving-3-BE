@@ -28,6 +28,7 @@ export class LogInterceptor implements NestInterceptor {
     const { method, url, headers, body, cookies } = req;
     const store = this.als.getStore();
 
+    logger.info('==============================================');
     logger.info(`Incoming Request: ${method} ${url}`);
     if (store?.userId) logger.info(`User ID: ${store.userId}`);
 
