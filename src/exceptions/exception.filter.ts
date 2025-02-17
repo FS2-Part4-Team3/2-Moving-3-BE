@@ -8,7 +8,7 @@ import { Request, Response } from 'express';
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
-  catch(exception: unknown, host: ArgumentsHost) {
+  catch(exception: Error, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
@@ -19,7 +19,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     } else if (exception instanceof HttpException) {
       res = exception.getResponse();
     } else {
-      logger.error(`exception info: ${stringifyJson(exception as object)}`);
+      logger.error(`exception info: ${stringifyJson(exception)}`);
       res = new UncaughtException();
     }
 
