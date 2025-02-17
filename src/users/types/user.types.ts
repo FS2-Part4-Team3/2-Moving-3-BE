@@ -12,8 +12,8 @@ export interface IUser extends ModelBase {
   password?: string;
   salt?: string;
   refreshToken?: string;
-  serviceType: ServiceType[];
-  areas: AreaType[];
+  serviceType?: ServiceType[];
+  areas?: AreaType[];
 
   provider?: string;
   providerId?: string;

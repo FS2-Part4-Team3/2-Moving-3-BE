@@ -1,10 +1,10 @@
 import { MoveRepository } from '#move/move.repository.js';
 import { NotificationService } from '#notifications/notification.service.js';
+import { NotificationType } from '#notifications/types/notification.types.js';
 import { getNextDate, getNextWeek } from '#utils/dateUtils.js';
 import logger from '#utils/logger.js';
 import { Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { NotificationType } from '@prisma/client';
 
 @Injectable()
 export class NotificationScheduler {

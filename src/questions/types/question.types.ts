@@ -9,7 +9,7 @@ export interface IQuestion extends ModelBase {
   estimationId: string;
   userId?: string;
   driverId?: string;
-  notifications: INotification[];
+  notifications?: INotification[];
 }
 
 export class QuestionEntity {

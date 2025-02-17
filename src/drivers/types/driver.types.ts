@@ -15,8 +15,8 @@ export interface IDriver extends ModelBase {
   phoneNumber?: string;
   introduce?: string;
   description?: string;
-  serviceType: ServiceType[];
-  availableAreas: AreaType[];
+  serviceType?: ServiceType[];
+  availableAreas?: AreaType[];
   startAt: Date;
 
   applyCount: number;
