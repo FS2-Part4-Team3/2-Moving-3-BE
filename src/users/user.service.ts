@@ -16,11 +16,17 @@ export class UserService implements IUserService {
     private readonly als: AsyncLocalStorage<IStorage>,
   ) {}
 
-  async getUsers(options: FindOptions) {
+  async findUsers(options: FindOptions) {
     const totalCount = await this.userRepository.count();
     const list = await this.userRepository.findMany(options);
 
     return { totalCount, list };
+  }
+
+  async findUser(id: string) {
+    const user = await this.userRepository.findById(id);
+
+    return filterSensitiveData(user);
   }
 
   async updateUser(body: UserPatchDTO) {
