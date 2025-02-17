@@ -67,14 +67,15 @@ model Driver {
   provider   String?
   providerId String?
 
-  reviews       Review[]
-  requests      Request[]
-  estimations   Estimation[]
-  likedUsers    User[]
-  questions     Question[]
-  notifications Notification[]
-  Chat          Chat[]
-  reviewSummary ReviewSummary?
+  reviews        Review[]
+  requests       Request[]
+  estimations    Estimation[]
+  likedUsers     User[]
+  questions      Question[]
+  notifications  Notification[]
+  Chat           Chat[]
+  reviewSummary  ReviewSummary?
+  reviewKeywords ReviewKeywords[]
 }
 
 model MoveInfo {
@@ -241,6 +242,23 @@ model ReviewSummary {
   @@index([createdAt])
 }
 
+model ReviewKeywords {
+  id        String    @id @default(uuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  keyword String
+  type    KeywordType
+  count   Int         @default(1)
+
+  driver   Driver @relation(fields: [driverId], references: [id])
+  driverId String
+
+  @@unique([driverId, keyword])
+  @@index([driverId])
+}
+
 /**
  * ******************************************************* enum *********************************************
  */
@@ -303,4 +321,9 @@ enum NotificationType {
 enum ChatDirection {
   USER_TO_DRIVER
   DRIVER_TO_USER
+}
+
+enum KeywordType {
+  POSITIVE
+  NEGATIVE
 }

@@ -24,6 +24,7 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ScheduleModule } from '@nestjs/schedule';
+import { ReviewKeywordsModule } from '#reviewKeywords/reviewKeywords.module.js';
 
 const controllers: Array<any> = [AppController];
 if (nodeEnv === 'development') {
@@ -47,6 +48,7 @@ if (nodeEnv === 'development') {
     SwaggerModule,
     StorageModule,
     ReviewSummaryModule,
+    ReviewKeywordsModule,
     ConfigModule.forRoot({ isGlobal: true, load: [jwtConfig, postgresConfig], envFilePath: '.env' }),
     ScheduleModule.forRoot(),
   ],

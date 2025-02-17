@@ -41,6 +41,7 @@
       "#reviews/*": ["./src/reviews/*"],
       "#users/*": ["./src/users/*"],
       "#reviewSummary/*": ["./src/reviewSummary/*"],
+      "#reviewKeywords/*": ["./src/reviewKeywords/*"],
       "#prisma/*": ["./prisma/*"]
     }
   },
