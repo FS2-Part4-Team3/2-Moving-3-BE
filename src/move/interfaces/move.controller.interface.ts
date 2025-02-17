@@ -17,4 +17,5 @@ export interface IMoveController {
   getIsMoveInfoEditable: (moveInfoId: string) => Promise<IsMoveInfoEditableDTO>;
   postMoveInfo: (moveData: MoveInfoInputDTO) => Promise<MoveInfo>;
   patchMoveInfo: (moveInfoId: string, body: Partial<MoveInfoInputDTO>) => Promise<MoveInfo>;
+  confirmEstimation: (moveInfoId: string, estimationId: string) => Promise<void>;
 }
