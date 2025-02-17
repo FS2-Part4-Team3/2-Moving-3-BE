@@ -1,4 +1,14 @@
-export type MoveInfoType = {};
+import { IRequest } from '#requests/types/request.types.js';
+import { ModelBase, Progress, ServiceType } from '#types/common.types.js';
+import { MoveInfo as PrismaMoveInfo } from '@prisma/client';
+
+interface PrismaMoveInfoBase extends Omit<PrismaMoveInfo, keyof ModelBase> {}
+interface MoveInfoBase extends PrismaMoveInfoBase {}
+
+export interface MoveInfo extends MoveInfoBase, ModelBase {}
+
+export interface MoveInfoInputDTO extends Omit<MoveInfo, keyof ModelBase> {}
+
 export interface IMoveInfo {
   id: string;
   createdAt: Date;
@@ -18,20 +28,6 @@ export interface IMoveInfo {
   requests: IRequest[];
 }
 
-enum ServiceType {
-  SMALL = 'SMALL',
-  HOME = 'HOME',
-  OFFICE = 'OFFICE',
-}
-
-export enum Progress {
-  PENDING = 'PENDING',
-  EXPIRED = 'EXPIRED',
-  CONFIRMED = 'CONFIRMED',
-  CANCELED = 'CANCELED',
-  COMPLETE = 'COMPLETE',
-}
-
 export interface IEstimation {
   id: string;
   createdAt: Date;
@@ -44,23 +40,4 @@ export interface IEstimation {
   driverId: string;
 
   confirmedForId: string;
-}
-
-export interface IRequest {
-  id: string;
-  createdAt: Date;
-  updatedAt: Date;
-
-  moveInfoId: string;
-  status: RequestStatus;
-  driverId: string;
-  driverNotifications: any[];
-}
-
-export enum RequestStatus {
-  PENDING = 'PENDING',
-  EXPIRED = 'EXPIRED',
-  APPLY = 'APPLY',
-  REJECTED = 'REJECTED',
-  CANCELED = 'CANCELED',
 }

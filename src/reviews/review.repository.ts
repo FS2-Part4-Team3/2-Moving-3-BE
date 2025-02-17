@@ -1,9 +1,9 @@
 import { PrismaService } from '#global/prisma.service.js';
 import { IReviewRepository } from '#reviews/interfaces/review.repository.interface.js';
-import { CreateReviewDTO, PatchReviewDTO } from '#reviews/review.types.js';
 import { FindOptions, SortOrder } from '#types/options.type.js';
 import { GetQueries } from '#types/queries.type.js';
 import { Injectable } from '@nestjs/common';
+import { CreateReviewDTO, PatchReviewDTO } from './types/review.dto.js';
 
 @Injectable()
 export class ReviewRepository implements IReviewRepository {

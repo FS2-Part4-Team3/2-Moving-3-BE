@@ -7,14 +7,12 @@ import { MoveService } from './move.service.js';
 import {
   BaseMoveInfoOutputDTO,
   IsMoveInfoEditableDTO,
-  MoveInfo,
   MoveInfoIdDTO,
-  MoveInfoInputDTO,
   MoveInfoResponseDTO,
   MoveInfoWithEstimationsResponseDTO,
   MoveInputDTO,
   MovePatchInputDTO,
-} from './move.types.js';
+} from './types/move.dto.js';
 
 @Controller('moves')
 export class MoveController implements IMoveController {
@@ -133,7 +131,7 @@ export class MoveController implements IMoveController {
     status: HttpStatus.OK,
     type: BaseMoveInfoOutputDTO,
   })
-  async postMoveInfo(@Body() moveData: MoveInfoInputDTO): Promise<MoveInfo> {
+  async postMoveInfo(@Body() moveData: MoveInputDTO) {
     const moveInfo = await this.moveService.postMoveInfo(moveData);
     return moveInfo;
   }
@@ -148,7 +146,7 @@ export class MoveController implements IMoveController {
     status: HttpStatus.OK,
     type: BaseMoveInfoOutputDTO,
   })
-  async patchMoveInfo(@Param('moveInfoId') moveInfoId: string, @Body() body: Partial<MoveInfoInputDTO>) {
+  async patchMoveInfo(@Param('moveInfoId') moveInfoId: string, @Body() body: MovePatchInputDTO) {
     const moveInfo = await this.moveService.patchMoveInfo(moveInfoId, body);
 
     return moveInfo;

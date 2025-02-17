@@ -1,5 +1,5 @@
 import { PersonalInfo } from '#auth/types/filtered.types.js';
-import { Review } from '#reviews/review.types.js';
+import { Review } from '#reviews/types/review.types.js';
 import { ModelBase } from '#types/common.types.js';
 import { $Enums, Driver as PrismaDriver } from '@prisma/client';
 import { ArrayNotEmpty, IsDate, IsIn, IsNotEmpty, IsString } from 'class-validator';
