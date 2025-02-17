@@ -5,7 +5,13 @@ import { GetQueries } from '#types/queries.type.js';
 import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { ReviewService } from './review.service.js';
-import { DriverReviewResponseDTO, MyReviewResponseDTO, PatchReviewDTO, ReviewBodyDTO, ReviewOutputDTO } from './review.types.js';
+import {
+  DriverReviewResponseDTO,
+  MyReviewResponseDTO,
+  PatchReviewDTO,
+  ReviewBodyDTO,
+  ReviewOutputDTO,
+} from './types/review.dto.js';
 
 @Controller('reviews')
 export class ReviewController implements IReviewController {

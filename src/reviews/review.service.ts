@@ -1,14 +1,13 @@
 import { IReviewService } from '#reviews/interfaces/review.service.interface.js';
 import { IStorage } from '#types/common.types.js';
-
 import { Injectable } from '@nestjs/common';
 import { AsyncLocalStorage } from 'async_hooks';
 import { ReviewRepository } from './review.repository.js';
-import { ReviewBodyDTO, PatchReviewDTO } from './review.types.js';
 import { ForbiddenException } from '#exceptions/http.exception.js';
 import { ReviewAlreadyExistsException, ReviewNotFoundException } from './review.exception.js';
 import { EstimationRepository } from '#estimations/estimation.repository.js';
 import { GetQueries } from '#types/queries.type.js';
+import { PatchReviewDTO, ReviewBodyDTO } from './types/review.dto.js';
 
 @Injectable()
 export class ReviewService implements IReviewService {

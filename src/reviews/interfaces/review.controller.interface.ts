@@ -1,4 +1,5 @@
-import { ReviewBodyDTO, PatchReviewDTO, IReivew, DriverReviewResponseDTO, MyReviewResponseDTO } from '#reviews/review.types.js';
+import { DriverReviewResponseDTO, MyReviewResponseDTO, PatchReviewDTO, ReviewBodyDTO } from '#reviews/types/review.dto.js';
+import { IReivew } from '#reviews/types/review.types.js';
 import { FindOptions } from '#types/options.type.js';
 
 export interface IReviewController {

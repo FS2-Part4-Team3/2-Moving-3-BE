@@ -31,84 +31,6 @@ export class EstimationRepository implements IEstimationRepository {
     });
   }
 
-  // 대기중 지정 여부
-  async isSpecificEstimation(moveInfoId: string): Promise<boolean> {
-    const count = await this.prisma.request.count({
-      where: {
-        moveInfoId: moveInfoId,
-        status: Status.PENDING, // 지정 요청이 있는지 확인
-      },
-    });
-    return count > 0;
-  }
-
-  // 대기중 견적 조회
-  async findUserEstimations(
-    userId: string,
-    page: number,
-    pageSize: number,
-  ): Promise<{ estimations: Estimation[]; totalCount: number }> {
-    const moveInfos = await this.prisma.moveInfo.findMany({
-      where: { ownerId: userId },
-      select: { id: true },
-    });
-
-    const moveInfoIds = moveInfos.map(info => info.id);
-
-    const totalCount = await this.prisma.estimation.count({
-      where: {
-        moveInfoId: { in: moveInfoIds },
-        OR: [
-          {
-            moveInfo: {
-              progress: Progress.OPEN,
-              requests: { none: {} },
-            },
-          },
-          {
-            moveInfo: {
-              requests: {
-                some: { status: Status.PENDING },
-              },
-            },
-          },
-        ],
-      },
-    });
-
-    const estimations = await this.prisma.estimation.findMany({
-      where: {
-        moveInfoId: { in: moveInfoIds },
-        OR: [
-          {
-            moveInfo: {
-              progress: Progress.OPEN,
-              requests: { none: {} },
-            },
-          },
-          {
-            moveInfo: {
-              requests: {
-                some: { status: Status.PENDING },
-              },
-            },
-          },
-        ],
-      },
-      include: {
-        driver: true,
-        moveInfo: true,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-      skip: (page - 1) * pageSize,
-      take: pageSize,
-    });
-
-    return { estimations, totalCount };
-  }
-
   // 리뷰 가능한 견적 목록 토탈 카운트
   async findTotalCount(moveInfoIds: string[]): Promise<number> {
     return this.prisma.estimation.count({
@@ -344,5 +266,119 @@ export class EstimationRepository implements IEstimationRepository {
         price: null,
       },
     });
+  }
+
+  //대기중 견적 조회 토탈 카운트
+  async getTotalCountForUser(userId): Promise<number> {
+    return this.prisma.estimation.count({
+      where: {
+        moveInfo: {
+          ownerId: userId,
+          progress: Progress.OPEN,
+          confirmedEstimationId: null,
+        },
+        price: { not: null },
+      },
+    });
+  }
+
+  // 대기중 지정 견적인지 아닌지 확인하는거.. 근데이건 아닌가..?
+  async isDesignatedEstimation(estimationId: string): Promise<boolean> {
+    const estimation = await this.prisma.estimation.findUnique({
+      where: { id: estimationId },
+      select: { confirmedForId: true },
+    });
+
+    return estimation?.confirmedForId !== null;
+  }
+
+  // 대기중 견적 조회 리스트
+  async findUserEstimations(userId: string, page: number, pageSize: number) {
+    return this.prisma.estimation.findMany({
+      where: {
+        moveInfo: {
+          ownerId: userId,
+          progress: Progress.OPEN,
+          confirmedEstimationId: null,
+        },
+        price: { not: null },
+      },
+      include: {
+        driver: true,
+        moveInfo: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    });
+  }
+
+  // 대기중 견적 조회
+  async findUserEstimation(
+    userId: string,
+    page: number,
+    pageSize: number,
+  ): Promise<{ estimations: Estimation[]; totalCount: number }> {
+    const moveInfos = await this.prisma.moveInfo.findMany({
+      where: { ownerId: userId },
+      select: { id: true },
+    });
+
+    const moveInfoIds = moveInfos.map(info => info.id);
+
+    const totalCount = await this.prisma.estimation.count({
+      where: {
+        moveInfoId: { in: moveInfoIds },
+        OR: [
+          {
+            moveInfo: {
+              progress: Progress.OPEN,
+              requests: { none: {} },
+            },
+          },
+          {
+            moveInfo: {
+              requests: {
+                some: { status: Status.PENDING },
+              },
+            },
+          },
+        ],
+      },
+    });
+
+    const estimations = await this.prisma.estimation.findMany({
+      where: {
+        moveInfoId: { in: moveInfoIds },
+        OR: [
+          {
+            moveInfo: {
+              progress: Progress.OPEN,
+              requests: { none: {} },
+            },
+          },
+          {
+            moveInfo: {
+              requests: {
+                some: { status: Status.PENDING },
+              },
+            },
+          },
+        ],
+      },
+      include: {
+        driver: true,
+        moveInfo: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    });
+
+    return { estimations, totalCount };
   }
 }

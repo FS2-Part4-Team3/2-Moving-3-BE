@@ -1,48 +1,6 @@
-import { IRequest } from '#requests/request.types.js';
-import { ModelBase, Progress, ProgressEnum, ServiceType, ServiceTypeEnum } from '#types/common.types.js';
 import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { $Enums, MoveInfo as PrismaMoveInfo } from '@prisma/client';
 import { IsDate, IsEnum, IsNotEmpty, IsString } from 'class-validator';
-
-interface PrismaMoveInfoBase extends Omit<PrismaMoveInfo, keyof ModelBase> {}
-interface MoveInfoBase extends PrismaMoveInfoBase {}
-
-export interface MoveInfo extends MoveInfoBase, ModelBase {}
-
-export interface MoveInfoInputDTO extends Omit<MoveInfo, keyof ModelBase> {}
-
-export interface IMoveInfo {
-  id: string;
-  createdAt: Date;
-  updatedAt: Date;
-  deletedAt?: Date;
-
-  serviceType: ServiceTypeEnum;
-  date: Date;
-  fromAddress: string;
-  toAddress: string;
-  progress: ProgressEnum;
-
-  confirmedEstimationId: string;
-
-  ownerId: string;
-  estimations: IEstimation[];
-  requests: IRequest[];
-}
-
-export interface IEstimation {
-  id: string;
-  createdAt: Date;
-  updatedAt: Date;
-
-  price: number;
-  comment: string;
-
-  moveInfoId: string;
-  driverId: string;
-
-  confirmedForId: string;
-}
+import { Progress, ProgressEnum, ServiceType, ServiceTypeEnum } from '#types/common.types.js';
 
 export class MoveInfoIdDTO {
   @ApiProperty({ description: '이사정보 ID', type: String })
@@ -50,10 +8,10 @@ export class MoveInfoIdDTO {
 }
 
 export class MoveInputDTO {
-  @IsEnum($Enums.ServiceType, { message: '서비스 타입이 유효하지 않습니다.' })
+  @IsEnum(ServiceTypeEnum, { message: '서비스 타입이 유효하지 않습니다.' })
   @IsNotEmpty({ message: '서비스 타입을 선택해주세요.' })
   @ApiProperty({ description: '서비스 타입' })
-  serviceType: $Enums.ServiceType;
+  serviceType: ServiceType;
 
   @IsDate({ message: '유효한 날짜를 입력해주세요.' })
   @IsNotEmpty({ message: '이사 날짜는 필수입니다.' })
@@ -72,6 +30,18 @@ export class MoveInputDTO {
 }
 
 export class MovePatchInputDTO extends PartialType(MoveInputDTO) {}
+
+export class CreateMoveDTO extends MoveInputDTO {
+  @IsString({ message: '작성자 ID는 문자열이어야 합니다.' })
+  @IsNotEmpty({ message: '작성자 ID는 필수입니다.' })
+  @ApiProperty({ description: '작성자 ID' })
+  ownerId: string;
+
+  @IsEnum(ProgressEnum, { message: '이사정보 상태가 유효하지 않습니다.' })
+  @IsNotEmpty({ message: '이사정보 상태는 필수입니다.' })
+  @ApiProperty({ description: '이사정보 상태' })
+  progress: Progress;
+}
 
 export class BaseMoveInfoOutputDTO {
   @ApiProperty({ description: '이사정보 ID', type: String })

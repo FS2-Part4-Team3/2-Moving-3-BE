@@ -1,7 +1,7 @@
 import { PrismaService } from '#global/prisma.service.js';
 import { IRequestRepository } from '#requests/interfaces/request.repository.interface.js';
-import { CreateRequestDTO, PatchRequestDTO } from '#requests/request.types.js';
 import { Injectable } from '@nestjs/common';
+import { CreateRequestDTO, PatchRequestDTO } from './types/request.dto.js';
 
 @Injectable()
 export class RequestRepository implements IRequestRepository {
@@ -39,5 +39,20 @@ export class RequestRepository implements IRequestRepository {
     const request = await this.request.delete({ where: { id } });
 
     return request;
+  }
+
+  // 지정여부 확인하기 ( 리퀘스트 테이블에서 apply인거만 )
+  async DesignatedRequest(moveInfoId: string, driverId: string): Promise<boolean> {
+    const [{ exists }] = await this.prisma.$queryRaw<{ exists: boolean }[]>` SELECT EXISTS(
+        SELECT 1
+        FROM "Request" AS r
+        LEFT JOIN "MoveInfo" AS m ON r."moveInfoId" = m.id
+        LEFT JOIN "Driver" AS d ON r."driverId" = d.id
+        WHERE r."moveInfoId" = ${moveInfoId}
+        AND r."driverId" = ${driverId}
+        AND r."status" IS NOT NULL
+        )`;
+    console.log('ddddddddddddddddddddddddddddd', exists);
+    return exists;
   }
 }
