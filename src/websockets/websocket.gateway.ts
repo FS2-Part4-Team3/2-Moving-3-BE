@@ -1,5 +1,5 @@
 import { WSPerson } from '#decorators/ws-person.decorator.js';
-import { Driver } from '#drivers/types/driver.types.js';
+import { IDriver } from '#drivers/types/driver.types.js';
 import { WsJwtGuard } from '#guards/ws-jwt.guard.js';
 import { User } from '#users/types/user.types.js';
 import { IWebsocketGateway } from '#websockets/interfaces/websocket.gateway.interface.js';
@@ -26,7 +26,7 @@ export class WebsocketGateway implements IWebsocketGateway {
 
   @UseGuards(WsJwtGuard)
   @SubscribeMessage('subscribe')
-  handleSubscribe(@ConnectedSocket() client: Socket, @WSPerson() person: User | Driver) {
+  handleSubscribe(@ConnectedSocket() client: Socket, @WSPerson() person: User | IDriver) {
     const { id } = person;
 
     const sockets = this.getSockets(id);

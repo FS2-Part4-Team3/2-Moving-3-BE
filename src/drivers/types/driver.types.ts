@@ -4,7 +4,7 @@ import { AreaType, ModelBase, ServiceType } from '#types/common.types.js';
 import { $Enums } from '@prisma/client';
 import { ArrayNotEmpty, IsDate, IsIn, IsNotEmpty, IsString } from 'class-validator';
 
-export interface Driver extends ModelBase {
+export interface IDriver extends ModelBase {
   email: string;
   name: string;
   nickname?: string;

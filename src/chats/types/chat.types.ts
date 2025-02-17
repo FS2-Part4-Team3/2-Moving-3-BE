@@ -5,7 +5,7 @@ export enum ChatDirection {
   DRIVER_TO_USER = 'DRIVER_TO_USER',
 }
 
-export interface Chat extends ModelBase {
+export interface IChat extends ModelBase {
   userId: string;
   driverId: string;
 
