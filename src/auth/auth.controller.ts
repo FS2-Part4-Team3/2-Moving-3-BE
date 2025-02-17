@@ -134,12 +134,14 @@ export class AuthController implements IAuthController {
   }
 
   @Delete('signOut')
+  @UseGuards(AccessTokenGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: '로그아웃' })
   @ApiResponse({
     status: HttpStatus.NO_CONTENT,
   })
   async signOut(@Res({ passthrough: true }) response: Response) {
+    await this.authService.signOut();
     this.setAccessToken(response, '');
     this.setRefreshToken(response, '');
   }

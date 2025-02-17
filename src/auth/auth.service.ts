@@ -119,6 +119,13 @@ export class AuthService implements IAuthService {
     return result;
   }
 
+  async signOut() {
+    const { userId, driverId, type } = this.als.getStore();
+    const id = type === UserType.User ? userId : driverId;
+
+    return await this.authRepository.delete(id);
+  }
+
   async findLoggedInUser(id: string) {
     let isOnline = false;
     const user = await this.authRepository.findByLoginId(id);
