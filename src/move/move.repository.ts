@@ -263,34 +263,4 @@ export class MoveRepository implements IMoveRepository {
       success: expiredMoves.length > 0,
     };
   }
-
-  // async updateToExpired(now: Date): Promise<string[]> {
-  //   await this.moveInfo.updateMany({
-  //     where: {
-  //       progress: ProgressEnum.OPEN,
-  //       confirmedEstimationId: null,
-  //       date: { lt: now },
-  //     },
-  //     data: { progress: ProgressEnum.EXPIRED },
-  //   });
-
-  //   const expiredMoves = await this.moveInfo.findMany({
-  //     where: {
-  //       progress: ProgressEnum.EXPIRED,
-  //       date: { lt: now }, // 만료된 ..
-  //     },
-  //     select: { id: true },
-  //   });
-
-  //   return expiredMoves.map(move => move.id);
-  // }
-
-  // // 자동만료 수정
-  // async findExpiredMoveInfoIds(): Promise<string[]> {
-  //   const expiredMoves = await this.moveInfo.findMany({
-  //     where: { progress: 'EXPIRED' },
-  //     select: { id: true },
-  //   });
-  //   return expiredMoves.map(move => move.id);
-  // }
 }
