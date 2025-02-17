@@ -4,9 +4,14 @@ import { MoveInfoGetQueries, moveInfoWithEstimationsGetQueries } from '#types/qu
 import { Injectable, Logger } from '@nestjs/common';
 import { AsyncLocalStorage } from 'async_hooks';
 import { MoveRepository } from './move.repository.js';
-import { AutoCompleteException, MoveInfoNotFoundException, ReceivedEstimationException } from './move.exception.js';
+import {
+  AutoCompleteException,
+  MoveInfoAlreadyExistsException,
+  MoveInfoNotFoundException,
+  ReceivedEstimationException,
+} from './move.exception.js';
 import { Progress } from '@prisma/client';
-import { ForbiddenException, InternalServerErrorException } from '#exceptions/http.exception.js';
+import { ForbiddenException, InternalServerErrorException, UnauthorizedException } from '#exceptions/http.exception.js';
 import { DriverInvalidTokenException } from '#drivers/driver.exception.js';
 import { DriverService } from '#drivers/driver.service.js';
 import { EstimationsFilter, IsActivate } from '#types/options.type.js';
@@ -262,12 +267,24 @@ export class MoveService implements IMoveService {
 
   async postMoveInfo(moveData: MoveInputDTO) {
     const { userId } = this.als.getStore();
+    if (!userId) {
+      throw new UnauthorizedException();
+    }
+    const existingMoveInfo = await this.moveRepository.findByUserId(userId);
+
+    if (existingMoveInfo.length > 0) {
+      throw new MoveInfoAlreadyExistsException();
+    }
+
     const progress = Progress.OPEN;
     const moveInfo = await this.moveRepository.postMoveInfo({
       ...moveData,
       ownerId: userId,
       progress,
     });
+    if (!moveInfo) {
+      throw new InternalServerErrorException('이사 정보 생성 중 오류가 발생했습니다.');
+    }
 
     return moveInfo;
   }

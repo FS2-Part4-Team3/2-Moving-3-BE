@@ -17,6 +17,7 @@ enum ExceptionMessages {
   ALREADY_LIKED = '이미 찜해둔 기사입니다.',
   ALREADY_UNLIKED = '이미 찜 해제된 기사입니다.',
 
+  MOVEINFO_ALREADY_EXISTS = '이미 생성된 이사정보가 있습니다. 하나만 생성할 수 있습니다.',
   MOVEINFO_NOT_FOUND = '이사 정보가 없습니다.',
   RECEIVED_ESTIMATE = '받은 견적이 있습니다',
 

@@ -18,3 +18,9 @@ export class AutoCompleteException extends InternalServerErrorException {
     super(ExceptionMessages.AUTO_COMPLETE_ERROR);
   }
 }
+
+export class MoveInfoAlreadyExistsException extends BadRequestException {
+  constructor() {
+    super(ExceptionMessages.MOVEINFO_ALREADY_EXISTS);
+  }
+}
