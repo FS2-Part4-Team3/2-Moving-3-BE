@@ -53,29 +53,6 @@ export enum ProgressEnum {
   COMPLETE = 'COMPLETE',
 }
 
-export type NotificationType =
-  | 'MOVE_INFO_EXPIRED'
-  | 'NEW_REQUEST'
-  | 'NEW_ESTIMATION'
-  | 'REQUEST_REJECTED'
-  | 'ESTIMATION_CONFIRMED'
-  | 'NEW_QUESTION'
-  | 'D_7'
-  | 'D_1'
-  | 'D_DAY';
-
-export enum NotificationTypeEnum {
-  MOVE_INFO_EXPIRED = 'MOVE_INFO_EXPIRED',
-  NEW_REQUEST = 'NEW_REQUEST',
-  NEW_ESTIMATION = 'NEW_ESTIMATION',
-  REQUEST_REJECTED = 'REQUEST_REJECTED',
-  ESTIMATION_CONFIRMED = 'ESTIMATION_CONFIRMED',
-  NEW_QUESTION = 'NEW_QUESTION',
-  D_7 = 'D_7',
-  D_1 = 'D_1',
-  D_DAY = 'D_DAY',
-}
-
 export type AreaType =
   | 'SEOUL'
   | 'GYEONGGI'

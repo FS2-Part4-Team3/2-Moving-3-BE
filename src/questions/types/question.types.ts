@@ -1,12 +1,16 @@
+import { INotification } from '#notifications/types/notification.types.js';
 import { ModelBase } from '#types/common.types.js';
 import { ApiProperty } from '@nestjs/swagger';
-import { Question as PrismaQuestion } from '@prisma/client';
 import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
 
-interface PrismaQuestionBase extends Omit<PrismaQuestion, keyof ModelBase> {}
-interface QuestionBase extends PrismaQuestionBase {}
+export interface IQuestion extends ModelBase {
+  content: string;
 
-export interface Question extends QuestionBase, ModelBase {}
+  estimationId: string;
+  userId?: string;
+  driverId?: string;
+  notifications?: INotification[];
+}
 
 export class QuestionEntity {
   @IsString({ message: '내용은 문자열 형식입니다.' })

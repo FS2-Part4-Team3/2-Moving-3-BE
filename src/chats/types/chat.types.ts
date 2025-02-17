@@ -1,7 +1,16 @@
 import { ModelBase } from '#types/common.types.js';
-import { Chat as PrismaChat } from '@prisma/client';
 
-interface PrismaChatBase extends Omit<PrismaChat, keyof ModelBase> {}
-interface ChatBase extends PrismaChatBase {}
+export enum ChatDirection {
+  USER_TO_DRIVER = 'USER_TO_DRIVER',
+  DRIVER_TO_USER = 'DRIVER_TO_USER',
+}
 
-export interface Chat extends ChatBase, ModelBase {}
+export interface IChat extends ModelBase {
+  userId: string;
+  driverId: string;
+
+  direction: ChatDirection;
+  message: string;
+  image?: string;
+  isRead: boolean;
+}
