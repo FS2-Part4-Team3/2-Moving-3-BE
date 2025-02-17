@@ -2,12 +2,13 @@ import { BaseException } from '#exceptions/base.exception.js';
 import { UncaughtException } from '#exceptions/common.exception.js';
 import formatTimestamp from '#utils/format-timestamp.js';
 import logger from '#utils/logger.js';
+import stringifyJson from '#utils/stringifyJson.js';
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException } from '@nestjs/common';
 import { Request, Response } from 'express';
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
-  catch(exception: unknown, host: ArgumentsHost) {
+  catch(exception: Error, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
@@ -18,6 +19,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     } else if (exception instanceof HttpException) {
       res = exception.getResponse();
     } else {
+      logger.error(`exception info: ${stringifyJson(exception)}`);
       res = new UncaughtException();
     }
 

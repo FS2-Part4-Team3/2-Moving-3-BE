@@ -1,5 +1,6 @@
 import { AuthService } from '#auth/auth.service.js';
 import { IAuthController } from '#auth/interfaces/auth.controller.interface.js';
+import { LoggedInUsersDTO } from '#auth/types/auth.dto.js';
 import { FilteredDriverOutputDTO } from '#auth/types/filtered.driver.dto.js';
 import { FilteredUserOutputDTO } from '#auth/types/filtered.user.dto.js';
 import { GoogleAuthType, KakaoAuthType, NaverAuthType } from '#auth/types/provider.types.js';
@@ -41,7 +42,7 @@ export class AuthController implements IAuthController {
     const maxAge = token ? 1000 * 60 * 60 : 0;
 
     res.cookie('accessToken', token, {
-      httpOnly: true,
+      // httpOnly: true,
       secure: true,
       sameSite: 'none',
       maxAge,
@@ -79,6 +80,7 @@ export class AuthController implements IAuthController {
     @Res({ passthrough: true }) response: Response,
   ) {
     const { person, accessToken, refreshToken } = await this.authService.createPerson(body, type);
+    this.setAccessToken(response, accessToken);
     this.setRefreshToken(response, refreshToken);
 
     return { person, accessToken };
@@ -99,6 +101,7 @@ export class AuthController implements IAuthController {
   })
   async updatePassword(@Body() body: UpdatePasswordDTO, @Res({ passthrough: true }) response: Response) {
     const { person, accessToken, refreshToken } = await this.authService.updatePassword(body);
+    this.setAccessToken(response, accessToken);
     this.setRefreshToken(response, refreshToken);
 
     return { person, accessToken };
@@ -124,18 +127,22 @@ export class AuthController implements IAuthController {
     const type = userType === 'user' ? UserType.User : UserType.Driver;
 
     const { person, accessToken, refreshToken } = await this.authService.signIn(body, type);
+    this.setAccessToken(response, accessToken);
     this.setRefreshToken(response, refreshToken);
 
     return { person, accessToken };
   }
 
   @Delete('signOut')
+  @UseGuards(AccessTokenGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: '로그아웃' })
   @ApiResponse({
     status: HttpStatus.NO_CONTENT,
   })
   async signOut(@Res({ passthrough: true }) response: Response) {
+    await this.authService.signOut();
+    this.setAccessToken(response, '');
     this.setRefreshToken(response, '');
   }
 
@@ -156,7 +163,7 @@ export class AuthController implements IAuthController {
   }
 
   @Get('isLoggedIn')
-  @ApiOperation({ summary: '로그인 상태 조회' })
+  @ApiOperation({ summary: '로그인 상태 조회(본인)' })
   @ApiResponse({
     status: HttpStatus.OK,
     schema: {
@@ -203,6 +210,16 @@ export class AuthController implements IAuthController {
     return { isAccessTokenValid, isRefreshTokenValid, userType };
   }
 
+  @Get(':id/isOnline')
+  @ApiOperation({ summary: '로그인 상태 조회(id)' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: LoggedInUsersDTO,
+  })
+  async isOnline(@Param('id') id: string) {
+    return await this.authService.findLoggedInUser(id);
+  }
+
   @Post('refresh')
   @UseGuards(RefreshTokenGuard)
   @ApiOperation({ summary: '토큰 재발급' })
@@ -219,6 +236,7 @@ export class AuthController implements IAuthController {
   })
   async refreshToken(@Res({ passthrough: true }) response: Response) {
     const { person, accessToken, refreshToken, type } = await this.authService.getNewToken();
+    this.setAccessToken(response, accessToken);
     this.setRefreshToken(response, refreshToken);
 
     return { person, accessToken };
@@ -246,6 +264,7 @@ export class AuthController implements IAuthController {
     const redirectResult: GoogleAuthType = req.user;
 
     const { person, accessToken, refreshToken } = await this.authService.googleAuth(redirectResult);
+    this.setAccessToken(response, accessToken);
     this.setRefreshToken(response, refreshToken);
 
     response.redirect(`${oauthRedirect}/callback/google?accessToken=${accessToken}`);
@@ -273,6 +292,7 @@ export class AuthController implements IAuthController {
     const redirectResult: KakaoAuthType = req.user;
 
     const { person, accessToken, refreshToken } = await this.authService.kakaoAuth(redirectResult);
+    this.setAccessToken(response, accessToken);
     this.setRefreshToken(response, refreshToken);
 
     response.redirect(`${oauthRedirect}/callback/google?accessToken=${accessToken}`);
@@ -300,6 +320,7 @@ export class AuthController implements IAuthController {
     const redirectResult: NaverAuthType = req.user;
 
     const { person, accessToken, refreshToken } = await this.authService.naverAuth(redirectResult);
+    this.setAccessToken(response, accessToken);
     this.setRefreshToken(response, refreshToken);
 
     response.redirect(`${oauthRedirect}/callback/google?accessToken=${accessToken}`);

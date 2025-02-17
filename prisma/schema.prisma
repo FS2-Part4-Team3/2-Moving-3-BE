@@ -242,6 +242,18 @@ model ReviewSummary {
   @@index([createdAt])
 }
 
+model loggedInUsers {
+  id        String    @id @default(uuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  loginId      String @unique
+  refreshToken String
+
+  @@index([createdAt])
+}
+
 model ReviewKeywords {
   id        String    @id @default(uuid())
   createdAt DateTime  @default(now())

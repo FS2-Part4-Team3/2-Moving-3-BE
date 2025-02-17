@@ -1,9 +1,14 @@
 import { imageRegex } from '#auth/types/auth.types.js';
-import { Chat } from '#chats/types/chat.types.js';
+import { IChat } from '#chats/types/chat.types.js';
 import { ModelBase } from '#types/common.types.js';
 import { ApiProperty } from '@nestjs/swagger';
 import { ChatDirection } from '@prisma/client';
 import { IsOptional, IsString, Matches } from 'class-validator';
+
+export class ChatReadInputDTO {
+  @ApiProperty({ description: '읽을 알림 ID 목록' })
+  ids: string[];
+}
 
 export interface ChatCreateDTO {
   userId: string;
@@ -37,7 +42,7 @@ export class ChatsDTO {
   totalCount: number;
 
   @ApiProperty({ description: '채팅 내역' })
-  list: Chat[];
+  list: IChat[];
 }
 
 export class ChatDTO extends ModelBase {
