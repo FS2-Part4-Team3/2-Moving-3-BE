@@ -1,13 +1,13 @@
 import { PrismaService } from '#global/prisma.service.js';
 import { IMoveRepository } from '#move/interfaces/move.repository.interface.js';
-import { MoveInfo, MoveInfoInputDTO } from '#move/move.types.js';
+import { IMoveInfo } from '#move/types/move.types.js';
+import { AreaType, ProgressEnum } from '#types/common.types.js';
 import { MoveInfoSortOrder, OffsetPaginationOptions } from '#types/options.type.js';
 import { MoveInfoGetQueries } from '#types/queries.type.js';
 import { areaToKeyword } from '#utils/address-utils.js';
 import { getDayEnd, getDayStart } from '#utils/dateUtils.js';
 import { Injectable } from '@nestjs/common';
-import { Area, Progress } from '@prisma/client';
-import { IMoveInfo } from './types/move.types.js';
+import { CreateMoveDTO, MovePatchInputDTO } from './types/move.dto.js';
 
 @Injectable()
 export class MoveRepository implements IMoveRepository {
@@ -19,7 +19,7 @@ export class MoveRepository implements IMoveRepository {
   async findManyByDate(date: Date) {
     const moveInfos = await this.moveInfo.findMany({
       where: {
-        progress: Progress.CONFIRMED,
+        progress: ProgressEnum.CONFIRMED,
         date: {
           gte: getDayStart(date),
           lt: getDayEnd(date),
@@ -71,7 +71,7 @@ export class MoveRepository implements IMoveRepository {
     return totalCount;
   }
 
-  async getFilteringCounts(driverId: string, driverAvailableAreas: Area[]) {
+  async getFilteringCounts(driverId: string, driverAvailableAreas: AreaType[]) {
     const serviceTypeCounts = await Promise.all(
       ['SMALL', 'HOME', 'OFFICE'].map(async type => ({
         type,
@@ -85,7 +85,7 @@ export class MoveRepository implements IMoveRepository {
                 },
               },
             },
-            progress: Progress.OPEN,
+            progress: ProgressEnum.OPEN,
           },
         }),
       })),
@@ -108,7 +108,7 @@ export class MoveRepository implements IMoveRepository {
             },
           },
         },
-        progress: Progress.OPEN,
+        progress: ProgressEnum.OPEN,
       },
     });
 
@@ -126,7 +126,7 @@ export class MoveRepository implements IMoveRepository {
             },
           },
         },
-        progress: Progress.OPEN,
+        progress: ProgressEnum.OPEN,
       },
     });
 
@@ -135,10 +135,7 @@ export class MoveRepository implements IMoveRepository {
 
   async findByUserId(userId: string) {
     const moveInfo = await this.moveInfo.findMany({
-      where: { ownerId: userId, progress: Progress.OPEN },
-      include: {
-        requests: true,
-      },
+      where: { ownerId: userId, progress: ProgressEnum.OPEN },
     });
 
     return moveInfo;
@@ -148,7 +145,7 @@ export class MoveRepository implements IMoveRepository {
     const { page = 1, pageSize = 10 } = paginationOptions;
 
     const list = await this.moveInfo.findMany({
-      where: { ownerId: userId, progress: { in: [Progress.CANCELED, Progress.COMPLETE] } },
+      where: { ownerId: userId, progress: { in: [ProgressEnum.CANCELED, ProgressEnum.COMPLETE] } },
       forceFind: true,
       skip: (page - 1) * pageSize,
       take: pageSize,
@@ -170,11 +167,11 @@ export class MoveRepository implements IMoveRepository {
     return moveInfo;
   }
 
-  async postMoveInfo(moveData: MoveInfoInputDTO): Promise<MoveInfo> {
+  async postMoveInfo(moveData: CreateMoveDTO) {
     return await this.moveInfo.create({ data: moveData });
   }
 
-  async update(id: string, data: Partial<MoveInfoInputDTO>) {
+  async update(id: string, data: MovePatchInputDTO) {
     const moveInfo = await this.moveInfo.update({ where: { id }, data });
 
     return moveInfo;
@@ -210,7 +207,7 @@ export class MoveRepository implements IMoveRepository {
       where: { id: moveInfoId },
       data: {
         confirmedEstimationId: estimationId,
-        progress: Progress.CONFIRMED, // 상태를 CONFIRMED로 업데이트
+        progress: ProgressEnum.CONFIRMED, // 상태를 CONFIRMED로 업데이트
       },
     });
   }
@@ -256,42 +253,35 @@ export class MoveRepository implements IMoveRepository {
   async updateToComplete(now: Date) {
     return this.prisma.moveInfo.updateMany({
       where: {
-        progress: 'CONFIRMED',
+        progress: ProgressEnum.CONFIRMED,
         date: { lt: now },
         confirmedEstimationId: { not: null },
       },
       data: {
-        progress: 'COMPLETE', // 'COMPLETE'로 변경
+        progress: ProgressEnum.COMPLETE, // 'COMPLETE'로 변경 ProgressEnum.OPEN
       },
     });
   }
 
-  async updateToExpired(now: Date) {
-    return this.prisma.moveInfo.updateMany({
+  async updateToExpired(now: Date): Promise<string[]> {
+    const updatedMoves = await this.moveInfo.updateMany({
       where: {
-        progress: 'OPEN', // 'OPEN' 상태
+        progress: 'OPEN',
         confirmedEstimationId: null,
         date: { lt: now },
       },
-      data: {
-        progress: 'EXPIRED', // 'EXPIRED'로 변경
-      },
+      data: { progress: 'EXPIRED' }, // 'EXPIRED'로 변경
     });
+    return updatedMoves.count > 0 ? updatedMoves.ids : [];
   }
 
-  async updateToRequestExpired() {
-    return this.prisma.request.updateMany({
-      where: {
-        moveInfoId: {
-          in: (
-            await this.prisma.moveInfo.findMany({
-              where: { progress: 'EXPIRED' },
-              select: { id: true },
-            })
-          ).map(move => move.id), // EXPIRED 상태가 된 moveInfo ID 목록 추출
-        },
-      },
-      data: { status: 'EXPIRED' },
-    });
+  // 자동만료 수정
+  async findExpiredMoveInfoIds(): Promise<string[]> {
+    return this.moveInfo
+      .findMany({
+        where: { progress: 'EXPIRED' },
+        select: { id: true },
+      })
+      .then(moves => moves.flatMap(move => move.id));
   }
 }

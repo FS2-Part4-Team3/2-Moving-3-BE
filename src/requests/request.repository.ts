@@ -1,7 +1,7 @@
 import { PrismaService } from '#global/prisma.service.js';
 import { IRequestRepository } from '#requests/interfaces/request.repository.interface.js';
-import { CreateRequestDTO, PatchRequestDTO } from '#requests/request.types.js';
 import { Injectable } from '@nestjs/common';
+import { CreateRequestDTO, PatchRequestDTO } from './types/request.dto.js';
 
 @Injectable()
 export class RequestRepository implements IRequestRepository {
@@ -55,18 +55,40 @@ export class RequestRepository implements IRequestRepository {
     return exists;
   }
 
-  // 자동 만료 기능
-  async updateToRequestExpired() {
-    return this.prisma.request.updateMany({
+  //자동 만료 기능 여기서는 통신이 필요하지 않다 <<
+  // async updateToRequestExpired() {
+  //   return this.request.updateMany({
+  //     where: {
+  //       moveInfoId: {
+  //         in: (
+  //           await this.prisma.moveInfo.findMany({
+  //             where: { progress: 'EXPIRED' },
+  //             select: { id: true },
+  //           })
+  //         ).map(move => move.id), // EXPIRED 상태가 된 moveInfo ID 목록 추출
+  //       },
+  //     },
+  //     data: { status: 'EXPIRED' },
+  //   });
+  // }
+
+  // 자동 만료 기능 2
+  //   async updateToRequestExpired() {
+  //     return this.request.updateMany({
+  //       where: {
+  //         moveInfo: { progress: 'EXPIRED' },
+  //       },
+  //       data: { status: 'EXPIRED' },
+  //     });
+  //   }
+
+  //자동 만료 3
+  async updateToRequestExpired(moveInfoIds: string[]) {
+    if (moveInfoIds.length === 0) return { count: 0 };
+
+    return this.request.updateMany({
       where: {
-        moveInfoId: {
-          in: (
-            await this.prisma.moveInfo.findMany({
-              where: { progress: 'EXPIRED' },
-              select: { id: true },
-            })
-          ).map(move => move.id), // EXPIRED 상태가 된 moveInfo ID 목록 추출
-        },
+        moveInfoId: { in: moveInfoIds },
       },
       data: { status: 'EXPIRED' },
     });

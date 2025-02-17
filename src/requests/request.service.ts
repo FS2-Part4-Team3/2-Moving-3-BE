@@ -7,7 +7,7 @@ import { AlreadyRequestedException, RequestNotFoundException } from './request.e
 import { ForbiddenException } from '#exceptions/http.exception.js';
 import { RequestRepository } from './request.repository.js';
 import { MoveInfoNotFoundException } from '#move/move.exception.js';
-import { CreateRequestDTO } from './request.types.js';
+import { CreateRequestDTO } from './types/request.dto.js';
 
 @Injectable()
 export class RequestService implements IRequestService {
@@ -39,7 +39,7 @@ export class RequestService implements IRequestService {
       throw new MoveInfoNotFoundException();
     }
 
-    const requests = moveInfo[0].requests ? moveInfo[0].requests : [];
+    const requests = await this.requestRepository.findByMoveInfoId(moveInfo[0].id);
     if (!requests || requests.length === 0) {
       return { isRequestPossible: true };
     }
@@ -60,7 +60,7 @@ export class RequestService implements IRequestService {
       throw new ForbiddenException();
     }
 
-    const requests = moveInfo[0].requests ? moveInfo[0].requests : [];
+    const requests = await this.requestRepository.findByMoveInfoId(moveInfo[0].id);
     const isRequestPossible = requests.some(request => request.driverId === driverId);
     if (isRequestPossible) {
       throw new AlreadyRequestedException();

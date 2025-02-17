@@ -6,7 +6,6 @@ import { AsyncLocalStorage } from 'async_hooks';
 import { MoveRepository } from './move.repository.js';
 import { MoveInfoNotFoundException, ReceivedEstimationException } from './move.exception.js';
 import { Progress } from '@prisma/client';
-import { MoveInfo, MoveInfoInputDTO } from './move.types.js';
 import { ForbiddenException } from '#exceptions/http.exception.js';
 import { DriverInvalidTokenException } from '#drivers/driver.exception.js';
 import { DriverService } from '#drivers/driver.service.js';
@@ -15,6 +14,7 @@ import { EstimationRepository } from '#estimations/estimation.repository.js';
 import { ConfirmedEstimationException, EstimationNotFoundException } from '#estimations/estimation.exception.js';
 import { RequestRepository } from '#requests/request.repository.js';
 import { areaToKeyword } from '#utils/address-utils.js';
+import { MoveInputDTO, MovePatchInputDTO } from './types/move.dto.js';
 import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
@@ -35,16 +35,14 @@ export class MoveService implements IMoveService {
 
     // 'CONFIRMED' 상태에서 진행된 이사는 'COMPLETE'로 바꾸기
     const updatedComplete = await this.moveRepository.updateToComplete(now);
+    this.logger.log(`Auto-completed ${updatedComplete.count} moves to COMPLETE.`);
 
-    // 확정되지 않은 'OPEN' 상태의 이사 요청을 'EXPIRED'로 바꾸기
-    const updatedMoveExpired = await this.moveRepository.updateToExpired(now);
+    // 'OPEN' 상태에서 'EXPIRED'로 변경된 MoveInfo의 ID 목록을 바로 받아오기
+    const expiredMoveInfoIds = await this.moveRepository.updateToExpired(now);
+    this.logger.log(`Auto-expired ${expiredMoveInfoIds.length} moves.`);
 
     // 'EXPIRED'인 MoveInfo에 연결된 Request들도 'EXPIRED'로 변경
-    const updatedRequestsExpired = await this.requestRepository.updateToRequestExpired();
-
-    // 로그 출력
-    this.logger.log(`Auto-completed ${updatedComplete.count} moves to COMPLETE.`);
-    this.logger.log(`Auto-expired ${updatedMoveExpired.count} moves.`);
+    const updatedRequestsExpired = await this.requestRepository.updateToRequestExpired(expiredMoveInfoIds);
     this.logger.log(`Auto-expired ${updatedRequestsExpired.count} requests.`);
   }
 
@@ -257,7 +255,7 @@ export class MoveService implements IMoveService {
     return { totalCount, list: processedMoveInfos };
   }
 
-  async postMoveInfo(moveData: MoveInfoInputDTO): Promise<MoveInfo> {
+  async postMoveInfo(moveData: MoveInputDTO) {
     const { userId } = this.als.getStore();
     const progress = Progress.OPEN;
     const moveInfo = await this.moveRepository.postMoveInfo({
@@ -269,7 +267,7 @@ export class MoveService implements IMoveService {
     return moveInfo;
   }
 
-  async patchMoveInfo(moveInfoId: string, body: Partial<MoveInfoInputDTO>) {
+  async patchMoveInfo(moveInfoId: string, body: MovePatchInputDTO) {
     const { userId } = this.als.getStore();
     const moveInfo = await this.moveRepository.findByMoveInfoId(moveInfoId);
 

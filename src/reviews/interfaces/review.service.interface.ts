@@ -1,4 +1,5 @@
-import { DriverReviewResponseDTO, IReivew, MyReviewResponseDTO, PatchReviewDTO, ReviewBodyDTO } from '#reviews/review.types.js';
+import { DriverReviewResponseDTO, MyReviewResponseDTO, PatchReviewDTO, ReviewBodyDTO } from '#reviews/types/review.dto.js';
+import { IReivew } from '#reviews/types/review.types.js';
 import { GetQueries } from '#types/queries.type.js';
 
 export interface IReviewService {

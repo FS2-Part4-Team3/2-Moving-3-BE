@@ -7,7 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AsyncLocalStorage } from 'async_hooks';
 import { RequestNotFoundException } from '#requests/request.exception.js';
-import { BaseRequestOutputDTO, checkRequestOutputDTO, RequestOutputDTO } from '#requests/request.types.js';
+import { BaseRequestOutputDTO, checkRequestOutputDTO, RequestOutputDTO } from '#requests/types/request.dto.js';
 
 describe('RequestController', () => {
   let controller: RequestController;

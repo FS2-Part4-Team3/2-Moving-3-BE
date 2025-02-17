@@ -3,7 +3,7 @@ import { IRequestController } from '#requests/interfaces/request.controller.inte
 import { Controller, Delete, Get, HttpStatus, Param, Post, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { RequestService } from './request.service.js';
-import { BaseRequestOutputDTO, checkRequestOutputDTO, RequestOutputDTO } from './request.types.js';
+import { BaseRequestOutputDTO, checkRequestOutputDTO, RequestOutputDTO } from './types/request.dto.js';
 
 @Controller('requests')
 export class RequestController implements IRequestController {
