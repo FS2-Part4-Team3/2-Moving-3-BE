@@ -26,7 +26,7 @@
     "#requests/*": "./dist/requests/*",
     "#reviews/*": "./dist/reviews/*",
     "#users/*": "./dist/users/*",
-    "#aiReviewSummary/*": "./dist/aiReviewSummary/*"
+    "#reviewSummary/*": "./dist/reviewSummary/*"
   },
   "scripts": {
     "build": "nest build",

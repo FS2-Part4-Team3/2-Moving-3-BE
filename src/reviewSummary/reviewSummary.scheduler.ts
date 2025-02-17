@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { AiReviewSummaryService } from './aiReviewSummary.service.js';
+import { ReviewSummaryService } from './reviewSummary.service.js';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { DriverRepository } from '#drivers/driver.repository.js';
 
@@ -8,7 +8,7 @@ export class AiReviewSummaryScheduler {
   private readonly logger = new Logger(AiReviewSummaryScheduler.name);
 
   constructor(
-    private readonly aiReviewSummaryService: AiReviewSummaryService,
+    private readonly ReviewSummaryService: ReviewSummaryService,
     private readonly driverRepository: DriverRepository,
   ) {}
 
@@ -26,7 +26,7 @@ export class AiReviewSummaryScheduler {
     for (const { id } of drivers) {
       try {
         this.logger.log(`리뷰 요약 중: ${id}`);
-        await this.aiReviewSummaryService.generateAiReviewSummary(id);
+        await this.ReviewSummaryService.generateAiReviewSummary(id);
         this.logger.log(`리뷰 요약 완료: ${id}`);
       } catch (error) {
         this.logger.error(`리뷰 요약 실패: ${id}`, error.stack);

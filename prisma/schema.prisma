@@ -67,7 +67,6 @@ model Driver {
   provider   String?
   providerId String?
 
-
   reviews       Review[]
   requests      Request[]
   estimations   Estimation[]
@@ -75,7 +74,7 @@ model Driver {
   questions     Question[]
   notifications Notification[]
   Chat          Chat[]
-  aiReviewSummary aiReviewSummary?
+  reviewSummary ReviewSummary?
 }
 
 model MoveInfo {
@@ -214,27 +213,27 @@ model Chat {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
-  
+
   user     User   @relation(fields: [userId], references: [id])
   userId   String
   driver   Driver @relation(fields: [driverId], references: [id])
   driverId String
-  
+
   direction ChatDirection
   message   String
   image     String?
   isRead    Boolean       @default(false)
 
   @@index([createdAt])
- }
- 
-model aiReviewSummary {
+}
+
+model ReviewSummary {
   id        String    @id @default(uuid())
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
-  summaryReview String
+  summary String
 
   driver   Driver @relation(fields: [driverId], references: [id])
   driverId String @unique
