@@ -13,21 +13,35 @@ export function prismaSoftDeleteMiddleware(): Prisma.Middleware {
       delete params.args.forceFind;
     }
 
-    if (params.action === 'delete' && !params.args?.forceDelete) {
-      params.action = 'update';
-      params.args.data = {
-        ...params.args.data,
-        deletedAt: new Date(),
-      };
-    }
+    if (['delete', 'deleteMany'].includes(params.action)) {
+      const args = params.args as any;
 
-    if (params.action === 'deleteMany' && !params.args?.forceDelete) {
-      params.action = 'updateMany';
-      params.args.data = {
-        ...params.args.data,
-        deletedAt: new Date(),
-      };
+      if (!args.forceDelete) {
+        params.action = params.action === 'delete' ? 'update' : 'updateMany';
+
+        params.args.data = {
+          ...params.args.data,
+          deletedAt: new Date(),
+        };
+      }
+
+      delete args.forceDelete;
     }
+    // if (params.action === 'delete' && !params.args?.forceDelete) {
+    //   params.action = 'update';
+    //   params.args.data = {
+    //     ...params.args.data,
+    //     deletedAt: new Date(),
+    //   };
+    // }
+
+    // if (params.action === 'deleteMany' && !params.args?.forceDelete) {
+    //   params.action = 'updateMany';
+    //   params.args.data = {
+    //     ...params.args.data,
+    //     deletedAt: new Date(),
+    //   };
+    // }
 
     return next(params);
   };

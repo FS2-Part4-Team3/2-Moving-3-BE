@@ -1,5 +1,6 @@
 import { AuthService } from '#auth/auth.service.js';
 import { IAuthController } from '#auth/interfaces/auth.controller.interface.js';
+import { LoggedInUsersDTO } from '#auth/types/auth.dto.js';
 import { FilteredDriverOutputDTO } from '#auth/types/filtered.driver.dto.js';
 import { FilteredUserOutputDTO } from '#auth/types/filtered.user.dto.js';
 import { GoogleAuthType, KakaoAuthType, NaverAuthType } from '#auth/types/provider.types.js';
@@ -133,12 +134,14 @@ export class AuthController implements IAuthController {
   }
 
   @Delete('signOut')
+  @UseGuards(AccessTokenGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: '로그아웃' })
   @ApiResponse({
     status: HttpStatus.NO_CONTENT,
   })
   async signOut(@Res({ passthrough: true }) response: Response) {
+    await this.authService.signOut();
     this.setAccessToken(response, '');
     this.setRefreshToken(response, '');
   }
@@ -160,7 +163,7 @@ export class AuthController implements IAuthController {
   }
 
   @Get('isLoggedIn')
-  @ApiOperation({ summary: '로그인 상태 조회' })
+  @ApiOperation({ summary: '로그인 상태 조회(본인)' })
   @ApiResponse({
     status: HttpStatus.OK,
     schema: {
@@ -205,6 +208,16 @@ export class AuthController implements IAuthController {
     }
 
     return { isAccessTokenValid, isRefreshTokenValid, userType };
+  }
+
+  @Get(':id/isOnline')
+  @ApiOperation({ summary: '로그인 상태 조회(id)' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: LoggedInUsersDTO,
+  })
+  async isOnline(@Param('id') id: string) {
+    return await this.authService.findLoggedInUser(id);
   }
 
   @Post('refresh')
