@@ -18,4 +18,8 @@ export class AuthRepository implements IAuthRepository {
       create: { loginId, refreshToken },
     });
   }
+
+  async delete(loginId: string) {
+    return await this.loggedInUsers.delete({ where: { loginId } });
+  }
 }
