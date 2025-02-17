@@ -41,7 +41,7 @@ export class AuthController implements IAuthController {
     const maxAge = token ? 1000 * 60 * 60 : 0;
 
     res.cookie('accessToken', token, {
-      httpOnly: true,
+      // httpOnly: true,
       secure: true,
       sameSite: 'none',
       maxAge,
