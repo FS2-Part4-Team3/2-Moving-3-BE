@@ -19,4 +19,5 @@ export interface IMoveController {
   postMoveInfo: (moveData: MoveInputDTO) => Promise<IMoveInfo>;
   patchMoveInfo: (moveInfoId: string, body: MovePatchInputDTO) => Promise<IMoveInfo>;
   deleteMoveInfo: (moveInfoId: string) => Promise<IMoveInfo>;
+  confirmEstimation: (moveInfoId: string, estimationId: string) => Promise<void>;
 }

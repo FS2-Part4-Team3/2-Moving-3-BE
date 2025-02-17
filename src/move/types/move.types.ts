@@ -28,6 +28,11 @@ export interface IMoveInfo {
   requests: IRequest[];
 }
 
+export interface UpdateResponse {
+  count: number;
+  success: boolean;
+}
+
 export interface IEstimation {
   id: string;
   createdAt: Date;

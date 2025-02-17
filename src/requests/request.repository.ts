@@ -2,6 +2,7 @@ import { PrismaService } from '#global/prisma.service.js';
 import { IRequestRepository } from '#requests/interfaces/request.repository.interface.js';
 import { Injectable } from '@nestjs/common';
 import { CreateRequestDTO, PatchRequestDTO } from './types/request.dto.js';
+import { UpdateResponse } from '#move/types/move.types.js';
 
 @Injectable()
 export class RequestRepository implements IRequestRepository {
@@ -52,7 +53,20 @@ export class RequestRepository implements IRequestRepository {
         AND r."driverId" = ${driverId}
         AND r."status" IS NOT NULL
         )`;
-    console.log('ddddddddddddddddddddddddddddd', exists);
     return exists;
+  }
+
+  //자동 만료 3
+  async updateToRequestExpired(moveInfoIds: string[]): Promise<UpdateResponse> {
+    if (moveInfoIds.length === 0) return { count: 0, success: false };
+
+    const updatedRequests = await this.request.updateMany({
+      where: {
+        moveInfoId: { in: moveInfoIds },
+      },
+      data: { status: 'EXPIRED' },
+    });
+
+    return { count: updatedRequests.count, success: updatedRequests.count > 0 };
   }
 }

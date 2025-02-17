@@ -1,12 +1,12 @@
 import { IMoveService } from '#move/interfaces/move.service.interface.js';
 import { AreaType, IStorage, UserType } from '#types/common.types.js';
 import { MoveInfoGetQueries, moveInfoWithEstimationsGetQueries } from '#types/queries.type.js';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { AsyncLocalStorage } from 'async_hooks';
 import { MoveRepository } from './move.repository.js';
-import { MoveInfoNotFoundException, ReceivedEstimationException } from './move.exception.js';
+import { AutoCompleteException, MoveInfoNotFoundException, ReceivedEstimationException } from './move.exception.js';
 import { Progress } from '@prisma/client';
-import { ForbiddenException } from '#exceptions/http.exception.js';
+import { ForbiddenException, InternalServerErrorException } from '#exceptions/http.exception.js';
 import { DriverInvalidTokenException } from '#drivers/driver.exception.js';
 import { DriverService } from '#drivers/driver.service.js';
 import { EstimationsFilter, IsActivate } from '#types/options.type.js';
@@ -15,9 +15,13 @@ import { ConfirmedEstimationException, EstimationNotFoundException } from '#esti
 import { RequestRepository } from '#requests/request.repository.js';
 import { areaToKeyword } from '#utils/address-utils.js';
 import { MoveInputDTO, MovePatchInputDTO } from './types/move.dto.js';
+import { Cron, CronExpression } from '@nestjs/schedule';
+import logger from '#utils/logger.js';
 
 @Injectable()
 export class MoveService implements IMoveService {
+  private readonly logger = logger;
+
   constructor(
     private readonly driverService: DriverService,
     private readonly moveRepository: MoveRepository,
@@ -25,6 +29,27 @@ export class MoveService implements IMoveService {
     private readonly estimationRepository: EstimationRepository,
     private readonly requestRepository: RequestRepository,
   ) {}
+
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  async autoCompleteMoves(): Promise<void> {
+    const now = new Date();
+
+    try {
+      const updatedComplete = await this.moveRepository.updateToComplete(now);
+      this.logger.info(`완료된 이사 ${updatedComplete.count}건 업데이트, 성공 여부: ${updatedComplete.success}`);
+
+      const expiredMoveInfoIds = await this.moveRepository.updateToExpired(now);
+      this.logger.info(`만료된 이사 ${expiredMoveInfoIds.length}건`);
+
+      if (expiredMoveInfoIds.length > 0) {
+        const updatedRequestsExpired = await this.requestRepository.updateToRequestExpired(expiredMoveInfoIds);
+        this.logger.info(`만료된 요청 ${updatedRequestsExpired.count}건,성공 여부: ${updatedRequestsExpired.success}`);
+      }
+    } catch (error) {
+      this.logger.error(`Error: ${error.message}`, error.stack);
+      throw new AutoCompleteException();
+    }
+  }
 
   private async getFilteredDriverData(driverId: string) {
     const driver = await this.driverService.findDriver(driverId);
@@ -282,7 +307,7 @@ export class MoveService implements IMoveService {
     return softDeleteMoveInfo;
   }
 
-  async confirmEstimation(moveInfoId: string, estimationId: string) {
+  async confirmEstimation(moveInfoId: string, estimationId: string): Promise<void> {
     const { userId } = this.als.getStore();
 
     // 1. 이사 정보 찾기
@@ -316,5 +341,7 @@ export class MoveService implements IMoveService {
 
     this.moveRepository.confirmEstimation(moveInfoId, estimationId);
     this.estimationRepository.confirmedForIdEstimation(estimationId, moveInfoId);
+
+    this.logger.info(`이사 정보(${moveInfoId})에 대해 견적(${estimationId})을 확정했습니다.`);
   }
 }
