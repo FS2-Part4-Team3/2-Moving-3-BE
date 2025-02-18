@@ -1,4 +1,4 @@
-export interface IAiReviewSummary {
+export interface IReviewSummary {
   id: string;
   createdAt: Date;
   updatedAt: Date;

@@ -1,21 +1,21 @@
 import { Controller, Get, HttpStatus, Param, Post } from '@nestjs/common';
-import { AiReviewSummaryService } from '#aiReviewSummary/aiReviewSummary.service.js';
+import { ReviewSummaryService } from '#reviewSummary/reviewSummary.service.js';
 import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
-import { AiReviewSummaryResponseDTO } from './types/aiReviewSummary.dto.js';
+import { ReviewSummaryResponseDTO } from './types/reviewSummary.dto.js';
 
 @Controller('reviewSummary')
-export class AiReviewSummaryController {
-  constructor(private readonly aiReviewSummaryService: AiReviewSummaryService) {}
+export class ReviewSummaryController {
+  constructor(private readonly reviewSummaryService: ReviewSummaryService) {}
 
   @Get(':driverId')
   @ApiOperation({ summary: '기사의 요약된 AI리뷰 조회' })
   @ApiParam({ name: 'driverId', description: '기사 ID', type: 'string' })
   @ApiResponse({
     status: HttpStatus.OK,
-    type: AiReviewSummaryResponseDTO,
+    type: ReviewSummaryResponseDTO,
   })
   async getAiReviewSummary(@Param('driverId') driverId: string) {
-    return this.aiReviewSummaryService.getAiReviewSummary(driverId);
+    return this.reviewSummaryService.getAiReviewSummary(driverId);
   }
 
   @Post(':driverId')
@@ -23,9 +23,9 @@ export class AiReviewSummaryController {
   @ApiParam({ name: 'driverId', description: '기사 ID', type: 'string' })
   @ApiResponse({
     status: HttpStatus.OK,
-    type: AiReviewSummaryResponseDTO,
+    type: ReviewSummaryResponseDTO,
   })
   async generateAiReviewSummary(@Param('driverId') driverId: string) {
-    return this.aiReviewSummaryService.generateAiReviewSummary(driverId);
+    return this.reviewSummaryService.generateAiReviewSummary(driverId);
   }
 }

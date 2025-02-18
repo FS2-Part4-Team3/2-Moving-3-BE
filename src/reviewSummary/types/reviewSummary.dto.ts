@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class AiReviewSummaryResponseDTO {
+export class ReviewSummaryResponseDTO {
   @ApiProperty({ description: '이사정보 ID', type: String })
   id: string;
 
