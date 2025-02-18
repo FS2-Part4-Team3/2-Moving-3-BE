@@ -47,6 +47,8 @@ export class AuthController implements IAuthController {
       sameSite: 'none',
       maxAge,
     });
+
+    res.setHeader('Authorization', `Bearer ${token}`);
   }
 
   private setRefreshToken(res: Response, token: string) {

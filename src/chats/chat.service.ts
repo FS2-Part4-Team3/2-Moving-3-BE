@@ -1,6 +1,7 @@
 import { ChatRepository } from '#chats/chat.repository.js';
 import { IChatService } from '#chats/interfaces/chat.service.interface.js';
 import { ChatPostDTO } from '#chats/types/chat.dto.js';
+import { MoveRepository } from '#move/move.repository.js';
 import { IStorage, UserType } from '#types/common.types.js';
 import { OffsetPaginationOptions } from '#types/options.type.js';
 import { generateS3DownloadUrlForChat } from '#utils/S3/generate-s3-download-url.js';
@@ -14,6 +15,7 @@ import { AsyncLocalStorage } from 'async_hooks';
 export class ChatService implements IChatService {
   constructor(
     private readonly chatRepository: ChatRepository,
+    private readonly moveRepository: MoveRepository,
     private readonly websocketGateway: WebsocketGateway,
     private readonly als: AsyncLocalStorage<IStorage>,
   ) {}
@@ -23,10 +25,14 @@ export class ChatService implements IChatService {
     const validId = type === UserType.User ? userId : driverId;
 
     const totalCount = await this.chatRepository.countList(validId, type);
-    const driverIds = await this.chatRepository.findList(validId, type, options);
-    const list = driverIds.map(record => record.driverId);
-
-    return { totalCount, list };
+    const uniqueIds = await this.chatRepository.findList(validId, type, options);
+    const list = uniqueIds.map(record => (type === UserType.User ? record.driverId : record.userId));
+    if (type === UserType.Driver) {
+      const moves = await Promise.all(list.map(async userId => (await this.moveRepository.findByUserId(userId))[0]));
+      return { totalCount, list, moves };
+    } else {
+      return { totalCount, list };
+    }
   }
 
   async findChats(targetId: string, options: OffsetPaginationOptions) {
