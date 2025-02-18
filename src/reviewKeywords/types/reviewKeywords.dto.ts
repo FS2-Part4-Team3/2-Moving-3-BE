@@ -1,4 +1,4 @@
-import { KeywordType } from '#types/common.types.js';
+import { KeywordType, KeywordTypeEnum } from '#types/common.types.js';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class ReviewKeywordsDTO {
@@ -54,4 +54,20 @@ export class AnalyzeAiReviewKeywordsDTO {
 
   @ApiProperty({ description: '삭제된 키워드', type: [String] })
   removedKeywords: string[];
+}
+
+export class KeywordDTO {
+  @ApiProperty({ description: '키워드' })
+  keyword: string;
+
+  @ApiProperty({ description: '키워드의 출현 횟수' })
+  count: number;
+}
+
+export class ReviewKeywordsResponseDTO {
+  @ApiProperty({ description: 'POSITIVE 타입의 키워드들', type: [KeywordDTO] })
+  positive: KeywordDTO[];
+
+  @ApiProperty({ description: 'NEGATIVE 타입의 키워드들', type: [KeywordDTO] })
+  negative: KeywordDTO[];
 }

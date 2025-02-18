@@ -5,6 +5,8 @@ import { ReviewKeywordsRepository } from './reviewKeywords.repository.js';
 import { IReviewKeywordsService } from './interfaces/reviewKeywords.service.interface.js';
 import { ReviewNotFoundException } from '#reviews/review.exception.js';
 import { KeywordTypeEnum } from '#types/common.types.js';
+import { ReviewKeywordsGetQueries } from '#types/queries.type.js';
+import { KeywordDTO } from './types/reviewKeywords.dto.js';
 
 @Injectable()
 export class ReviewKeywordsService implements IReviewKeywordsService {
@@ -14,8 +16,13 @@ export class ReviewKeywordsService implements IReviewKeywordsService {
     private readonly googleGeminiService: GoogleGeminiService,
   ) {}
 
-  async findByDriverId(driverId: string) {
-    return this.reviewKeywordsRepository.findByDriverId(driverId);
+  async findByDriverId(driverId: string, options: ReviewKeywordsGetQueries) {
+    const results = await this.reviewKeywordsRepository.findByDriverId(driverId, options);
+
+    const positive = results.filter(item => item.type === 'POSITIVE').map(item => ({ keyword: item.keyword, count: item.count }));
+    const negative = results.filter(item => item.type === 'NEGATIVE').map(item => ({ keyword: item.keyword, count: item.count }));
+
+    return { positive, negative };
   }
 
   async analyzeAiReviewKeywords(driverId: string) {
