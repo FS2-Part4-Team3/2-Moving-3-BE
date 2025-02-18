@@ -185,7 +185,7 @@ export class AuthController implements IAuthController {
     let isRefreshTokenValid = false;
     let userType = null;
 
-    const accessToken = req.cookies['accessToken'];
+    const accessToken = req.headers['authorization']?.split(' ')[1];
     const refreshToken = req.cookies['refreshToken'];
 
     if (accessToken) {
