@@ -82,8 +82,8 @@ export class AuthController implements IAuthController {
     @Res({ passthrough: true }) response: Response,
   ) {
     const { person, accessToken, refreshToken } = await this.authService.createPerson(body, type);
-    this.setAccessToken(response, accessToken);
-    this.setRefreshToken(response, refreshToken);
+    // this.setAccessToken(response, accessToken);
+    // this.setRefreshToken(response, refreshToken);
 
     return { person, accessToken };
   }
@@ -185,7 +185,7 @@ export class AuthController implements IAuthController {
     let isRefreshTokenValid = false;
     let userType = null;
 
-    const accessToken = req.cookies['accessToken'];
+    const accessToken = req.headers['authorization']?.split(' ')[1];
     const refreshToken = req.cookies['refreshToken'];
 
     if (accessToken) {
