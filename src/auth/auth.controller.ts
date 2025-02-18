@@ -82,8 +82,8 @@ export class AuthController implements IAuthController {
     @Res({ passthrough: true }) response: Response,
   ) {
     const { person, accessToken, refreshToken } = await this.authService.createPerson(body, type);
-    this.setAccessToken(response, accessToken);
-    this.setRefreshToken(response, refreshToken);
+    // this.setAccessToken(response, accessToken);
+    // this.setRefreshToken(response, refreshToken);
 
     return { person, accessToken };
   }
