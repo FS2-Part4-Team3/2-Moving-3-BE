@@ -2,6 +2,7 @@ import { PrismaService } from '#global/prisma.service.js';
 import { Injectable } from '@nestjs/common';
 import { IReviewKeywordsRepository } from './interfaces/reviewKeywords.repository.interface.js';
 import { KeywordType } from '#types/common.types.js';
+import { ReviewKeywordsGetQueries } from '#types/queries.type.js';
 
 @Injectable()
 export class ReviewKeywordsRepository implements IReviewKeywordsRepository {
@@ -10,9 +11,12 @@ export class ReviewKeywordsRepository implements IReviewKeywordsRepository {
     this.reviewKeywords = prisma.reviewKeywords;
   }
 
-  async findByDriverId(driverId: string) {
+  async findByDriverId(driverId: string, options?: ReviewKeywordsGetQueries) {
+    const { filter } = options;
+
     return this.reviewKeywords.findMany({
-      where: { driverId },
+      where: { driverId, ...(filter && filter !== 'ALL' ? { type: filter } : {}) },
+      select: { keyword: true, count: true, type: true },
     });
   }
 

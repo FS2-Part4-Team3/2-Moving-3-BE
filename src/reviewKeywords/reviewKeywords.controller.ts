@@ -1,8 +1,10 @@
-import { Controller, Get, HttpStatus, Param, Post } from '@nestjs/common';
+import { Controller, Get, HttpStatus, Param, Post, Query } from '@nestjs/common';
 import { ReviewKeywordsService } from './reviewKeywords.service.js';
 import { IReviewKeywordsController } from './interfaces/reviewKeywords.controller.interface.js';
-import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
-import { AnalyzeAiReviewKeywordsDTO, ReviewKeywordsDTO } from './types/reviewKeywords.dto.js';
+import { ApiOperation, ApiParam, ApiQuery, ApiResponse } from '@nestjs/swagger';
+import { AnalyzeAiReviewKeywordsDTO, ReviewKeywordsResponseDTO } from './types/reviewKeywords.dto.js';
+import { ReviewKeywordsGetQueries } from '#types/queries.type.js';
+import { ReviewKeywordsFilter } from '#types/options.type.js';
 
 @Controller('reviewKeywords')
 export class ReviewKeywordsController implements IReviewKeywordsController {
@@ -11,12 +13,15 @@ export class ReviewKeywordsController implements IReviewKeywordsController {
   @Get(':driverId')
   @ApiOperation({ summary: '기사의 리뷰 키워드 조회' })
   @ApiParam({ name: 'driverId', description: '기사 ID', type: 'string' })
+  @ApiQuery({ name: 'filter', required: false, enum: ReviewKeywordsFilter })
   @ApiResponse({
     status: HttpStatus.OK,
-    type: ReviewKeywordsDTO,
+    type: ReviewKeywordsResponseDTO,
   })
-  async getReviewKeywords(@Param('driverId') driverId: string) {
-    return this.reviewKeywordsService.findByDriverId(driverId);
+  async getReviewKeywords(@Param('driverId') driverId: string, @Query() query: ReviewKeywordsGetQueries) {
+    const options = { filter: query.filter };
+
+    return this.reviewKeywordsService.findByDriverId(driverId, options);
   }
 
   @Post(':driverId')

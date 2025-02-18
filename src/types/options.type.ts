@@ -47,6 +47,12 @@ export enum EstimationsFilter {
   confirmed = 'confirmed',
 }
 
+export enum ReviewKeywordsFilter {
+  ALL = 'ALL',
+  POSITIVE = 'POSITIVE',
+  NEGATIVE = 'NEGATIVE',
+}
+
 export class FindOptions extends OffsetPaginationOptions {
   @IsOptional()
   @IsEnum(SortOrder, { message: '올바른 정렬 기준을 골라주세요' })
@@ -105,4 +111,11 @@ export class moveInfoWithEstimationsFilter extends OffsetPaginationOptions {
   @IsEnum(EstimationsFilter, { message: 'all, confirmed를 보내주세요' })
   @ApiProperty({ description: '받았던 견적 필터링' })
   filter: EstimationsFilter;
+}
+
+export class GetReviewKeywordsFilter {
+  @IsOptional()
+  @IsEnum(ReviewKeywordsFilter, { message: 'ALL, POSITIVE, NEGATIVE를 보내주세요' })
+  @ApiProperty({ description: '기사의 리뷰 키워드 조회 필터링' })
+  filter: ReviewKeywordsFilter;
 }
