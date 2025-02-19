@@ -220,7 +220,7 @@ model Chat {
   driverId String
 
   direction ChatDirection
-  message   String
+  message   String?
   image     String?
   isRead    Boolean       @default(false)
 
