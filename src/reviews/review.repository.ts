@@ -75,10 +75,7 @@ export class ReviewRepository implements IReviewRepository {
       ...review,
       estimation: {
         ...review.estimation,
-        moveInfo: {
-          ...review.estimation.moveInfo,
-          isSpecificRequest: review.estimation.moveInfo.requests.some(req => req.driverId === review.driverId),
-        },
+        isSpecificRequest: review.estimation.moveInfo.requests.some(req => req.driverId === review.driverId),
       },
     }));
 
