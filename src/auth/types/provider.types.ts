@@ -5,29 +5,7 @@ export interface ProviderInfo {
   providerId: string;
 }
 
-export interface GoogleAuthType {
-  email: string;
-  name: string;
-  photo: string;
-  provider: string;
-  id: string;
-  userType: UserType;
-  accessToken?: string;
-  refreshToken?: string;
-}
-
-export interface KakaoAuthType {
-  email: string;
-  name: string;
-  photo: string;
-  provider: string;
-  id: string;
-  userType: UserType;
-  accessToken?: string;
-  refreshToken?: string;
-}
-
-export interface NaverAuthType {
+export interface SocialAuthType {
   email: string;
   name: string;
   photo: string;

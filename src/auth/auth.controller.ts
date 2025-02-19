@@ -3,7 +3,7 @@ import { IAuthController } from '#auth/interfaces/auth.controller.interface.js';
 import { LoggedInUsersDTO } from '#auth/types/auth.dto.js';
 import { FilteredDriverOutputDTO } from '#auth/types/filtered.driver.dto.js';
 import { FilteredUserOutputDTO } from '#auth/types/filtered.user.dto.js';
-import { GoogleAuthType, KakaoAuthType, NaverAuthType } from '#auth/types/provider.types.js';
+import { SocialAuthType } from '#auth/types/provider.types.js';
 import { SignInDTO, SignUpDTO } from '#auth/types/sign.dto.js';
 import { UpdatePasswordDTO } from '#auth/types/update-password.dto.js';
 import { oauthRedirect } from '#configs/common.config.js';
@@ -263,9 +263,9 @@ export class AuthController implements IAuthController {
   @ApiExcludeEndpoint()
   @UseGuards(AuthGuard('google'))
   async googleAuthRedirect(@Req() req, @Res({ passthrough: true }) response: Response) {
-    const redirectResult: GoogleAuthType = req.user;
+    const redirectResult: SocialAuthType = req.user;
 
-    const { person, accessToken, refreshToken } = await this.authService.googleAuth(redirectResult);
+    const { person, accessToken, refreshToken } = await this.authService.socialAuth(redirectResult);
     this.setAccessToken(response, accessToken);
     this.setRefreshToken(response, refreshToken);
 
@@ -291,13 +291,13 @@ export class AuthController implements IAuthController {
   @ApiExcludeEndpoint()
   @UseGuards(AuthGuard('kakao'))
   async kakaoAuthRedirect(@Req() req, @Res({ passthrough: true }) response: Response) {
-    const redirectResult: KakaoAuthType = req.user;
+    const redirectResult: SocialAuthType = req.user;
 
-    const { person, accessToken, refreshToken } = await this.authService.kakaoAuth(redirectResult);
+    const { person, accessToken, refreshToken } = await this.authService.socialAuth(redirectResult);
     this.setAccessToken(response, accessToken);
     this.setRefreshToken(response, refreshToken);
 
-    response.redirect(`${oauthRedirect}/callback/google?accessToken=${accessToken}`);
+    response.redirect(`${oauthRedirect}/callback/kakao?accessToken=${accessToken}`);
   }
 
   @Get('naver/:userType')
@@ -319,12 +319,12 @@ export class AuthController implements IAuthController {
   @ApiExcludeEndpoint()
   @UseGuards(AuthGuard('naver'))
   async naverAuthRedirect(@Req() req, @Res({ passthrough: true }) response: Response) {
-    const redirectResult: NaverAuthType = req.user;
+    const redirectResult: SocialAuthType = req.user;
 
-    const { person, accessToken, refreshToken } = await this.authService.naverAuth(redirectResult);
+    const { person, accessToken, refreshToken } = await this.authService.socialAuth(redirectResult);
     this.setAccessToken(response, accessToken);
     this.setRefreshToken(response, refreshToken);
 
-    response.redirect(`${oauthRedirect}/callback/google?accessToken=${accessToken}`);
+    response.redirect(`${oauthRedirect}/callback/naver?accessToken=${accessToken}`);
   }
 }

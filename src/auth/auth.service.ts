@@ -7,8 +7,8 @@ import {
 import { AuthRepository } from '#auth/auth.repository.js';
 import { IAuthService } from '#auth/interfaces/auth.service.interface.js';
 import { JwtGenerateService } from '#auth/jwt-generate.service.js';
-import { GoogleCreateDTO, KakaoCreateDTO, NaverCreateDTO } from '#auth/types/provider.dto.js';
-import { GoogleAuthType, KakaoAuthType, NaverAuthType } from '#auth/types/provider.types.js';
+import { SocialCreateDTO } from '#auth/types/provider.dto.js';
+import { SocialAuthType } from '#auth/types/provider.types.js';
 import { SignInDTO, SignUpDTO } from '#auth/types/sign.dto.js';
 import { UpdatePasswordDTO } from '#auth/types/update-password.dto.js';
 import { DriverRepository } from '#drivers/driver.repository.js';
@@ -153,7 +153,7 @@ export class AuthService implements IAuthService {
     return { id, isOnline };
   }
 
-  async googleAuth(redirectResult: GoogleAuthType) {
+  async socialAuth(redirectResult: SocialAuthType) {
     const { email, name, photo, provider, id, userType } = redirectResult;
 
     if (!userType || !Object.values(UserType).includes(userType)) {
@@ -161,40 +161,8 @@ export class AuthService implements IAuthService {
     }
 
     const repo = userType === UserType.User ? this.userRepository : this.driverRepository;
-    const target = await repo.findByEmail(email);
-
-    if (target) {
-      if (target.provider !== provider || target.providerId !== id) {
-        throw new UnauthorizedException();
-      }
-
-      const accessToken = await this.jwtGenerateService.generateAccessToken({ id: target.id, type: userType });
-      const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: target.id, type: userType });
-      target.type = userType;
-
-      return { person: await filterSensitiveData(target), accessToken, refreshToken };
-    }
-
-    const data: GoogleCreateDTO = { email, name, image: photo, provider, providerId: id };
-    const person = await repo.createByProviderCreateDTO(data);
-
-    const accessToken = await this.jwtGenerateService.generateAccessToken({ id: person.id, type: userType });
-    const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: person.id, type: userType });
-    person.type = userType;
-
-    return { person: await filterSensitiveData(person), accessToken, refreshToken };
-  }
-
-  async kakaoAuth(redirectResult: KakaoAuthType) {
-    const { email, name, photo, provider, id, userType } = redirectResult;
-
-    if (!userType || !Object.values(UserType).includes(userType)) {
-      throw new InvalidUserTypeException();
-    }
-
-    const repo = userType === UserType.User ? this.userRepository : this.driverRepository;
-    const target = await repo.findByEmail(email);
     const providerId = id.toString();
+    const target = await repo.findByEmail(email);
 
     if (target) {
       if (target.provider !== provider || target.providerId !== providerId) {
@@ -203,49 +171,24 @@ export class AuthService implements IAuthService {
 
       const accessToken = await this.jwtGenerateService.generateAccessToken({ id: target.id, type: userType });
       const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: target.id, type: userType });
-      target.type = userType;
 
+      target.type = userType;
       return { person: await filterSensitiveData(target), accessToken, refreshToken };
     }
 
-    const data: KakaoCreateDTO = { email, name, image: photo, provider, providerId };
+    const data: SocialCreateDTO = {
+      email,
+      name,
+      image: photo,
+      provider,
+      providerId,
+    };
+
     const person = await repo.createByProviderCreateDTO(data);
 
     const accessToken = await this.jwtGenerateService.generateAccessToken({ id: person.id, type: userType });
     const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: person.id, type: userType });
-    person.type = userType;
 
-    return { person: await filterSensitiveData(person), accessToken, refreshToken };
-  }
-
-  async naverAuth(redirectResult: NaverAuthType) {
-    const { email, name, photo, provider, id, userType } = redirectResult;
-
-    if (!userType || !Object.values(UserType).includes(userType)) {
-      throw new InvalidUserTypeException();
-    }
-
-    const repo = userType === UserType.User ? this.userRepository : this.driverRepository;
-    const target = await repo.findByEmail(email);
-    const providerId = id.toString();
-
-    if (target) {
-      if (target.provider !== provider || target.providerId !== providerId) {
-        throw new UnauthorizedException();
-      }
-
-      const accessToken = await this.jwtGenerateService.generateAccessToken({ id: target.id, type: userType });
-      const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: target.id, type: userType });
-      target.type = userType;
-
-      return { person: await filterSensitiveData(target), accessToken, refreshToken };
-    }
-
-    const data: NaverCreateDTO = { email, name, image: photo, provider, providerId };
-    const person = await repo.createByProviderCreateDTO(data);
-
-    const accessToken = await this.jwtGenerateService.generateAccessToken({ id: person.id, type: userType });
-    const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: person.id, type: userType });
     person.type = userType;
 
     return { person: await filterSensitiveData(person), accessToken, refreshToken };
