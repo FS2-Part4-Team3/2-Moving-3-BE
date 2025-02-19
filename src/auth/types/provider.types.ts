@@ -23,7 +23,6 @@ export interface KakaoAuthType {
   provider: string;
   id: string;
   userType: UserType;
-  phoneNumber: string;
   accessToken?: string;
   refreshToken?: string;
 }
@@ -32,7 +31,6 @@ export interface NaverAuthType {
   email: string;
   name: string;
   photo: string;
-  nickname: string;
   provider: string;
   id: string;
   userType: UserType;

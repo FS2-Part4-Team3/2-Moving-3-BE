@@ -186,7 +186,7 @@ export class AuthService implements IAuthService {
   }
 
   async kakaoAuth(redirectResult: KakaoAuthType) {
-    const { email, name, photo, provider, id, userType, phoneNumber } = redirectResult;
+    const { email, name, photo, provider, id, userType } = redirectResult;
 
     if (!userType || !Object.values(UserType).includes(userType)) {
       throw new InvalidUserTypeException();
@@ -208,7 +208,7 @@ export class AuthService implements IAuthService {
       return { person: await filterSensitiveData(target), accessToken, refreshToken };
     }
 
-    const data: KakaoCreateDTO = { email, name, image: photo, provider, providerId, phoneNumber };
+    const data: KakaoCreateDTO = { email, name, image: photo, provider, providerId };
     const person = await repo.createByProviderCreateDTO(data);
 
     const accessToken = await this.jwtGenerateService.generateAccessToken({ id: person.id, type: userType });
@@ -219,7 +219,7 @@ export class AuthService implements IAuthService {
   }
 
   async naverAuth(redirectResult: NaverAuthType) {
-    const { email, name, photo, nickname, provider, id, userType } = redirectResult;
+    const { email, name, photo, provider, id, userType } = redirectResult;
 
     if (!userType || !Object.values(UserType).includes(userType)) {
       throw new InvalidUserTypeException();
