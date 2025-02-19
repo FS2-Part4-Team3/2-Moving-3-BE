@@ -270,23 +270,25 @@ export class MoveService implements IMoveService {
     if (!userId) {
       throw new UnauthorizedException();
     }
-    const existingMoveInfo = await this.moveRepository.findByUserId(userId);
 
-    if (existingMoveInfo.length > 0) {
+    const existingMoveCount = await this.moveRepository.countByUserId(userId);
+    if (existingMoveCount > 0) {
       throw new MoveInfoAlreadyExistsException();
     }
 
     const progress = Progress.OPEN;
-    const moveInfo = await this.moveRepository.postMoveInfo({
-      ...moveData,
-      ownerId: userId,
-      progress,
-    });
-    if (!moveInfo) {
+
+    try {
+      const moveInfo = await this.moveRepository.postMoveInfo({
+        ...moveData,
+        ownerId: userId,
+        progress,
+      });
+
+      return moveInfo;
+    } catch (error) {
       throw new InternalServerErrorException('이사 정보 생성 중 오류가 발생했습니다.');
     }
-
-    return moveInfo;
   }
 
   async patchMoveInfo(moveInfoId: string, body: MovePatchInputDTO) {

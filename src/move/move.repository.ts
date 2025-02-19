@@ -263,4 +263,10 @@ export class MoveRepository implements IMoveRepository {
       success: expiredMoves.length > 0,
     };
   }
+
+  async countByUserId(userId: string): Promise<number> {
+    return this.moveInfo.count({
+      where: { ownerId: userId, progress: ProgressEnum.OPEN },
+    });
+  }
 }
