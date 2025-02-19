@@ -40,7 +40,8 @@
       "#requests/*": ["./src/requests/*"],
       "#reviews/*": ["./src/reviews/*"],
       "#users/*": ["./src/users/*"],
-      "#aiReviewSummary/*": ["./src/aiReviewSummary/*"],
+      "#reviewSummary/*": ["./src/reviewSummary/*"],
+      "#reviewKeywords/*": ["./src/reviewKeywords/*"],
       "#prisma/*": ["./prisma/*"]
     }
   },

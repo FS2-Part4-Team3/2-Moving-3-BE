@@ -1,5 +1,6 @@
 import { imageRegex } from '#auth/types/auth.types.js';
 import { IChat } from '#chats/types/chat.types.js';
+import { MoveInfo } from '#move/types/move.types.js';
 import { ModelBase } from '#types/common.types.js';
 import { ApiProperty } from '@nestjs/swagger';
 import { ChatDirection } from '@prisma/client';
@@ -35,6 +36,9 @@ export class ChatListDTO {
 
   @ApiProperty({ description: '채팅 목록' })
   list: string[];
+
+  @ApiProperty({ description: '이사 정보' })
+  moves?: MoveInfo[];
 }
 
 export class ChatsDTO {

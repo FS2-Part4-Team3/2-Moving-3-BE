@@ -16,13 +16,13 @@ export class ChatRepository implements IChatRepository {
     const where = userType === UserType.User ? { userId: id } : { driverId: id };
     const distinctField = userType === UserType.User ? 'driverId' : 'userId';
 
-    const uniqueDrivers = await this.chat.findMany({
+    const uniqueIds = await this.chat.findMany({
       where,
       distinct: [distinctField],
       select: { [distinctField]: true },
     });
 
-    return uniqueDrivers.length;
+    return uniqueIds.length;
   }
 
   async countChats(userId: string, driverId: string) {
@@ -39,7 +39,7 @@ export class ChatRepository implements IChatRepository {
     const distinctField = userType === UserType.User ? 'driverId' : 'userId';
     const { page, pageSize } = options;
 
-    const uniqueDrivers = await this.chat.findMany({
+    const uniqueIds = await this.chat.findMany({
       where,
       orderBy: { createdAt: 'desc' },
       take: pageSize,
@@ -48,7 +48,7 @@ export class ChatRepository implements IChatRepository {
       select: { [distinctField]: true },
     });
 
-    return uniqueDrivers;
+    return uniqueIds;
   }
 
   async findChats(userId: string, driverId: string, options: OffsetPaginationOptions) {

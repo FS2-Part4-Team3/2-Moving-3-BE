@@ -1,6 +1,7 @@
 import {
   DriversFindOptions,
   FindOptions,
+  GetReviewKeywordsFilter,
   MoveInfoFilter,
   moveInfoWithEstimationsFilter,
   OffsetPaginationOptions,
@@ -16,3 +17,4 @@ export class ReviewableGetQueries extends PartialType(OffsetPaginationOptions) {
 export class DriverEstimationsGetQueries extends PartialType(OffsetPaginationOptions) {}
 export class DriverRejectedEstimations extends PartialType(OffsetPaginationOptions) {}
 export class ChatGetQueries extends PartialType(OffsetPaginationOptions) {}
+export class ReviewKeywordsGetQueries extends PartialType(GetReviewKeywordsFilter) {}
