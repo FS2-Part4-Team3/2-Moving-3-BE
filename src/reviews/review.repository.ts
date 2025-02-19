@@ -60,12 +60,12 @@ export class ReviewRepository implements IReviewRepository {
                 },
               },
             },
-            driver: {
-              select: {
-                name: true,
-                image: true,
-              },
-            },
+          },
+        },
+        driver: {
+          select: {
+            name: true,
+            image: true,
           },
         },
       },
