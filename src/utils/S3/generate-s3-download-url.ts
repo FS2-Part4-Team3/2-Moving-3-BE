@@ -4,7 +4,7 @@ import { IUser } from '#users/types/user.types.js';
 import { generatePresignedDownloadUrl } from '#utils/S3/generate-presigned-download-url.js';
 
 export async function generateS3DownloadUrl(person: IUser | IDriver) {
-  if (!person.image) {
+  if (!person.image || person.provider) {
     return;
   }
 
