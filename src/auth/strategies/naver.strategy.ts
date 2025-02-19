@@ -48,7 +48,6 @@ export class NaverStrategy extends PassportStrategy(Strategy, 'naver') {
         email: _json.email,
         name: displayName,
         photo: _json.profile_image,
-        nickname: _json.nickname,
         provider,
         id,
         userType,
