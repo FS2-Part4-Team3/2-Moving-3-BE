@@ -25,3 +25,8 @@ export interface INotification extends ModelBase {
   estimationId?: string;
   questionId?: string;
 }
+
+export interface WebsocketNotification {
+  type: string;
+  data: INotification;
+}
