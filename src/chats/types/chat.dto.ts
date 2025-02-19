@@ -15,7 +15,7 @@ export interface ChatCreateDTO {
   userId: string;
   driverId: string;
   direction: ChatDirection;
-  message: string;
+  message?: string;
   image?: string;
 }
 
@@ -67,4 +67,12 @@ export class ChatDTO extends ModelBase {
 
   @ApiProperty({ description: '읽음 여부' })
   isRead: boolean;
+}
+
+export class ChatImageUploadDTO {
+  @ApiProperty({ description: '이미지 업로드 URL' })
+  uploadUrl: string;
+
+  @ApiProperty({ description: '이미지 파일명' })
+  uniqueFileName: string;
 }

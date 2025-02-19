@@ -10,7 +10,7 @@ export interface IChat extends ModelBase {
   driverId: string;
 
   direction: ChatDirection;
-  message: string;
+  message?: string;
   image?: string;
   isRead: boolean;
 }

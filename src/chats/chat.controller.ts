@@ -1,6 +1,6 @@
 import { ChatService } from '#chats/chat.service.js';
 import { IChatController } from '#chats/interfaces/chat.controller.interface.js';
-import { ChatDTO, ChatListDTO, ChatPostDTO, ChatReadInputDTO, ChatsDTO } from '#chats/types/chat.dto.js';
+import { ChatDTO, ChatImageUploadDTO, ChatListDTO, ChatReadInputDTO, ChatsDTO } from '#chats/types/chat.dto.js';
 import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { ChatGetQueries } from '#types/queries.type.js';
 import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards } from '@nestjs/common';
@@ -29,12 +29,21 @@ export class ChatController implements IChatController {
     return await this.chatService.findChats(targetId, { page, pageSize });
   }
 
-  @Post(':targetId')
+  @Post('image')
+  @UseGuards(AccessTokenGuard)
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: '채팅 전송' })
-  @ApiResponse({ status: HttpStatus.CREATED, type: ChatDTO })
-  async postChat(@Param('targetId') targetId: string, @Body() body: ChatPostDTO) {
-    return await this.chatService.createChat(targetId, body);
+  @ApiOperation({ summary: '채팅 이미지 업로드' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        image: { type: 'string', description: '이미지 파일명' },
+      },
+    },
+  })
+  @ApiResponse({ status: HttpStatus.CREATED, type: ChatImageUploadDTO })
+  async postChatImage(@Body('image') image: string) {
+    return await this.chatService.createImageUploadUrl(image);
   }
 
   @Post(':targetId/read')

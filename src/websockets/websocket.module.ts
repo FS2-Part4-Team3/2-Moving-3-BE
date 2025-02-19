@@ -1,9 +1,10 @@
+import { ChatModule } from '#chats/chat.module.js';
 import { GuardModule } from '#guards/guard.module.js';
 import { WebsocketGateway } from '#websockets/websocket.gateway.js';
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 
 @Module({
-  imports: [GuardModule],
+  imports: [GuardModule, forwardRef(() => ChatModule)],
   controllers: [],
   providers: [WebsocketGateway],
   exports: [WebsocketGateway],
