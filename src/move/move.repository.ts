@@ -149,7 +149,14 @@ export class MoveRepository implements IMoveRepository {
       forceFind: true,
       skip: (page - 1) * pageSize,
       take: pageSize,
-      include: { confirmedEstimation: true, estimations: true },
+      include: {
+        confirmedEstimation: true,
+        estimations: {
+          where: {
+            price: { not: null },
+          },
+        },
+      },
     });
 
     return list;

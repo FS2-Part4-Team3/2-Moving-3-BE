@@ -8,6 +8,7 @@ import { ReviewAlreadyExistsException, ReviewNotFoundException } from './review.
 import { EstimationRepository } from '#estimations/estimation.repository.js';
 import { GetQueries } from '#types/queries.type.js';
 import { PatchReviewDTO, ReviewBodyDTO } from './types/review.dto.js';
+import filterSensitiveData from '#utils/filterSensitiveData.js';
 
 @Injectable()
 export class ReviewService implements IReviewService {
@@ -18,17 +19,26 @@ export class ReviewService implements IReviewService {
   ) {}
 
   async getMyReviews(options: GetQueries) {
-    const store = this.als.getStore();
-    const userId = store?.userId;
+    const userId = this.als.getStore()?.userId;
 
     if (!userId) {
       throw new ForbiddenException();
     }
 
-    const list = await this.reviewRepository.findManyMyReviews(userId, options);
-    const totalCount = await this.reviewRepository.totalCount(userId, 'user');
+    const [list, totalCount] = await Promise.all([
+      this.reviewRepository.findManyMyReviews(userId, options),
+      this.reviewRepository.totalCount(userId, 'user'),
+    ]);
 
-    return { totalCount, list };
+    return {
+      totalCount,
+      list: await Promise.all(
+        list.map(async review => ({
+          ...review,
+          driver: await filterSensitiveData(review.driver),
+        })),
+      ),
+    };
   }
 
   async getDriverReviews(driverId: string, options: GetQueries) {
