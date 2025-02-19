@@ -1,4 +1,5 @@
 import { ChatRepository } from '#chats/chat.repository.js';
+import { ChatCreateEvent } from '#chats/events/chat.event.js';
 import { IChatService } from '#chats/interfaces/chat.service.interface.js';
 import { ChatCreateDTO } from '#chats/types/chat.dto.js';
 import { ChatDirection } from '#chats/types/chat.types.js';
@@ -9,6 +10,7 @@ import { generateS3DownloadUrlForChat } from '#utils/S3/generate-s3-download-url
 import { generateS3UploadUrl } from '#utils/S3/generate-s3-upload-url.js';
 import { WebsocketGateway } from '#websockets/websocket.gateway.js';
 import { Injectable } from '@nestjs/common';
+import { OnEvent } from '@nestjs/event-emitter';
 import { AsyncLocalStorage } from 'async_hooks';
 
 @Injectable()
@@ -19,6 +21,11 @@ export class ChatService implements IChatService {
     private readonly websocketGateway: WebsocketGateway,
     private readonly als: AsyncLocalStorage<IStorage>,
   ) {}
+
+  @OnEvent('chat.create')
+  handleChatCreate(event: ChatCreateEvent) {
+    return this.createChat(event.chatData);
+  }
 
   async findList(options: OffsetPaginationOptions) {
     const { userId, driverId, type } = this.als.getStore();

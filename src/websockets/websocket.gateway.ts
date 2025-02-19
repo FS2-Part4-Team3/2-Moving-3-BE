@@ -1,4 +1,4 @@
-import { ChatService } from '#chats/chat.service.js';
+import { ChatCreateEvent } from '#chats/events/chat.event.js';
 import { IChat } from '#chats/types/chat.types.js';
 import { WSPerson } from '#decorators/ws-person.decorator.js';
 import { IDriver } from '#drivers/types/driver.types.js';
@@ -7,6 +7,7 @@ import { WebsocketNotification } from '#notifications/types/notification.types.j
 import { IUser } from '#users/types/user.types.js';
 import { IWebsocketGateway } from '#websockets/interfaces/websocket.gateway.interface.js';
 import { UseGuards } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ConnectedSocket, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
@@ -19,7 +20,7 @@ import { Server, Socket } from 'socket.io';
 export class WebsocketGateway implements IWebsocketGateway {
   @WebSocketServer()
   server: Server;
-  constructor(private readonly chatService: ChatService) {}
+  constructor(private readonly eventEmitter: EventEmitter2) {}
 
   private sockets: Map<string, Socket[]> = new Map();
 
@@ -44,7 +45,7 @@ export class WebsocketGateway implements IWebsocketGateway {
     });
 
     client.on('chat', data => {
-      this.chatService.createChat(data);
+      this.eventEmitter.emit('chat.create', new ChatCreateEvent(data));
     });
 
     client.on('typing', ({ targetId }) => {

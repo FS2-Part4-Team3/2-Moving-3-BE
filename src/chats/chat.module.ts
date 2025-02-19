@@ -5,12 +5,12 @@ import { DBModule } from '#global/db.module.js';
 import { GuardModule } from '#guards/guard.module.js';
 import { MoveModule } from '#move/move.module.js';
 import { WebSocketModule } from '#websockets/websocket.module.js';
-import { forwardRef, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 
 @Module({
-  imports: [DBModule, GuardModule, forwardRef(() => WebSocketModule), MoveModule],
+  imports: [DBModule, GuardModule, WebSocketModule, MoveModule],
   controllers: [ChatController],
   providers: [ChatService, ChatRepository],
-  exports: [ChatService],
+  exports: [],
 })
 export class ChatModule {}
