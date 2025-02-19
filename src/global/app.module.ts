@@ -1,4 +1,4 @@
-import { AiReviewSummaryModule } from '#aiReviewSummary/aiReviewSummary.module.js';
+import { ReviewSummaryModule } from '#reviewSummary/reviewSummary.module.js';
 import { AuthModule } from '#auth/auth.module.js';
 import { ChatModule } from '#chats/chat.module.js';
 import { nodeEnv } from '#configs/common.config.js';
@@ -25,6 +25,7 @@ import { ConfigModule } from '@nestjs/config';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
+import { ReviewKeywordsModule } from '#reviewKeywords/reviewKeywords.module.js';
 
 const controllers: Array<any> = [AppController];
 if (nodeEnv === 'development') {
@@ -47,7 +48,8 @@ if (nodeEnv === 'development') {
     ChatModule,
     SwaggerModule,
     StorageModule,
-    AiReviewSummaryModule,
+    ReviewSummaryModule,
+    ReviewKeywordsModule,
     ConfigModule.forRoot({ isGlobal: true, load: [jwtConfig, postgresConfig], envFilePath: '.env' }),
     ScheduleModule.forRoot(),
     EventEmitterModule.forRoot(),

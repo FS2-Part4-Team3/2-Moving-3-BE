@@ -17,8 +17,10 @@ enum ExceptionMessages {
   ALREADY_LIKED = '이미 찜해둔 기사입니다.',
   ALREADY_UNLIKED = '이미 찜 해제된 기사입니다.',
 
+  MOVEINFO_ALREADY_EXISTS = '이미 생성된 이사정보가 있습니다. 하나만 생성할 수 있습니다.',
   MOVEINFO_NOT_FOUND = '이사 정보가 없습니다.',
   RECEIVED_ESTIMATE = '받은 견적이 있습니다',
+  NO_ESTIMATION_FOUND = '받은 견적이 없습니다.',
 
   MOVE_REQUEST_NOT_FOUND = '이사 요청을 먼저 해주세요.',
   ESTIMATION_ALREADY_CONFIRMED = '이미 확정된 견적이 있습니다.',
@@ -47,6 +49,8 @@ enum ExceptionMessages {
   INVALID_TOKEN = '토큰이 잘못되었습니다.',
   TOKEN_NOT_FOUND = '토큰을 찾을 수 없습니다.',
   UN_CATCHED_EXCEPTION = '오류가 발생했습니다.',
+
+  AUTO_COMPLETE_ERROR = '자동 완료 중 오류가 발생했습니다.',
 }
 
 export default ExceptionMessages;

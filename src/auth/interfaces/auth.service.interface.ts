@@ -1,6 +1,6 @@
 import { LoggedInUsersDTO } from '#auth/types/auth.dto.js';
 import { FilteredPerson, FilteredPersonWithToken } from '#auth/types/filtered.types.js';
-import { GoogleAuthType, KakaoAuthType, NaverAuthType } from '#auth/types/provider.types.js';
+import { SocialAuthType } from '#auth/types/provider.types.js';
 import { SignInDTO, SignUpDTO } from '#auth/types/sign.dto.js';
 import { UpdatePasswordDTO } from '#auth/types/update-password.dto.js';
 import { UserType } from '#types/common.types.js';
@@ -12,7 +12,5 @@ export interface IAuthService {
   signIn: (body: SignInDTO, type: UserType) => Promise<FilteredPersonWithToken>;
   getNewToken: () => Promise<FilteredPersonWithToken>;
   findLoggedInUser: (id: string) => Promise<LoggedInUsersDTO>;
-  googleAuth: (redirectResult: GoogleAuthType) => Promise<FilteredPersonWithToken>;
-  kakaoAuth: (redirectResult: KakaoAuthType) => Promise<FilteredPersonWithToken>;
-  naverAuth: (redirectResult: NaverAuthType) => Promise<FilteredPersonWithToken>;
+  socialAuth: (redirectResult: SocialAuthType) => Promise<FilteredPersonWithToken>;
 }

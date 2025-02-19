@@ -1,7 +1,7 @@
-import { EstimationInputDTO, Estimation, IsActivate, UserEstimationDetailDTO } from '#estimations/estimation.types.js';
+import { EstimationInputDTO, Estimation, IsActivate } from '#estimations/estimation.types.js';
 import { IEstimationRepository } from '#estimations/interfaces/estimation.repository.interface.js';
 import { PrismaService } from '#global/prisma.service.js';
-import { FindOptions, SortOrder } from '#types/options.type.js';
+import { FindOptions } from '#types/options.type.js';
 import { Injectable } from '@nestjs/common';
 import { Progress, Status } from '@prisma/client';
 

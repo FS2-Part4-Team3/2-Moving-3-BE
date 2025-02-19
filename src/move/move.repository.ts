@@ -1,6 +1,6 @@
 import { PrismaService } from '#global/prisma.service.js';
 import { IMoveRepository } from '#move/interfaces/move.repository.interface.js';
-import { IMoveInfo } from '#move/types/move.types.js';
+import { IMoveInfo, UpdateResponse } from '#move/types/move.types.js';
 import { AreaType, ProgressEnum } from '#types/common.types.js';
 import { MoveInfoSortOrder, OffsetPaginationOptions } from '#types/options.type.js';
 import { MoveInfoGetQueries } from '#types/queries.type.js';
@@ -149,7 +149,14 @@ export class MoveRepository implements IMoveRepository {
       forceFind: true,
       skip: (page - 1) * pageSize,
       take: pageSize,
-      include: { confirmedEstimation: true, estimations: true },
+      include: {
+        confirmedEstimation: true,
+        estimations: {
+          where: {
+            price: { not: null },
+          },
+        },
+      },
     });
 
     return list;
@@ -209,6 +216,64 @@ export class MoveRepository implements IMoveRepository {
         confirmedEstimationId: estimationId,
         progress: ProgressEnum.CONFIRMED, // 상태를 CONFIRMED로 업데이트
       },
+    });
+  }
+
+  async updateToComplete(now: Date): Promise<UpdateResponse> {
+    const result = await this.moveInfo.updateMany({
+      where: {
+        progress: ProgressEnum.CONFIRMED,
+        date: { lt: now },
+        confirmedEstimationId: { not: null },
+      },
+      data: {
+        progress: ProgressEnum.COMPLETE,
+      },
+    });
+
+    return {
+      count: result.count,
+      success: result.count > 0,
+    };
+  }
+
+  async updateToExpired(now: Date): Promise<string[]> {
+    await this.moveInfo.updateMany({
+      where: {
+        progress: ProgressEnum.OPEN,
+        confirmedEstimationId: null,
+        date: { lt: now },
+      },
+      data: { progress: ProgressEnum.EXPIRED },
+    });
+
+    const expiredMoves = await this.moveInfo.findMany({
+      where: {
+        progress: ProgressEnum.EXPIRED,
+        date: { lt: now }, // 만료된 ..
+      },
+      select: { id: true },
+    });
+
+    return expiredMoves.map(move => move.id); // id 배열 반환
+  }
+
+  // 자동만료 수정
+  async findExpiredMoveInfoIds(): Promise<UpdateResponse> {
+    const expiredMoves = await this.moveInfo.findMany({
+      where: { progress: ProgressEnum.EXPIRED },
+      select: { id: true },
+    });
+
+    return {
+      count: expiredMoves.length,
+      success: expiredMoves.length > 0,
+    };
+  }
+
+  async countByUserId(userId: string): Promise<number> {
+    return this.moveInfo.count({
+      where: { ownerId: userId, progress: ProgressEnum.OPEN },
     });
   }
 }

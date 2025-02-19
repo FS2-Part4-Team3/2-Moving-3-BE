@@ -1,5 +1,5 @@
 import { CreateMoveDTO, filterCountDTO, MoveInfoWithEstimationsDTO, MovePatchInputDTO } from '#move/types/move.dto.js';
-import { IMoveInfo } from '#move/types/move.types.js';
+import { IMoveInfo, UpdateResponse } from '#move/types/move.types.js';
 import { OffsetPaginationOptions } from '#types/options.type.js';
 import { MoveInfoGetQueries } from '#types/queries.type.js';
 import { Area } from '@prisma/client';
@@ -18,4 +18,8 @@ export interface IMoveRepository {
   postMoveInfo: (moveData: CreateMoveDTO) => Promise<IMoveInfo>;
   update: (id: string, data: MovePatchInputDTO) => Promise<IMoveInfo>;
   softDeleteMoveInfo: (id: string) => Promise<IMoveInfo>;
+  confirmEstimation: (moveInfoId: string, estimationId: string) => Promise<IMoveInfo>;
+  updateToComplete: (now: Date) => Promise<UpdateResponse>;
+  updateToExpired: (now: Date) => Promise<string[]>;
+  findExpiredMoveInfoIds: () => Promise<UpdateResponse>;
 }

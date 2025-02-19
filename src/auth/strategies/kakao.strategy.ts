@@ -14,7 +14,7 @@ export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
       clientSecret: kakaoConfig.kakaoClientSecret,
       callbackURL: '/auth/oauth2/redirect/kakao',
       passReqToCallback: true,
-      scope: ['account_email', 'profile_nickname', 'profile_image', 'name', 'phone_number'],
+      scope: ['account_email', 'profile_nickname', 'profile_image'],
     } as StrategyOptionWithRequest);
   }
 
@@ -43,15 +43,14 @@ export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
       }
 
       const userType = state;
-      const { _json, provider, id, displayName } = profile;
+      const { _json, provider, id } = profile;
       const user = {
         email: _json.kakao_account.email,
-        name: displayName,
+        name: _json.properties.nickname,
         photo: _json.properties.profile_image,
         provider,
         id,
         userType,
-        phoneNumber: _json.kakao_account.phone_number,
       };
       const result = { ...user, accessToken, refreshToken };
       done(null, result);

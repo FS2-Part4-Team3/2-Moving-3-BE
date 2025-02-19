@@ -91,3 +91,10 @@ export enum AreaTypeEnum {
   BUSAN = 'BUSAN',
   JEJU = 'JEJU',
 }
+
+export type KeywordType = 'POSITIVE' | 'NEGATIVE';
+
+export enum KeywordTypeEnum {
+  POSITIVE = 'POSITIVE',
+  NEGATIVE = 'NEGATIVE',
+}

@@ -1,21 +1,21 @@
 import { Injectable } from '@nestjs/common';
-import { IAiReviewSummaryService } from '#aiReviewSummary/interfaces/aiReviewSummary.service.interface.js';
-import { AiReviewSummaryRepository } from '#aiReviewSummary/aiReviewSummary.repository.js';
+import { IReviewSummaryService } from '#reviewSummary/interfaces/reviewSummary.service.interface.js';
+import { ReviewSummaryRepository } from '#reviewSummary/reviewSummary.repository.js';
 import { ReviewRepository } from '#reviews/review.repository.js';
 import { GoogleGeminiService } from '#global/ai-services/gemini.service.js';
-import { AiReviewSummaryNotFoundException } from '#aiReviewSummary/aiReviewSummary.exception.js';
+import { AiReviewSummaryNotFoundException } from '#reviewSummary/reviewSummary.exception.js';
 import { ReviewNotFoundException } from '#reviews/review.exception.js';
 
 @Injectable()
-export class AiReviewSummaryService implements IAiReviewSummaryService {
+export class ReviewSummaryService implements IReviewSummaryService {
   constructor(
-    private readonly aiReviewSummaryRepository: AiReviewSummaryRepository,
+    private readonly reviewSummaryRepository: ReviewSummaryRepository,
     private readonly reviewRepository: ReviewRepository,
     private readonly googleGeminiService: GoogleGeminiService,
   ) {}
 
   async getAiReviewSummary(driverId: string) {
-    const summary = await this.aiReviewSummaryRepository.findByDriverId(driverId);
+    const summary = await this.reviewSummaryRepository.findByDriverId(driverId);
     if (!summary) {
       throw new AiReviewSummaryNotFoundException();
     }
@@ -32,6 +32,6 @@ export class AiReviewSummaryService implements IAiReviewSummaryService {
 
     const aiSummary = await this.googleGeminiService.summarizeReviews(reviewTexts);
 
-    return this.aiReviewSummaryRepository.createOrUpdate(driverId, aiSummary);
+    return this.reviewSummaryRepository.createOrUpdate(driverId, aiSummary);
   }
 }
