@@ -13,7 +13,7 @@ import { SignInDTO, SignUpDTO } from '#auth/types/sign.dto.js';
 import { UpdatePasswordDTO } from '#auth/types/update-password.dto.js';
 import { DriverRepository } from '#drivers/driver.repository.js';
 import { InvalidUserTypeException } from '#exceptions/common.exception.js';
-import { UnauthorizedException } from '#exceptions/http.exception.js';
+import { ForbiddenException, UnauthorizedException } from '#exceptions/http.exception.js';
 import { IStorage, UserType } from '#types/common.types.js';
 import { UserRepository } from '#users/user.repository.js';
 import compareExp from '#utils/compareExp.js';
@@ -197,5 +197,34 @@ export class AuthService implements IAuthService {
     await this.authRepository.upsert(target.id, refreshToken);
 
     return { person: await filterSensitiveData(person), accessToken, refreshToken };
+  }
+
+  async socialAuthVerify(redirectResult: SocialAuthType) {
+    const { email, provider, id, userType } = redirectResult;
+
+    if (!userType || !Object.values(UserType).includes(userType)) {
+      throw new InvalidUserTypeException();
+    }
+
+    const repo = userType === UserType.User ? this.userRepository : this.driverRepository;
+    const providerId = id.toString();
+    const target = await repo.findByEmail(email);
+
+    if (!target) {
+      throw new ForbiddenException();
+    }
+
+    if (target.provider !== provider || target.providerId !== providerId) {
+      throw new UnauthorizedException();
+    }
+
+    const accessToken = await this.jwtGenerateService.generateAccessToken({ id: target.id, type: userType });
+    const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: target.id, type: userType });
+
+    target.type = userType;
+
+    await this.authRepository.upsert(target.id, refreshToken);
+
+    return { person: await filterSensitiveData(target), accessToken, refreshToken };
   }
 }

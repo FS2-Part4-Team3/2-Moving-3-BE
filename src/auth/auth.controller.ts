@@ -259,6 +259,21 @@ export class AuthController implements IAuthController {
   })
   async googleAuth() {}
 
+  @Get('google/:userType/verify')
+  @UseGuards(AuthGuard('googleVerify'))
+  @ApiOperation({ summary: '구글 로그인 유저 인증' })
+  @ApiParam({ name: 'userType', enum: UserType })
+  @ApiResponse({
+    status: HttpStatus.FOUND,
+    headers: {
+      Location: {
+        description: '구글 콜백 페이지에 액세스 토큰과 함께 리다이렉션',
+        schema: { type: 'string', example: 'https://www.moving.wiki/callback/google/verify?accessToken=TokenValue' },
+      },
+    },
+  })
+  async googleAuthVerify() {}
+
   @Get('oauth2/redirect/google')
   @ApiExcludeEndpoint()
   @UseGuards(AuthGuard('google'))
@@ -270,6 +285,19 @@ export class AuthController implements IAuthController {
     this.setRefreshToken(response, refreshToken);
 
     response.redirect(`${oauthRedirect}/callback/google?accessToken=${accessToken}`);
+  }
+
+  @Get('oauth2/redirect/google/verify')
+  @ApiExcludeEndpoint()
+  @UseGuards(AuthGuard('googleVerify'))
+  async googleAuthVerifyRedirect(@Req() req, @Res({ passthrough: true }) response: Response) {
+    const redirectResult: SocialAuthType = req.user;
+
+    const { person, accessToken, refreshToken } = await this.authService.socialAuthVerify(redirectResult);
+    this.setAccessToken(response, accessToken);
+    this.setRefreshToken(response, refreshToken);
+
+    response.redirect(`${oauthRedirect}/callback/google/verify?accessToken=${accessToken}`);
   }
 
   @Get('kakao/:userType')
