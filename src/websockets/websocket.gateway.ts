@@ -49,11 +49,11 @@ export class WebsocketGateway implements IWebsocketGateway {
       this.eventEmitter.emit('chat.create', new ChatCreateEvent(data));
     });
 
-    client.on('typing', ({ targetId }) => {
+    client.on('typing', targetId => {
       this.sendTypingStatus(id, targetId, 'typing');
     });
 
-    client.on('stopped_typing', ({ targetId }) => {
+    client.on('stopped_typing', targetId => {
       this.sendTypingStatus(id, targetId, 'stopped_typing');
     });
 
