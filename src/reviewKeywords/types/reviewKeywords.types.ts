@@ -12,3 +12,5 @@ export interface IReviewKeywords {
 
   driverId: string;
 }
+
+export type reviewKeywordSortOrderType = { count: 'asc' | 'desc' };

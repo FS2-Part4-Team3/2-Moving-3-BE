@@ -7,6 +7,8 @@ import { ReviewNotFoundException } from '#reviews/review.exception.js';
 import { KeywordTypeEnum } from '#types/common.types.js';
 import { ReviewKeywordsGetQueries } from '#types/queries.type.js';
 import { KeywordDTO } from './types/reviewKeywords.dto.js';
+import { ReviewKeywordsFilter, reviewKeywordSortOrder } from '#types/options.type.js';
+import { reviewKeywordSortOrderType } from './types/reviewKeywords.types.js';
 
 @Injectable()
 export class ReviewKeywordsService implements IReviewKeywordsService {
@@ -17,12 +19,34 @@ export class ReviewKeywordsService implements IReviewKeywordsService {
   ) {}
 
   async findByDriverId(driverId: string, options: ReviewKeywordsGetQueries) {
-    const results = await this.reviewKeywordsRepository.findByDriverId(driverId, options);
+    const { page = 1, pageSize = 20, orderBy, filter } = options;
 
-    const positive = results.filter(item => item.type === 'POSITIVE').map(item => ({ keyword: item.keyword, count: item.count }));
-    const negative = results.filter(item => item.type === 'NEGATIVE').map(item => ({ keyword: item.keyword, count: item.count }));
+    let sort: reviewKeywordSortOrderType = { count: 'desc' };
+    switch (orderBy) {
+      case reviewKeywordSortOrder.LowestCount:
+        sort = { count: 'asc' };
+        break;
+      case reviewKeywordSortOrder.HighestCount:
+        sort = { count: 'desc' };
+        break;
+    }
 
-    return { positive, negative };
+    if (filter === ReviewKeywordsFilter.ALL) {
+      const topKeywords = await this.reviewKeywordsRepository.findTopKeywords(driverId, sort);
+      return {
+        positive: topKeywords.positive,
+        negative: topKeywords.negative,
+        totalCount: topKeywords.positive.length + topKeywords.negative.length,
+      };
+    }
+
+    const results = await this.reviewKeywordsRepository.findByType(driverId, filter, page, pageSize, sort);
+
+    return {
+      positive: filter === ReviewKeywordsFilter.POSITIVE ? results.keywords : [],
+      negative: filter === ReviewKeywordsFilter.NEGATIVE ? results.keywords : [],
+      totalCount: results.totalCount,
+    };
   }
 
   async analyzeAiReviewKeywords(driverId: string) {

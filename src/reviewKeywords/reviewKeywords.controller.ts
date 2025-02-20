@@ -19,7 +19,7 @@ export class ReviewKeywordsController implements IReviewKeywordsController {
     type: ReviewKeywordsResponseDTO,
   })
   async getReviewKeywords(@Param('driverId') driverId: string, @Query() query: ReviewKeywordsGetQueries) {
-    const options = { filter: query.filter };
+    const options = { page: query.page, pageSize: query.pageSize, filter: query.filter, orderBy: query.orderBy };
 
     return this.reviewKeywordsService.findByDriverId(driverId, options);
   }

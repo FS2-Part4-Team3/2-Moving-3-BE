@@ -64,10 +64,34 @@ export class KeywordDTO {
   count: number;
 }
 
+export class KeywordWithTypeDTO extends KeywordDTO {
+  @ApiProperty({ description: '키워드 타입' })
+  type: KeywordType;
+}
+
+export class PositiveOrNegativeKeywordsDTO {
+  @ApiProperty({ description: '키워드들', type: [KeywordWithTypeDTO] })
+  keywords: KeywordWithTypeDTO[];
+
+  @ApiProperty({ description: '키워드 총 개수', type: Number })
+  totalCount: number;
+}
+
+export class TopKeywordsDTO {
+  @ApiProperty({ description: 'POSITIVE 타입의 키워드들', type: [KeywordDTO] })
+  positive: KeywordDTO[];
+
+  @ApiProperty({ description: 'NEGATIVE 타입의 키워드들', type: [KeywordDTO] })
+  negative: KeywordDTO[];
+}
+
 export class ReviewKeywordsResponseDTO {
   @ApiProperty({ description: 'POSITIVE 타입의 키워드들', type: [KeywordDTO] })
   positive: KeywordDTO[];
 
   @ApiProperty({ description: 'NEGATIVE 타입의 키워드들', type: [KeywordDTO] })
   negative: KeywordDTO[];
+
+  @ApiProperty({ description: '키워드 총 개수', type: Number })
+  totalCount: number;
 }
