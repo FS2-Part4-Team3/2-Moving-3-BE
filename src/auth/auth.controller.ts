@@ -14,7 +14,21 @@ import { GuardService } from '#guards/guard.service.js';
 import { HashPasswordGuard } from '#guards/hash-password.guard.js';
 import { RefreshTokenGuard } from '#guards/refresh-token.guard.js';
 import { UserType } from '#types/common.types.js';
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
+  Redirect,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { AuthGuard } from '@nestjs/passport';
@@ -259,7 +273,7 @@ export class AuthController implements IAuthController {
   })
   async googleAuth() {}
 
-  @Get('google/:userType/verify')
+  @Get('google/:userType/verify/:userId')
   @UseGuards(AuthGuard('googleVerify'))
   @ApiOperation({ summary: '구글 로그인 유저 인증' })
   @ApiParam({ name: 'userType', enum: UserType })
@@ -275,6 +289,8 @@ export class AuthController implements IAuthController {
   async googleAuthVerify() {}
 
   @Get('oauth2/redirect/google')
+  @HttpCode(HttpStatus.FOUND)
+  @Redirect()
   @ApiExcludeEndpoint()
   @UseGuards(AuthGuard('google'))
   async googleAuthRedirect(@Req() req, @Res({ passthrough: true }) response: Response) {
@@ -284,10 +300,12 @@ export class AuthController implements IAuthController {
     this.setAccessToken(response, accessToken);
     this.setRefreshToken(response, refreshToken);
 
-    response.redirect(`${oauthRedirect}/callback/google?accessToken=${accessToken}`);
+    return { url: `${oauthRedirect}/callback/google?accessToken=${accessToken}` };
   }
 
   @Get('oauth2/redirect/google/verify')
+  @HttpCode(HttpStatus.FOUND)
+  @Redirect()
   @ApiExcludeEndpoint()
   @UseGuards(AuthGuard('googleVerify'))
   async googleAuthVerifyRedirect(@Req() req, @Res({ passthrough: true }) response: Response) {
@@ -297,7 +315,7 @@ export class AuthController implements IAuthController {
     this.setAccessToken(response, accessToken);
     this.setRefreshToken(response, refreshToken);
 
-    response.redirect(`${oauthRedirect}/callback/google/verify?accessToken=${accessToken}`);
+    return { url: `${oauthRedirect}/callback/google/verify?accessToken=${accessToken}` };
   }
 
   @Get('kakao/:userType')

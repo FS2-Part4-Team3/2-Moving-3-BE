@@ -200,7 +200,7 @@ export class AuthService implements IAuthService {
   }
 
   async socialAuthVerify(redirectResult: SocialAuthType) {
-    const { email, provider, id, userType } = redirectResult;
+    const { email, provider, id, userType, userId } = redirectResult;
 
     if (!userType || !Object.values(UserType).includes(userType)) {
       throw new InvalidUserTypeException();
@@ -210,7 +210,7 @@ export class AuthService implements IAuthService {
     const providerId = id.toString();
     const target = await repo.findByEmail(email);
 
-    if (!target) {
+    if (!target || target.id !== userId) {
       throw new ForbiddenException();
     }
 
