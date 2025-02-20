@@ -207,6 +207,11 @@ export class MoveInfoWithEstimationsResponseDTO {
 }
 
 export class IsMoveInfoEditableDTO {
-  @ApiProperty({ description: '이사정보 변경(수정, 삭제) 가능여부', type: Boolean })
+  @ApiProperty({ description: '이사정보 변경 가능여부', type: Boolean })
   isMoveInfoEditable: Boolean;
+}
+
+export class IsMoveInfoRegistrableDTO {
+  @ApiProperty({ description: '이사정보 등록 가능여부', type: Boolean })
+  isMoveInfoRegistrable: Boolean;
 }

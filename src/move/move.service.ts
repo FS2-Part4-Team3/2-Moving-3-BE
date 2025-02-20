@@ -200,7 +200,7 @@ export class MoveService implements IMoveService {
 
     const moveInfo = await this.moveRepository.findByUserId(userId);
 
-    return moveInfo;
+    return { isMoveInfoRegistrable: !moveInfo || moveInfo.length === 0 };
   }
 
   async getIsMoveInfoEditable(moveInfoId: string) {
