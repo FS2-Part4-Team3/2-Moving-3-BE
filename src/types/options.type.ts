@@ -37,6 +37,11 @@ export enum DriverSortOrder {
   HighestCareer = 'HighestCareer',
 }
 
+export enum reviewKeywordSortOrder {
+  HighestCount = 'HighestCount',
+  LowestCount = 'LowestCount',
+}
+
 export enum IsActivate {
   Active = 'Active',
   Inactive = 'Inactive',
@@ -113,9 +118,14 @@ export class moveInfoWithEstimationsFilter extends OffsetPaginationOptions {
   filter: EstimationsFilter;
 }
 
-export class GetReviewKeywordsFilter {
+export class GetReviewKeywordsFilter extends OffsetPaginationOptions {
   @IsOptional()
   @IsEnum(ReviewKeywordsFilter, { message: 'ALL, POSITIVE, NEGATIVE를 보내주세요' })
   @ApiProperty({ description: '기사의 리뷰 키워드 조회 필터링' })
   filter: ReviewKeywordsFilter;
+
+  @IsOptional()
+  @IsEnum(reviewKeywordSortOrder, { message: '올바른 정렬 기준을 골라주세요' })
+  @ApiProperty({ description: '정렬 기준' })
+  orderBy: reviewKeywordSortOrder;
 }
