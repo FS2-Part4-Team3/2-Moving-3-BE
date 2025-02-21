@@ -61,6 +61,9 @@ class ReviewEstimationDTO {
 }
 
 class ReviewDriverDTO {
+  @ApiProperty({ description: '기사 ID', type: String })
+  id: string;
+
   @ApiProperty({ description: '기사 이름', type: String })
   name: String;
 
