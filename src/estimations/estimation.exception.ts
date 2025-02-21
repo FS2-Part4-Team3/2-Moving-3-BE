@@ -47,9 +47,3 @@ export class EstimationAccessForbiddenException extends ForbiddenException {
     super(ExceptionMessages.ESTIMATION_ACCESS_FORBIDDEN);
   }
 }
-
-export class NoEstimationFoundException extends NotFoundException {
-  constructor() {
-    super(ExceptionMessages.NO_ESTIMATION_FOUND);
-  }
-}

@@ -17,11 +17,7 @@ import { AsyncLocalStorage } from 'async_hooks';
 import { MoveRepository } from '#move/move.repository.js';
 import { RequestRepository } from '#requests/request.repository.js';
 import { IMoveInfo } from '#move/types/move.types.js';
-import {
-  EstimateAlreadyExistsException,
-  EstimationAccessForbiddenException,
-  NoEstimationFoundException,
-} from './estimation.exception.js';
+import { EstimateAlreadyExistsException, EstimationAccessForbiddenException } from './estimation.exception.js';
 import { RequestRejectedException } from './estimation.exception.js';
 import { DriverNotFoundException } from '#drivers/driver.exception.js';
 import { MoveInfoNotFoundException } from '#move/move.exception.js';
@@ -132,9 +128,10 @@ export class EstimationService implements IEstimationService {
     const totalCount = await this.estimationRepository.getTotalCountForUser(userId);
 
     // 받은 견적이 없으면 예외 처리
-    if (totalCount === 0) {
-      throw new NoEstimationFoundException();
-    }
+    // if (totalCount === 0) {
+    //   return { estimations: [], totalCount: 0 };
+    // }
+
     const estimations = await this.estimationRepository.findUserEstimations(userId, page, pageSize);
 
     const estimationsWithInfo = await Promise.all(
