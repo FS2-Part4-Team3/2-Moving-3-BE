@@ -154,7 +154,6 @@ export class AuthService implements IAuthService {
   }
 
   async socialAuth(redirectResult: SocialAuthType) {
-    console.log('🚀 ~ AuthService ~ socialAuth ~ redirectResult:', redirectResult);
     const { email, name, photo, provider, id, userType } = redirectResult;
 
     if (!userType || !Object.values(UserType).includes(userType)) {
@@ -165,31 +164,24 @@ export class AuthService implements IAuthService {
     const providerId = id.toString();
     const target = await repo.findByEmail(email);
 
+    let person;
     if (target) {
-      console.log(`>>>>>>>>     target: ${target}      <<<<<<<< `)
       if (target.provider !== provider || target.providerId !== providerId) {
         throw new UnauthorizedException();
       }
 
-      const accessToken = await this.jwtGenerateService.generateAccessToken({ id: target.id, type: userType });
-      const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: target.id, type: userType });
+      person = target;
+    } else {
+      const data: SocialCreateDTO = {
+        email,
+        name,
+        image: photo,
+        provider,
+        providerId,
+      };
 
-      target.type = userType;
-
-      await this.authRepository.upsert(target.id, refreshToken);
-
-      return { person: await filterSensitiveData(target), accessToken, refreshToken };
+      person = await repo.createByProviderCreateDTO(data);
     }
-
-    const data: SocialCreateDTO = {
-      email,
-      name,
-      image: photo,
-      provider,
-      providerId,
-    };
-
-    const person = await repo.createByProviderCreateDTO(data);
 
     const accessToken = await this.jwtGenerateService.generateAccessToken({ id: person.id, type: userType });
     const refreshToken = await this.jwtGenerateService.generateRefreshToken({ id: person.id, type: userType });
