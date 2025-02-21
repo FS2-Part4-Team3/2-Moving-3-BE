@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai';
 
 @Injectable()
 export class GoogleGeminiService {
@@ -25,19 +25,49 @@ export class GoogleGeminiService {
     reviewsText: string,
   ): Promise<{ positive: { keyword: string; count: number }[]; negative: { keyword: string; count: number }[] }> {
     try {
-      const model = this.genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+      const keywordSchema = {
+        description: 'AI가 추출한 키워드 목록',
+        type: SchemaType.OBJECT,
+        properties: {
+          positive: {
+            type: SchemaType.ARRAY,
+            description: '긍정적인 키워드 리스트',
+            items: {
+              type: SchemaType.OBJECT,
+              properties: {
+                keyword: { type: SchemaType.STRING, description: '키워드', nullable: false },
+                count: { type: SchemaType.INTEGER, description: '등장 횟수', nullable: false },
+              },
+              required: ['keyword', 'count'],
+            },
+          },
+          negative: {
+            type: SchemaType.ARRAY,
+            description: '부정적인 키워드 리스트',
+            items: {
+              type: SchemaType.OBJECT,
+              properties: {
+                keyword: { type: SchemaType.STRING, description: '키워드', nullable: false },
+                count: { type: SchemaType.INTEGER, description: '등장 횟수', nullable: false },
+              },
+              required: ['keyword', 'count'],
+            },
+          },
+        },
+      };
 
-      const promptText = `다음 리뷰에서 긍정적/부정적 키워드를 JSON 형식으로 추출하고, 각 키워드가 등장한 횟수도 포함해 주세요.
-      JSON 형식 예시:
-      {
-        "positive": [{"keyword": "친절", "count": 3}, {"keyword": "세심한 서비스", "count": 2}],
-        "negative": [{"keyword": "짐 손상", "count": 1}, {"keyword": "불친절", "count": 4}]
-      }
+      const model = this.genAI.getGenerativeModel({
+        model: 'gemini-1.5-flash',
+        generationConfig: {
+          responseMimeType: 'application/json',
+          responseSchema: keywordSchema,
+        },
+      });
+
+      const promptText = `다음 리뷰에서 긍정적/부정적 키워드를 추출하고, 각 키워드가 등장한 횟수도 포함해 주세요. 추가적으로 중복되는 키워드가 없었으면 해. 예를들어 '친절했지만, 친절하고, 친절하다' 이런 키워드는 '친절'로 추출해줘
   
       리뷰 텍스트:
-      "${reviewsText}"
-  
-      위의 JSON 형식 예시처럼 단어 위주로 추출해주세요.`;
+      "${reviewsText}"`;
 
       const result = await model.generateContent({
         contents: [{ role: 'user', parts: [{ text: promptText }] }],
@@ -45,19 +75,15 @@ export class GoogleGeminiService {
 
       const responseText = await result.response.text();
 
-      // 백틱과 코드 블록 제거
-      const cleanedResponse = responseText
-        .replace(/```json/g, '')
-        .replace(/```/g, '')
-        .trim();
+      let parsedResponse;
+      try {
+        parsedResponse = JSON.parse(responseText);
+      } catch (error) {
+        console.error('JSON 파싱 오류:', error);
+        return { positive: [], negative: [] };
+      }
 
-      // JSON 파싱
-      const parsedResponse = JSON.parse(cleanedResponse);
-
-      return {
-        positive: parsedResponse.positive || [],
-        negative: parsedResponse.negative || [],
-      };
+      return parsedResponse;
     } catch (error) {
       console.error('Error extracting keywords:', error);
       return { positive: [], negative: [] };
