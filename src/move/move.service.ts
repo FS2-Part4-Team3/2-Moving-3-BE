@@ -1,5 +1,5 @@
 import { IMoveService } from '#move/interfaces/move.service.interface.js';
-import { AreaType, IStorage, StatusEnum, UserType } from '#types/common.types.js';
+import { AreaType, IStorage, ProgressEnum, StatusEnum, UserType } from '#types/common.types.js';
 import { MoveInfoGetQueries, moveInfoWithEstimationsGetQueries } from '#types/queries.type.js';
 import { Injectable, Logger } from '@nestjs/common';
 import { AsyncLocalStorage } from 'async_hooks';
@@ -10,7 +10,6 @@ import {
   MoveInfoNotFoundException,
   ReceivedEstimationException,
 } from './move.exception.js';
-import { Progress } from '@prisma/client';
 import { ForbiddenException, InternalServerErrorException, UnauthorizedException } from '#exceptions/http.exception.js';
 import { DriverInvalidTokenException } from '#drivers/driver.exception.js';
 import { DriverService } from '#drivers/driver.service.js';
@@ -140,7 +139,7 @@ export class MoveService implements IMoveService {
             },
           },
         },
-        { progress: Progress.OPEN },
+        { progress: ProgressEnum.OPEN },
       ],
     };
 
@@ -150,7 +149,7 @@ export class MoveService implements IMoveService {
   private getReceivedEstimationsWhereCondition(userId: string) {
     return {
       ownerId: userId,
-      progress: { in: [Progress.CANCELED, Progress.COMPLETE] },
+      progress: { in: [ProgressEnum.EXPIRED, ProgressEnum.CANCELED, ProgressEnum.COMPLETE] },
     };
   }
 
@@ -235,6 +234,9 @@ export class MoveService implements IMoveService {
     const totalCount = await this.moveRepository.getTotalCount(whereCondition, true);
 
     const list = await this.moveRepository.findWithEstimationsByUserId(userId, paginationOptions);
+    if (list.length === 0) {
+      return { totalCount: 0, list: [] };
+    }
 
     const processedMoveInfos = await Promise.all(
       list.map(async moveInfo => ({
@@ -278,7 +280,7 @@ export class MoveService implements IMoveService {
       throw new MoveInfoAlreadyExistsException();
     }
 
-    const progress = Progress.OPEN;
+    const progress = ProgressEnum.OPEN;
 
     try {
       const moveInfo = await this.moveRepository.postMoveInfo({
