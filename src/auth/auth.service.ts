@@ -166,6 +166,7 @@ export class AuthService implements IAuthService {
     const target = await repo.findByEmail(email);
 
     if (target) {
+      console.log(`>>>>>>>>     target: ${target}      <<<<<<<< `)
       if (target.provider !== provider || target.providerId !== providerId) {
         throw new UnauthorizedException();
       }
@@ -195,7 +196,7 @@ export class AuthService implements IAuthService {
 
     person.type = userType;
 
-    await this.authRepository.upsert(target.id, refreshToken);
+    await this.authRepository.upsert(person.id, refreshToken);
 
     return { person: await filterSensitiveData(person), accessToken, refreshToken };
   }
