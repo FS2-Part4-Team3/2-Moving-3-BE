@@ -14,6 +14,7 @@ export interface SocialAuthType {
   userType: UserType;
   accessToken?: string;
   refreshToken?: string;
+  userId?: string;
 }
 
 export interface ProviderCreateDTO {

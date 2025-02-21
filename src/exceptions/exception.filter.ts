@@ -1,6 +1,7 @@
 import { BaseException } from '#exceptions/base.exception.js';
 import { UncaughtException } from '#exceptions/common.exception.js';
 import formatTimestamp from '#utils/format-timestamp.js';
+import { isValidJSON } from '#utils/isValidJSON.js';
 import logger from '#utils/logger.js';
 import stringifyJson from '#utils/stringifyJson.js';
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException } from '@nestjs/common';
@@ -19,7 +20,8 @@ export class HttpExceptionFilter implements ExceptionFilter {
     } else if (exception instanceof HttpException) {
       res = exception.getResponse();
     } else {
-      logger.error(`exception info: ${stringifyJson(exception)}`);
+      const info = isValidJSON(exception) ? stringifyJson(exception) : exception;
+      logger.error(`exception info: ${info}`);
       res = new UncaughtException();
     }
 

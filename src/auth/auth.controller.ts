@@ -14,7 +14,21 @@ import { GuardService } from '#guards/guard.service.js';
 import { HashPasswordGuard } from '#guards/hash-password.guard.js';
 import { RefreshTokenGuard } from '#guards/refresh-token.guard.js';
 import { UserType } from '#types/common.types.js';
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
+  Redirect,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { AuthGuard } from '@nestjs/passport';
@@ -259,7 +273,24 @@ export class AuthController implements IAuthController {
   })
   async googleAuth() {}
 
+  @Get('google/:userType/verify/:userId')
+  @UseGuards(AuthGuard('googleVerify'))
+  @ApiOperation({ summary: '구글 로그인 유저 인증' })
+  @ApiParam({ name: 'userType', enum: UserType })
+  @ApiResponse({
+    status: HttpStatus.FOUND,
+    headers: {
+      Location: {
+        description: '구글 콜백 페이지에 액세스 토큰과 함께 리다이렉션',
+        schema: { type: 'string', example: 'https://www.moving.wiki/callback/google/verify?accessToken=TokenValue' },
+      },
+    },
+  })
+  async googleAuthVerify() {}
+
   @Get('oauth2/redirect/google')
+  @HttpCode(HttpStatus.FOUND)
+  @Redirect()
   @ApiExcludeEndpoint()
   @UseGuards(AuthGuard('google'))
   async googleAuthRedirect(@Req() req, @Res({ passthrough: true }) response: Response) {
@@ -269,7 +300,22 @@ export class AuthController implements IAuthController {
     this.setAccessToken(response, accessToken);
     this.setRefreshToken(response, refreshToken);
 
-    response.redirect(`${oauthRedirect}/callback/google?accessToken=${accessToken}`);
+    return { url: `${oauthRedirect}/callback/google?accessToken=${accessToken}` };
+  }
+
+  @Get('oauth2/redirect/google/verify')
+  @HttpCode(HttpStatus.FOUND)
+  @Redirect()
+  @ApiExcludeEndpoint()
+  @UseGuards(AuthGuard('googleVerify'))
+  async googleAuthVerifyRedirect(@Req() req, @Res({ passthrough: true }) response: Response) {
+    const redirectResult: SocialAuthType = req.user;
+
+    const { person, accessToken, refreshToken } = await this.authService.socialAuthVerify(redirectResult);
+    this.setAccessToken(response, accessToken);
+    this.setRefreshToken(response, refreshToken);
+
+    return { url: `${oauthRedirect}/callback/google/verify?accessToken=${accessToken}` };
   }
 
   @Get('kakao/:userType')

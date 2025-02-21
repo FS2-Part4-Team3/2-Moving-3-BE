@@ -18,7 +18,11 @@ export class WsJwtGuard implements CanActivate {
     try {
       const jwtSecret = this.configService.get('jwtSecret');
       const client: CustomSocket = context.switchToWs().getClient<CustomSocket>();
-      const token = client.handshake.auth.token;
+      // const token = client.handshake.auth.token;
+      const token = client.handshake.headers.cookie
+        ?.split(';')
+        .find(c => c.trim().startsWith('accessToken='))
+        ?.split('=')[1];
 
       if (!token) {
         console.log('No Token');

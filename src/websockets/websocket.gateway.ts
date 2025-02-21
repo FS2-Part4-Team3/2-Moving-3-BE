@@ -5,6 +5,7 @@ import { IDriver } from '#drivers/types/driver.types.js';
 import { WsJwtGuard } from '#guards/ws-jwt.guard.js';
 import { WebsocketNotification } from '#notifications/types/notification.types.js';
 import { IUser } from '#users/types/user.types.js';
+import logger from '#utils/logger.js';
 import { IWebsocketGateway } from '#websockets/interfaces/websocket.gateway.interface.js';
 import { UseGuards } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
@@ -13,7 +14,7 @@ import { Server, Socket } from 'socket.io';
 
 @WebSocketGateway({
   cors: {
-    origin: '*',
+    origin: ['http://localhost:3000', 'http://www.moving.wiki', 'https://www.moving.wiki'],
     credentials: true,
   },
 })
@@ -48,13 +49,15 @@ export class WebsocketGateway implements IWebsocketGateway {
       this.eventEmitter.emit('chat.create', new ChatCreateEvent(data));
     });
 
-    client.on('typing', ({ targetId }) => {
+    client.on('typing', targetId => {
       this.sendTypingStatus(id, targetId, 'typing');
     });
 
-    client.on('stopped_typing', ({ targetId }) => {
+    client.on('stopped_typing', targetId => {
       this.sendTypingStatus(id, targetId, 'stopped_typing');
     });
+
+    logger.info(`>>>>>>>>>>>>>>>>>>>>>     socket connected - ${id}     <<<<<<<<<<<<<<<<<<<<`);
   }
 
   sendNotification(id: string, notification: WebsocketNotification) {
