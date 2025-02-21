@@ -3,6 +3,7 @@ import { ChatCreateEvent } from '#chats/events/chat.event.js';
 import { IChatService } from '#chats/interfaces/chat.service.interface.js';
 import { ChatCreateDTO } from '#chats/types/chat.dto.js';
 import { ChatDirection } from '#chats/types/chat.types.js';
+import { BadRequestException } from '#exceptions/http.exception.js';
 import { MoveRepository } from '#move/move.repository.js';
 import { IStorage, UserType } from '#types/common.types.js';
 import { OffsetPaginationOptions } from '#types/options.type.js';
@@ -71,6 +72,10 @@ export class ChatService implements IChatService {
   }
 
   async createImageUploadUrl(image: string) {
+    if (!image) {
+      throw new BadRequestException('파일명이 올바르지 않습니다.');
+    }
+
     const { userId, driverId, type } = this.als.getStore();
     const ownerId = type === UserType.User ? userId : driverId;
 
