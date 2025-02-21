@@ -64,6 +64,7 @@ export class ReviewRepository implements IReviewRepository {
         },
         driver: {
           select: {
+            id: true,
             name: true,
             image: true,
           },
