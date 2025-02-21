@@ -1,7 +1,7 @@
 import { PrismaService } from '#global/prisma.service.js';
 import { IMoveRepository } from '#move/interfaces/move.repository.interface.js';
 import { IMoveInfo, UpdateResponse } from '#move/types/move.types.js';
-import { AreaType, ProgressEnum } from '#types/common.types.js';
+import { AreaType, ProgressEnum, StatusEnum } from '#types/common.types.js';
 import { MoveInfoSortOrder, OffsetPaginationOptions } from '#types/options.type.js';
 import { MoveInfoGetQueries } from '#types/queries.type.js';
 import { areaToKeyword } from '#utils/address-utils.js';
@@ -53,7 +53,7 @@ export class MoveRepository implements IMoveRepository {
       orderBy: orderByCondition,
       include: {
         owner: { select: { name: true } },
-        requests: { select: { driverId: true } },
+        requests: { where: { status: StatusEnum.PENDING }, select: { driverId: true } },
       },
     });
 
@@ -185,7 +185,7 @@ export class MoveRepository implements IMoveRepository {
   }
 
   async softDeleteMoveInfo(id: string) {
-    const moveInfo = await this.moveInfo.delete({ where: { id } });
+    const moveInfo = await this.moveInfo.delete({ where: { id }, data: { progress: ProgressEnum.CANCELED } });
 
     return moveInfo;
   }

@@ -1,5 +1,5 @@
 import { IMoveService } from '#move/interfaces/move.service.interface.js';
-import { AreaType, IStorage, UserType } from '#types/common.types.js';
+import { AreaType, IStorage, StatusEnum, UserType } from '#types/common.types.js';
 import { MoveInfoGetQueries, moveInfoWithEstimationsGetQueries } from '#types/queries.type.js';
 import { Injectable, Logger } from '@nestjs/common';
 import { AsyncLocalStorage } from 'async_hooks';
@@ -22,6 +22,7 @@ import { areaToKeyword } from '#utils/address-utils.js';
 import { MoveInputDTO, MovePatchInputDTO } from './types/move.dto.js';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import logger from '#utils/logger.js';
+import { PrismaService } from '#global/prisma.service.js';
 
 @Injectable()
 export class MoveService implements IMoveService {
@@ -33,6 +34,7 @@ export class MoveService implements IMoveService {
     private readonly als: AsyncLocalStorage<IStorage>,
     private readonly estimationRepository: EstimationRepository,
     private readonly requestRepository: RequestRepository,
+    private readonly prisma: PrismaService,
   ) {}
 
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
@@ -321,9 +323,17 @@ export class MoveService implements IMoveService {
       throw new ForbiddenException();
     }
 
-    const softDeleteMoveInfo = await this.moveRepository.softDeleteMoveInfo(moveInfoId);
+    return await this.prisma.$transaction(async () => {
+      const softDeleteMoveInfo = await this.moveRepository.softDeleteMoveInfo(moveInfoId);
 
-    return softDeleteMoveInfo;
+      if (moveInfo.requests?.length > 0) {
+        await Promise.all(
+          moveInfo.requests.map(request => this.requestRepository.update(request.id, { status: StatusEnum.CANCELED })),
+        );
+      }
+
+      return softDeleteMoveInfo;
+    });
   }
 
   async confirmEstimation(moveInfoId: string, estimationId: string): Promise<void> {
