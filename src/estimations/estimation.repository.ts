@@ -381,4 +381,10 @@ export class EstimationRepository implements IEstimationRepository {
 
     return { estimations, totalCount };
   }
+
+  async findByMoveInfoId(moveInfoId: string) {
+    return this.estimation.findMany({
+      where: { moveInfoId },
+    });
+  }
 }

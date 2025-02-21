@@ -30,9 +30,12 @@ export class RequestOutputDTO extends BaseRequestOutputDTO {
   moveInfoOwnerId: String;
 }
 
-export class checkRequestOutputDTO {
+export class CheckRequestOutputDTO {
   @ApiProperty({ description: '지정견적요청 가능여부', type: Boolean })
   isRequestPossible: boolean;
+
+  @ApiProperty({ description: '가능/불가능 이유', type: String })
+  reason: string;
 }
 
 export class CreateRequestDTO {

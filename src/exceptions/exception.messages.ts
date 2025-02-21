@@ -41,6 +41,7 @@ enum ExceptionMessages {
 
   REQUEST_NOT_FOUND = '찾을 수 없는 지정견적요청입니다.',
   ALREADY_REQUESTED = '이미 지정견적요청을 하였습니다.',
+  ESTIMATION_ALREADY_RECEIVED = '이미 해당 드라이버로부터 견적을 받았으므로 지정견적 요청을 보낼 수 없습니다.',
 
   INVALID_NOTIFICATION_TYPE = '올바르지 않은 알림 형식입니다.',
 

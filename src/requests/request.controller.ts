@@ -3,7 +3,7 @@ import { IRequestController } from '#requests/interfaces/request.controller.inte
 import { Controller, Delete, Get, HttpStatus, Param, Post, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { RequestService } from './request.service.js';
-import { BaseRequestOutputDTO, checkRequestOutputDTO, RequestOutputDTO } from './types/request.dto.js';
+import { BaseRequestOutputDTO, CheckRequestOutputDTO, RequestOutputDTO } from './types/request.dto.js';
 
 @Controller('requests')
 export class RequestController implements IRequestController {
@@ -16,7 +16,7 @@ export class RequestController implements IRequestController {
   @ApiParam({ name: 'driverId', description: '기사 ID', type: 'string' })
   @ApiResponse({
     status: HttpStatus.OK,
-    type: checkRequestOutputDTO,
+    type: CheckRequestOutputDTO,
   })
   async checkRequest(@Param('driverId') driverId: string) {
     const requset = await this.requestService.checkRequest(driverId);
