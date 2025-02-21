@@ -1,6 +1,7 @@
 import { EstimationInputDTO, Estimation, IsActivate } from '#estimations/estimation.types.js';
 import { IEstimationRepository } from '#estimations/interfaces/estimation.repository.interface.js';
 import { PrismaService } from '#global/prisma.service.js';
+import { ProgressEnum } from '#types/common.types.js';
 import { FindOptions } from '#types/options.type.js';
 import { Injectable } from '@nestjs/common';
 import { Progress, Status } from '@prisma/client';
@@ -33,7 +34,7 @@ export class EstimationRepository implements IEstimationRepository {
 
   // 리뷰 가능한 견적 목록 토탈 카운트
   async findTotalCount(moveInfoIds: string[]): Promise<number> {
-    return this.prisma.estimation.count({
+    return this.estimation.count({
       where: {
         confirmedForId: { in: moveInfoIds },
       },
@@ -42,7 +43,7 @@ export class EstimationRepository implements IEstimationRepository {
 
   // 리뷰 가능한 견적 목록
   async findReviewableEstimations(userId: string, moveInfoIds: string[], page: number, pageSize: number) {
-    const estimations = await this.prisma.estimation.findMany({
+    const estimations = await this.estimation.findMany({
       where: {
         confirmedForId: { in: moveInfoIds },
       },
@@ -269,12 +270,12 @@ export class EstimationRepository implements IEstimationRepository {
   }
 
   //대기중 견적 조회 토탈 카운트
-  async getTotalCountForUser(userId): Promise<number> {
+  async getTotalCountForUser(userId: string): Promise<number> {
     return this.prisma.estimation.count({
       where: {
         moveInfo: {
           ownerId: userId,
-          progress: Progress.OPEN,
+          progress: ProgressEnum.OPEN,
           confirmedEstimationId: null,
         },
         price: { not: null },
