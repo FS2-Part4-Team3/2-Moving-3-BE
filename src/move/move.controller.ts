@@ -7,6 +7,7 @@ import { MoveService } from './move.service.js';
 import {
   BaseMoveInfoOutputDTO,
   IsMoveInfoEditableDTO,
+  IsMoveInfoRegistrableDTO,
   MoveInfoIdDTO,
   MoveInfoResponseDTO,
   MoveInfoWithEstimationsResponseDTO,
@@ -71,7 +72,7 @@ export class MoveController implements IMoveController {
   @ApiOperation({ summary: '이사 정보 등록 가능여부 조회' })
   @ApiResponse({
     status: HttpStatus.OK,
-    type: [BaseMoveInfoOutputDTO],
+    type: IsMoveInfoRegistrableDTO,
   })
   async checkMoveInfoExistence() {
     const moveInfo = await this.moveService.checkMoveInfoExistence();
