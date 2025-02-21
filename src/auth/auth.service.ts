@@ -154,6 +154,7 @@ export class AuthService implements IAuthService {
   }
 
   async socialAuth(redirectResult: SocialAuthType) {
+    console.log('🚀 ~ AuthService ~ socialAuth ~ redirectResult:', redirectResult);
     const { email, name, photo, provider, id, userType } = redirectResult;
 
     if (!userType || !Object.values(UserType).includes(userType)) {
