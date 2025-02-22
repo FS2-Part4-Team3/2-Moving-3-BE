@@ -145,7 +145,7 @@ export class MoveRepository implements IMoveRepository {
     const { page = 1, pageSize = 10 } = paginationOptions;
 
     const list = await this.moveInfo.findMany({
-      where: { ownerId: userId, progress: { in: [ProgressEnum.CANCELED, ProgressEnum.COMPLETE] } },
+      where: { ownerId: userId, progress: { in: [ProgressEnum.EXPIRED, ProgressEnum.CANCELED, ProgressEnum.COMPLETE] } },
       forceFind: true,
       skip: (page - 1) * pageSize,
       take: pageSize,
@@ -159,7 +159,11 @@ export class MoveRepository implements IMoveRepository {
       },
     });
 
-    return list;
+    const filteredMoveInfos = list.filter(moveInfo => {
+      return moveInfo.estimations.length > 0 || moveInfo.confirmedEstimation !== null;
+    });
+
+    return filteredMoveInfos;
   }
 
   async findByMoveInfoId(moveInfoId: string) {

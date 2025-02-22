@@ -68,6 +68,9 @@ export class EstimationOutputDTO {
   @ApiProperty({ description: '수정 날짜', type: String, format: 'date-time' })
   updatedAt: Date;
 
+  @ApiProperty({ description: '삭제 날짜', type: Date, format: 'date-time' })
+  deletedAt: Date;
+
   @ApiProperty({ description: '견적 가격', type: Number, nullable: true })
   price?: number;
 
@@ -79,6 +82,9 @@ export class EstimationOutputDTO {
 
   @ApiProperty({ description: '드라이버 ID', type: String })
   driverId: string;
+
+  @ApiProperty({ description: '확정된 이사정보 ID', type: String, nullable: true })
+  confirmedForId: string;
 }
 
 class DriverDTO {
