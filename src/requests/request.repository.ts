@@ -3,6 +3,7 @@ import { IRequestRepository } from '#requests/interfaces/request.repository.inte
 import { Injectable } from '@nestjs/common';
 import { CreateRequestDTO, PatchRequestDTO } from './types/request.dto.js';
 import { UpdateResponse } from '#move/types/move.types.js';
+import { IsActivate } from '#types/options.type.js';
 
 @Injectable()
 export class RequestRepository implements IRequestRepository {
@@ -68,5 +69,17 @@ export class RequestRepository implements IRequestRepository {
     });
 
     return { count: updatedRequests.count, success: updatedRequests.count > 0 };
+  }
+
+  // 유저 견적 상세 조회 지정요청 여부
+  async findDesignatedStatus(moveInfoId: string, driverId: string): Promise<IsActivate> {
+    const request = await this.request.findFirst({
+      where: {
+        moveInfoId,
+        driverId,
+      },
+    });
+
+    return request ? IsActivate.Active : IsActivate.Inactive;
   }
 }

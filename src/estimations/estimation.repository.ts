@@ -1,11 +1,9 @@
-import { Estimation, IsActivate } from '#estimations/estimation.types.js';
 import { IEstimationRepository } from '#estimations/interfaces/estimation.repository.interface.js';
 import { PrismaService } from '#global/prisma.service.js';
-import { ProgressEnum } from '#types/common.types.js';
-import { FindOptions } from '#types/options.type.js';
+import { ProgressEnum, StatusEnum } from '#types/common.types.js';
+import { FindOptions, IsActivate } from '#types/options.type.js';
 import { Injectable } from '@nestjs/common';
-import { Progress, Status } from '@prisma/client';
-import { EstimationInputDTO } from './types/estimation.dto.js';
+import { Estimation, EstimationDTO } from './types/estimation.types.js';
 
 @Injectable()
 export class EstimationRepository implements IEstimationRepository {
@@ -22,11 +20,11 @@ export class EstimationRepository implements IEstimationRepository {
     return estimation;
   }
 
-  async create(data: EstimationInputDTO, moveInfoId: string, driverId: string): Promise<Estimation> {
+  async create(data: EstimationDTO): Promise<Estimation> {
     return this.estimation.create({
       data: {
-        moveInfoId, //이사정보아이디
-        driverId, //드라이버아이디
+        moveInfoId: data.moveInfoId, //이사정보아이디
+        driverId: data.driverId, //드라이버아이디
         price: data.price ?? null, //견적가격(없으면 null로 처리하기)
         comment: data.comment, //견적코멘트
       },
@@ -61,17 +59,9 @@ export class EstimationRepository implements IEstimationRepository {
     return estimations.filter(estimation => !estimation.reviews.some(review => review.ownerId === userId));
   }
 
-  // 유저의 이사 정보 목록 가져오기
-  async getUserMoveInfos(userId: string) {
-    return this.prisma.moveInfo.findMany({
-      where: { ownerId: userId }, // 로그인한 유저의 이사만 조회하기
-      select: { id: true }, // 이사 ID만 선택
-    });
-  }
-
   // 지정 견적 요청 여부
   async isDesignatedRequest(estimationId: string): Promise<IsActivate> {
-    const estimation = await this.prisma.estimation.findUnique({
+    const estimation = await this.estimation.findUnique({
       where: { id: estimationId },
       include: {
         moveInfo: {
@@ -92,7 +82,7 @@ export class EstimationRepository implements IEstimationRepository {
 
   // 지정 견적 요청 여부 (상태 제외)
   async isDesignatedRequestDriver(estimationId: string): Promise<IsActivate> {
-    const estimation = await this.prisma.estimation.findUnique({
+    const estimation = await this.estimation.findUnique({
       where: { id: estimationId },
       include: {
         moveInfo: {
@@ -176,7 +166,7 @@ export class EstimationRepository implements IEstimationRepository {
   }
 
   async isDesignatedRequestForDriver(estimationId: string, driverId: string): Promise<IsActivate> {
-    const estimation = await this.prisma.estimation.findUnique({
+    const estimation = await this.estimation.findUnique({
       where: { id: estimationId },
       include: {
         moveInfo: {
@@ -220,21 +210,9 @@ export class EstimationRepository implements IEstimationRepository {
     });
   }
 
-  // 유저 견적 상세 조회 지정요청 여부
-  async findDesignatedStatus(moveInfoId: string, driverId: string): Promise<IsActivate> {
-    const request = await this.prisma.request.findFirst({
-      where: {
-        moveInfoId,
-        driverId,
-      },
-    });
-
-    return request ? IsActivate.Active : IsActivate.Inactive;
-  }
-
   // 드라이버 견적 상세 조회
   async findEstimationDriverDetail(estimationId: string) {
-    return this.prisma.estimation.findUnique({
+    return this.estimation.findUnique({
       where: { id: estimationId },
       include: {
         moveInfo: {
@@ -272,7 +250,7 @@ export class EstimationRepository implements IEstimationRepository {
 
   //대기중 견적 조회 토탈 카운트
   async getTotalCountForUser(userId: string): Promise<number> {
-    return this.prisma.estimation.count({
+    return this.estimation.count({
       where: {
         moveInfo: {
           ownerId: userId,
@@ -286,7 +264,7 @@ export class EstimationRepository implements IEstimationRepository {
 
   // 대기중 지정 견적인지 아닌지 확인하는거.. 근데이건 아닌가..?
   async isDesignatedEstimation(estimationId: string): Promise<boolean> {
-    const estimation = await this.prisma.estimation.findUnique({
+    const estimation = await this.estimation.findUnique({
       where: { id: estimationId },
       select: { confirmedForId: true },
     });
@@ -296,11 +274,11 @@ export class EstimationRepository implements IEstimationRepository {
 
   // 대기중 견적 조회 리스트
   async findUserEstimations(userId: string, page: number, pageSize: number) {
-    return this.prisma.estimation.findMany({
+    return this.estimation.findMany({
       where: {
         moveInfo: {
           ownerId: userId,
-          progress: Progress.OPEN,
+          progress: ProgressEnum.OPEN,
           confirmedEstimationId: null,
         },
         price: { not: null },
@@ -330,20 +308,20 @@ export class EstimationRepository implements IEstimationRepository {
 
     const moveInfoIds = moveInfos.map(info => info.id);
 
-    const totalCount = await this.prisma.estimation.count({
+    const totalCount = await this.estimation.count({
       where: {
         moveInfoId: { in: moveInfoIds },
         OR: [
           {
             moveInfo: {
-              progress: Progress.OPEN,
+              progress: ProgressEnum.OPEN,
               requests: { none: {} },
             },
           },
           {
             moveInfo: {
               requests: {
-                some: { status: Status.PENDING },
+                some: { status: StatusEnum.PENDING },
               },
             },
           },
@@ -351,20 +329,20 @@ export class EstimationRepository implements IEstimationRepository {
       },
     });
 
-    const estimations = await this.prisma.estimation.findMany({
+    const estimations = await this.estimation.findMany({
       where: {
         moveInfoId: { in: moveInfoIds },
         OR: [
           {
             moveInfo: {
-              progress: Progress.OPEN,
+              progress: ProgressEnum.OPEN,
               requests: { none: {} },
             },
           },
           {
             moveInfo: {
               requests: {
-                some: { status: Status.PENDING },
+                some: { status: StatusEnum.PENDING },
               },
             },
           },

@@ -1,4 +1,4 @@
-import { EstimationInputDTO } from '#estimations/estimation.types.js';
+import { EstimationInputDTO } from '#estimations/types/estimation.dto.js';
 import { QuestionPostDTO } from '#questions/types/question.dto.js';
 import { IQuestion } from '#questions/types/question.types.js';
 import { GetQueries } from '#types/queries.type.js';

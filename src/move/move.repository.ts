@@ -280,4 +280,12 @@ export class MoveRepository implements IMoveRepository {
       where: { ownerId: userId, progress: ProgressEnum.OPEN },
     });
   }
+
+  // 유저의 이사 정보 목록 가져오기
+  async getUserMoveInfo(userId: string) {
+    return this.moveInfo.findMany({
+      where: { ownerId: userId }, // 로그인한 유저의 이사만 조회하기
+      select: { id: true }, // 이사 ID만 선택
+    });
+  }
 }
