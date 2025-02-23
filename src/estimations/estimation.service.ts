@@ -89,7 +89,6 @@ export class EstimationService implements IEstimationService {
     if (!estimationData.price) {
       // 코멘트만 있을 경우: 반려
       await this.requestRepository.update(pendingRequest.id, { status: 'REJECTED' });
-      throw new RequestRejectedException();
     } else {
       // 코멘트와 가격이 있을 경우: 승인
       await this.requestRepository.update(pendingRequest.id, { status: 'APPLY' });
