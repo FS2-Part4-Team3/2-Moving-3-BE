@@ -1,4 +1,3 @@
-import { IEstimation } from '#estimations/estimation.types.js';
 import { IRequest } from '#requests/types/request.types.js';
 import { ModelBase, Progress, ServiceType } from '#types/common.types.js';
 import { MoveInfo as PrismaMoveInfo } from '@prisma/client';
@@ -32,4 +31,18 @@ export interface IMoveInfo {
 export interface UpdateResponse {
   count: number;
   success: boolean;
+}
+
+export interface IEstimation {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+
+  price: number;
+  comment: string;
+
+  moveInfoId: string;
+  driverId: string;
+
+  confirmedForId: string;
 }

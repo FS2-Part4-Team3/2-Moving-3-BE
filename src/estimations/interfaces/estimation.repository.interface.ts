@@ -1,4 +1,4 @@
-import { Estimation, EstimationInputDTO, EstimationOutputDTO } from '#estimations/estimation.types.js';
+import { Estimation, EstimationInputDTO, EstimationOutputDTO } from '#estimations/types/estimation.dto.js';
 import { FindOptions } from '#types/options.type.js';
 
 export interface IEstimationRepository {
