@@ -275,13 +275,13 @@ export class MoveRepository implements IMoveRepository {
     };
   }
 
-  async countByUserId(userId: string): Promise<number> {
+  async countByUserId(userId: string) {
     return this.moveInfo.count({
       where: { ownerId: userId, progress: ProgressEnum.OPEN },
     });
   }
 
-  async driverIdsForCompletedMoves(now: Date): Promise<string[]> {
+  async driverIdsForCompletedMoves(now: Date) {
     const completedMoves = await this.moveInfo.findMany({
       where: {
         progress: ProgressEnum.COMPLETE,

@@ -58,7 +58,7 @@ export class RequestRepository implements IRequestRepository {
   }
 
   //자동 만료 3
-  async updateToRequestExpired(moveInfoIds: string[]): Promise<UpdateResponse> {
+  async updateToRequestExpired(moveInfoIds: string[]) {
     if (moveInfoIds.length === 0) return { count: 0, success: false };
 
     const updatedRequests = await this.request.updateMany({
@@ -72,7 +72,7 @@ export class RequestRepository implements IRequestRepository {
   }
 
   // 유저 견적 상세 조회 지정요청 여부
-  async findDesignatedStatus(moveInfoId: string, driverId: string): Promise<IsActivate> {
+  async findDesignatedStatus(moveInfoId: string, driverId: string) {
     const request = await this.request.findFirst({
       where: {
         moveInfoId,
