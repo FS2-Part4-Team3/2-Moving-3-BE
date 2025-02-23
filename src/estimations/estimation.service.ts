@@ -374,25 +374,24 @@ export class EstimationService implements IEstimationService {
     const driver = await this.driversService.findDriver(estimation.driverId);
     const isLiked = await this.driversService.isLikedDriver(estimation.driverId);
     const designatedRequest = await this.requestRepository.findDesignatedStatus(estimation.moveInfoId, estimation.driverId);
+    const isSpecificRequest = designatedRequest === IsActivate.Active ? true : false;
 
     const ConfirmedEstimationInfo = {
-      estimationInfo: {
-        estimationId: estimation.id,
-        comment: estimation.comment,
-        price: estimation.price,
-      },
-      driverInfo: {
+      comment: estimation.comment,
+      price: estimation.price,
+
+      driver: {
         image: driver.image,
         name: driver.name,
         rating: driver.rating,
         reviewCount: driver.reviewCount,
         career: driver.career,
         applyCount: driver.applyCount,
-        likedUsers: isLiked,
+        isliked: isLiked,
         likeCount: driver.likeCount,
         serviceType: driver.serviceType,
       },
-      designatedRequest,
+      isSpecificRequest,
     };
     return ConfirmedEstimationInfo;
   }

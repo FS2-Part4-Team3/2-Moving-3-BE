@@ -332,18 +332,6 @@ export class RejectedEstimationsListDTO {
   estimationInfo: RejectEstimation;
 }
 
-class ConfirmedEstimation {
-  @ApiProperty({ description: '견적 ID', type: String })
-  estimationId: string;
-
-  @IsString()
-  @ApiProperty({ description: '견적 코멘트', type: String })
-  comment: string;
-
-  @ApiProperty({ description: '견적 가격', type: Number, nullable: true })
-  price?: number;
-}
-
 class ConfirmedDriverInfoDTO {
   @ApiProperty({ description: '드라이버 프로필 이미지', type: String, nullable: true })
   @IsOptional()
@@ -365,7 +353,7 @@ class ConfirmedDriverInfoDTO {
   applyCount: number;
 
   @ApiProperty({ description: '드라이버 찜 여부', type: Boolean })
-  likedUsers: boolean;
+  isliked: boolean;
 
   @ApiProperty({ description: '찜 숫자', type: Number })
   likeCount: number;
@@ -375,13 +363,16 @@ class ConfirmedDriverInfoDTO {
 }
 
 export class ConfirmedEstimationDTO {
-  @ApiProperty({ description: '견적 정보', type: ConfirmedEstimation })
-  estimationInfo: ConfirmedEstimation;
+  @IsString()
+  @ApiProperty({ description: '견적 코멘트', type: String })
+  comment: string;
+
+  @ApiProperty({ description: '견적 가격', type: Number, nullable: true })
+  price?: number;
 
   @ApiProperty({ description: '드라이버 정보', type: ConfirmedDriverInfoDTO })
-  driverInfo: ConfirmedDriverInfoDTO;
+  driver: ConfirmedDriverInfoDTO;
 
-  @ApiProperty({ description: '지정 견적 요청 상태', nullable: true })
-  @IsOptional()
-  designatedRequest: IsActivate;
+  @ApiProperty({ description: '지정 견적 요청 상태', type: Boolean })
+  isSpecificRequest: Boolean;
 }
