@@ -14,7 +14,6 @@ import {
   MoveInputDTO,
   MovePatchInputDTO,
 } from './types/move.dto.js';
-import { InternalServerErrorException } from '#exceptions/http.exception.js';
 
 @Controller('moves')
 export class MoveController implements IMoveController {
