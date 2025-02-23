@@ -1,9 +1,11 @@
 # FS2 PART4 TEAM3 MOVING BE
 
-2024.12. - </br>
-코드잇 스프린트 풀스택 2기 고급 프로젝트 3팀 (Backend)
+📅 2025.01.06 ~ 2025.02.25 </br>
+👥 코드잇 스프린트 풀스택 2기 고급 프로젝트 3팀 (Backend)
 
 </br>
+
+🔗 **관련 링크**
 
 - **무빙 홈페이지**: [moving.wiki](https://www.moving.wiki/)
 - **무빙 노션**: [Moving Notion](https://www.notion.so/168070c8d1ed80f780a9f4417cf0ec74?v=f40161463b244eab97b47b04b98f7f1a)
@@ -14,11 +16,38 @@
 - [FS2 PART4 TEAM3 MOVING BE](#fs2-part4-team3-moving-be)
 - [🛠️ 기술 스택](#️-기술-스택)
 - [👥 팀원 구성](#-팀원-구성)
-- [팀원별 구현 기능 상세](#팀원별-구현-기능-상세)
+- [📝 팀원별 구현 기능 상세](#--팀원별-구현-기능-상세)
 
 </br>
 
 # 🛠️ 기술 스택
+
+**BackEnd** <br>
+![NestJS](https://img.shields.io/badge/NestJS-E0234E?style=flat&logo=nestjs&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript&logoColor=white)
+![Swagger](https://img.shields.io/badge/Swagger-85EA2D?style=flat&logo=swagger&logoColor=black)
+![Passport](https://img.shields.io/badge/Passport-34E27A?style=flat&logo=passport&logoColor=white)
+![Jest](https://img.shields.io/badge/Jest-C21325?style=flat&logo=jest&logoColor=white)
+![PM2](https://img.shields.io/badge/PM2-2B037A?style=flat&logo=pm2&logoColor=white)
+![Winston](https://img.shields.io/badge/Winston-000000?style=flat)
+![JWT](https://img.shields.io/badge/JWT-000000?style=flat&logo=jsonwebtokens&logoColor=white)
+![Socket.io](https://img.shields.io/badge/Socket.io-010101?style=flat&logo=socket.io&logoColor=white)
+
+**Database** <br>
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-336791?style=flat&logo=postgresql&logoColor=white)
+![Prisma](https://img.shields.io/badge/Prisma-2D3748?style=flat&logo=prisma&logoColor=white)
+
+**DevOps & Others** <br>
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white)
+![Node-cron](https://img.shields.io/badge/Node--cron-777BB4?style=flat&logo=node-schedule&logoColor=white)
+
+**Tools** <br>
+![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white)
+![Notion](https://img.shields.io/badge/Notion-000000?style=flat&logo=notion&logoColor=white)
+![Slack](https://img.shields.io/badge/Slack-4A154B?style=flat&logo=slack&logoColor=white)
+![Discord](https://img.shields.io/badge/Discord-5865F2?style=flat&logo=discord&logoColor=white)
+![Gather](https://img.shields.io/badge/Gather-3A2EDE?style=flat&logo=gather&logoColor=white)
+![Zoom](https://img.shields.io/badge/Zoom-0B5CFF?style=flat&logo=Zoom&logoColor=white)
 
 # 👥 팀원 구성
 
@@ -27,26 +56,33 @@
 | [태영's Github](https://github.com/csbizz) | [명곤's Github](https://github.com/GGON123) | [윤서's 깃허브](https://github.com/hello-yoon) |
 
 </br>
-김태영
+
+**김태영**
 
 - 백엔드 파트장
 - 백엔드 자료 및 회의 정리
 
-강명곤
+</br>
+
+**강명곤**
 
 - 시연 영상 촬영
 - 시연 영상 편집
 
-김윤서
+</br>
+
+**김윤서**
 
 - 백엔드 일정 관리
 - README.md 작성
 
-# 팀원별 구현 기능 상세
+</br>
+
+# 📝 팀원별 구현 기능 상세
 
   </br>
 
-🌟 김태영
+🌟 김태영 (Backend Lead)
 
 - 인증/인가, 소셜 로그인 (구글)
 - 유저/기사 정보 및 비밀번호 수정
@@ -72,8 +108,8 @@
 🌟 김윤서
 
 - 유저 - 이사 정보 생성 기능
-- 드라이버 - 견적 생성/반려 기능
 
+- 드라이버 - 견적 생성/반려 기능
 - 유저 - 이사 견적 확정 기능
 - 견적 목록 조회 (유저/드라이버)
 - 견적 상세 조회 (유저/드라이버)
