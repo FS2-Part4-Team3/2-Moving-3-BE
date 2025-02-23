@@ -22,4 +22,7 @@ export interface IMoveRepository {
   updateToComplete: (now: Date) => Promise<UpdateResponse>;
   updateToExpired: (now: Date) => Promise<string[]>;
   findExpiredMoveInfoIds: () => Promise<UpdateResponse>;
+  countByUserId: (userId: string) => Promise<number>;
+  driverIdsForCompletedMoves: (now: Date) => Promise<string[]>;
+  getUserMoveInfo: (userId: string) => Promise<{ id: string }[]>;
 }

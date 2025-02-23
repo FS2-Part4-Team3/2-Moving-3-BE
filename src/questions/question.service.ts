@@ -1,6 +1,6 @@
 import { EstimationNotFoundException } from '#estimations/estimation.exception.js';
 import { EstimationRepository } from '#estimations/estimation.repository.js';
-import { Estimation } from '#estimations/estimation.types.js';
+import { Estimation } from '#estimations/types/estimation.types.js';
 import { ForbiddenException } from '#exceptions/http.exception.js';
 import { MoveRepository } from '#move/move.repository.js';
 import { IQuestionService } from '#questions/interfaces/question.service.interface.js';

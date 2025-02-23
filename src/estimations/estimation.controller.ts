@@ -1,14 +1,4 @@
 import { EstimationService } from '#estimations/estimation.service.js';
-import {
-  DriverEstimationDetailDTO,
-  DriverEstimationsList,
-  EstimationInputDTO,
-  EstimationOutputDTO,
-  RejectedEstimationsListDTO,
-  ReviewableListResponseDTO,
-  UserEstimationDetailDTO,
-  UserEstimationListWithCountDTO,
-} from '#estimations/estimation.types.js';
 import { IEstimationController } from '#estimations/interfaces/estimation.controller.interface.js';
 import { AccessTokenGuard } from '#guards/access-token.guard.js';
 import { QuestionService } from '#questions/question.service.js';
@@ -24,6 +14,17 @@ import {
 } from '#types/queries.type.js';
 import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards, ValidationPipe } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ConfirmedEstimationDTO,
+  DriverEstimationDetailDTO,
+  DriverEstimationsList,
+  EstimationInputDTO,
+  EstimationOutputDTO,
+  RejectedEstimationsListDTO,
+  ReviewableListResponseDTO,
+  UserEstimationDetailDTO,
+  UserEstimationListWithCountDTO,
+} from './types/estimation.dto.js';
 
 @Controller('estimations')
 export class EstimationController implements IEstimationController {
@@ -107,6 +108,7 @@ export class EstimationController implements IEstimationController {
   async getRejectedRequests(@Query() query: DriverRejectedEstimations) {
     const { page = 1, pageSize = 10 } = query;
     const options = { page, pageSize };
+
     const estimations = await this.estimationService.getRejectedEstimations(options);
     return estimations;
   }
@@ -132,8 +134,9 @@ export class EstimationController implements IEstimationController {
   @ApiParam({ name: 'estimationId', description: '견적 ID', type: 'string' })
   @ApiResponse({
     status: HttpStatus.OK,
+    type: ConfirmedEstimationDTO,
   })
-  async getConfirmedEstimation(@Param('estimationId') estimationId: string): Promise<any> {
+  async getConfirmedEstimation(@Param('estimationId') estimationId: string): Promise<ConfirmedEstimationDTO> {
     const estimation = await this.estimationService.getConfirmedEstimation(estimationId);
     return estimation;
   }

@@ -275,13 +275,13 @@ export class MoveRepository implements IMoveRepository {
     };
   }
 
-  async countByUserId(userId: string): Promise<number> {
+  async countByUserId(userId: string) {
     return this.moveInfo.count({
       where: { ownerId: userId, progress: ProgressEnum.OPEN },
     });
   }
 
-  async driverIdsForCompletedMoves(now: Date): Promise<string[]> {
+  async driverIdsForCompletedMoves(now: Date) {
     const completedMoves = await this.moveInfo.findMany({
       where: {
         progress: ProgressEnum.COMPLETE,
@@ -298,5 +298,13 @@ export class MoveRepository implements IMoveRepository {
     });
 
     return completedMoves.map(move => move.confirmedEstimation?.driverId).filter(id => id);
+  }
+
+  // 유저의 이사 정보 목록 가져오기
+  async getUserMoveInfo(userId: string) {
+    return this.moveInfo.findMany({
+      where: { ownerId: userId }, // 로그인한 유저의 이사만 조회하기
+      select: { id: true }, // 이사 ID만 선택
+    });
   }
 }

@@ -1,16 +1,5 @@
 import { IEstimationService } from '#estimations/interfaces/estimation.service.interface.js';
 import { EstimationRepository } from '#estimations/estimation.repository.js';
-import {
-  EstimationInputDTO,
-  Estimation,
-  ReviewableListDTO,
-  UserEstimationListWithCountDTO,
-  DriverEstimationsListDTO,
-  UserEstimationDetailDTO,
-  RejectedEstimationsListDTO,
-  DriverEstimationDetailDTO,
-  IsActivate,
-} from '#estimations/estimation.types.js';
 import { Injectable } from '@nestjs/common';
 import { IStorage } from '#types/common.types.js';
 import { AsyncLocalStorage } from 'async_hooks';
@@ -18,7 +7,6 @@ import { MoveRepository } from '#move/move.repository.js';
 import { RequestRepository } from '#requests/request.repository.js';
 import { IMoveInfo } from '#move/types/move.types.js';
 import { EstimateAlreadyExistsException, EstimationAccessForbiddenException } from './estimation.exception.js';
-import { RequestRejectedException } from './estimation.exception.js';
 import { DriverNotFoundException } from '#drivers/driver.exception.js';
 import { MoveInfoNotFoundException } from '#move/move.exception.js';
 import { DriverService } from '#drivers/driver.service.js';
@@ -29,6 +17,18 @@ import {
   EstimationGetQueries,
   ReviewableGetQueries,
 } from '#types/queries.type.js';
+import {
+  ConfirmedEstimationDTO,
+  DriverEstimationDetailDTO,
+  DriverEstimationsListDTO,
+  EstimationInputDTO,
+  RejectedEstimationsListDTO,
+  ReviewableListDTO,
+  UserEstimationDetailDTO,
+  UserEstimationListWithCountDTO,
+} from './types/estimation.dto.js';
+import { Estimation } from './types/estimation.types.js';
+import { IsActivate } from '#types/options.type.js';
 
 @Injectable()
 export class EstimationService implements IEstimationService {
@@ -181,7 +181,7 @@ export class EstimationService implements IEstimationService {
     }
 
     const { page, pageSize } = options;
-    const moveInfos = await this.estimationRepository.getUserMoveInfos(userId);
+    const moveInfos = await this.moveRepository.getUserMoveInfo(userId);
 
     if (moveInfos.length === 0) {
       throw new MoveInfoNotFoundException();
@@ -273,7 +273,7 @@ export class EstimationService implements IEstimationService {
 
     const estimation = await this.estimationRepository.findEstimationDetail(estimationId);
     const driver = await this.driversService.findDriver(estimation.driverId);
-    const designatedRequest = await this.estimationRepository.findDesignatedStatus(estimation.moveInfoId, estimation.driverId);
+    const designatedRequest = await this.requestRepository.findDesignatedStatus(estimation.moveInfoId, estimation.driverId);
 
     return {
       driverId: driver.id,
@@ -307,7 +307,7 @@ export class EstimationService implements IEstimationService {
       throw new EstimationAccessForbiddenException();
     }
 
-    const designatedRequest = await this.estimationRepository.findDesignatedStatus(estimation.moveInfoId, estimation.driverId);
+    const designatedRequest = await this.requestRepository.findDesignatedStatus(estimation.moveInfoId, estimation.driverId);
 
     return {
       user: {
@@ -368,31 +368,30 @@ export class EstimationService implements IEstimationService {
     return { estimations: estimationData, totalCount };
   }
 
-  async getConfirmedEstimation(estimationId: string): Promise<any> {
+  async getConfirmedEstimation(estimationId: string): Promise<ConfirmedEstimationDTO> {
     const { reviews, ...estimation } = await this.estimationRepository.findById(estimationId);
 
     const driver = await this.driversService.findDriver(estimation.driverId);
     const isLiked = await this.driversService.isLikedDriver(estimation.driverId);
-    const designatedRequest = await this.estimationRepository.findDesignatedStatus(estimation.moveInfoId, estimation.driverId);
+    const designatedRequest = await this.requestRepository.findDesignatedStatus(estimation.moveInfoId, estimation.driverId);
+    const isSpecificRequest = designatedRequest === IsActivate.Active ? true : false;
 
     const ConfirmedEstimationInfo = {
-      estimationInfo: {
-        estimationId: estimation.id,
-        comment: estimation.comment,
-        price: estimation.price,
-      },
-      driverInfo: {
+      comment: estimation.comment,
+      price: estimation.price,
+
+      driver: {
         image: driver.image,
         name: driver.name,
         rating: driver.rating,
         reviewCount: driver.reviewCount,
         career: driver.career,
         applyCount: driver.applyCount,
-        likedUsers: isLiked,
+        isliked: isLiked,
         likeCount: driver.likeCount,
         serviceType: driver.serviceType,
       },
-      designatedRequest,
+      isSpecificRequest,
     };
     return ConfirmedEstimationInfo;
   }

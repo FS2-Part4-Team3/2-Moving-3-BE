@@ -89,7 +89,6 @@ fs2-part4-team3-be
  ┃ ┃ ┣ estimation.module.ts
  ┃ ┃ ┣ estimation.repository.ts
  ┃ ┃ ┣ estimation.service.ts
- ┃ ┃ ┗ estimation.types.ts
  ┃ ┣ exceptions
  ┃ ┃ ┣ base.exception.ts
  ┃ ┃ ┣ common.exception.ts
