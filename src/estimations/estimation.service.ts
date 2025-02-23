@@ -182,7 +182,6 @@ export class EstimationService implements IEstimationService {
 
     const { page, pageSize } = options;
     const moveInfos = await this.moveRepository.getUserMoveInfo(userId);
-    console.log('~~~~~~', moveInfos);
 
     if (moveInfos.length === 0) {
       throw new MoveInfoNotFoundException();
