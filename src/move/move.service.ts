@@ -39,7 +39,7 @@ export class MoveService implements IMoveService {
     private readonly prisma: PrismaService,
   ) {}
 
-  // @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   async autoCompleteMoves(): Promise<void> {
     const now = new Date();
 
