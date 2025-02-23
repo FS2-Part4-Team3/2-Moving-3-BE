@@ -23,6 +23,7 @@ import { MoveInputDTO, MovePatchInputDTO } from './types/move.dto.js';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import logger from '#utils/logger.js';
 import { PrismaService } from '#global/prisma.service.js';
+import { DriverRepository } from '#drivers/driver.repository.js';
 
 @Injectable()
 export class MoveService implements IMoveService {
@@ -30,6 +31,7 @@ export class MoveService implements IMoveService {
 
   constructor(
     private readonly driverService: DriverService,
+    private readonly driverRepository: DriverRepository,
     private readonly moveRepository: MoveRepository,
     private readonly als: AsyncLocalStorage<IStorage>,
     private readonly estimationRepository: EstimationRepository,
@@ -37,13 +39,22 @@ export class MoveService implements IMoveService {
     private readonly prisma: PrismaService,
   ) {}
 
-  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  // @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   async autoCompleteMoves(): Promise<void> {
     const now = new Date();
 
     try {
       const updatedComplete = await this.moveRepository.updateToComplete(now);
       this.logger.info(`완료된 이사 ${updatedComplete.count}건 업데이트, 성공 여부: ${updatedComplete.success}`);
+
+      if (updatedComplete.success) {
+        const driverIds = await this.moveRepository.driverIdsForCompletedMoves(now);
+
+        if (driverIds.length > 0) {
+          await this.driverRepository.updateApplyCount(driverIds);
+          this.logger.info(`드라이버 확정 건수 업데이트 완료: ${driverIds.length}건`);
+        }
+      }
 
       const expiredMoveInfoIds = await this.moveRepository.updateToExpired(now);
       this.logger.info(`만료된 이사 ${expiredMoveInfoIds.length}건`);

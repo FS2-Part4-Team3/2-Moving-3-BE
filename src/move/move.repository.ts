@@ -280,4 +280,23 @@ export class MoveRepository implements IMoveRepository {
       where: { ownerId: userId, progress: ProgressEnum.OPEN },
     });
   }
+
+  async driverIdsForCompletedMoves(now: Date): Promise<string[]> {
+    const completedMoves = await this.moveInfo.findMany({
+      where: {
+        progress: ProgressEnum.COMPLETE,
+        date: { lt: now },
+        confirmedEstimationId: { not: null },
+      },
+      select: {
+        confirmedEstimation: {
+          select: {
+            driverId: true,
+          },
+        },
+      },
+    });
+
+    return completedMoves.map(move => move.confirmedEstimation?.driverId).filter(id => id);
+  }
 }

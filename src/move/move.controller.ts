@@ -14,10 +14,23 @@ import {
   MoveInputDTO,
   MovePatchInputDTO,
 } from './types/move.dto.js';
+import { InternalServerErrorException } from '#exceptions/http.exception.js';
 
 @Controller('moves')
 export class MoveController implements IMoveController {
   constructor(private readonly moveService: MoveService) {}
+
+  @Get('test')
+  async testAutoComplete() {
+    console.log('컨트롤러');
+    try {
+      await this.moveService.autoCompleteMoves();
+      return 'Auto-complete moves triggered';
+    } catch (error) {
+      console.error('컨트롤러 에러', error);
+      throw new InternalServerErrorException('자동 완료 중 오류 발생');
+    }
+  }
 
   @Get()
   @UseGuards(AccessTokenGuard)
