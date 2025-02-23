@@ -6,6 +6,7 @@ import { AsyncLocalStorage } from 'async_hooks';
 import { MoveRepository } from './move.repository.js';
 import {
   AutoCompleteException,
+  ConfirmedEstimationMoveInfoException,
   MoveInfoAlreadyExistsException,
   MoveInfoNotFoundException,
   ReceivedEstimationException,
@@ -323,6 +324,9 @@ export class MoveService implements IMoveService {
     }
     if (moveInfo.ownerId !== userId) {
       throw new ForbiddenException();
+    }
+    if (moveInfo.confirmedEstimationId) {
+      throw new ConfirmedEstimationMoveInfoException();
     }
 
     return await this.prisma.$transaction(async () => {

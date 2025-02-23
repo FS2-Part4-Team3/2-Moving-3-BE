@@ -24,3 +24,9 @@ export class MoveInfoAlreadyExistsException extends BadRequestException {
     super(ExceptionMessages.MOVEINFO_ALREADY_EXISTS);
   }
 }
+
+export class ConfirmedEstimationMoveInfoException extends BadRequestException {
+  constructor() {
+    super(ExceptionMessages.ESTIMATION_ALREADY_CONFIRMED);
+  }
+}
