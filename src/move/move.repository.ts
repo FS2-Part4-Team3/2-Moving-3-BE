@@ -281,6 +281,25 @@ export class MoveRepository implements IMoveRepository {
     });
   }
 
+  async driverIdsForCompletedMoves(now: Date): Promise<string[]> {
+    const completedMoves = await this.moveInfo.findMany({
+      where: {
+        progress: ProgressEnum.COMPLETE,
+        date: { lt: now },
+        confirmedEstimationId: { not: null },
+      },
+      select: {
+        confirmedEstimation: {
+          select: {
+            driverId: true,
+          },
+        },
+      },
+    });
+
+    return completedMoves.map(move => move.confirmedEstimation?.driverId).filter(id => id);
+  }
+
   // 유저의 이사 정보 목록 가져오기
   async getUserMoveInfo(userId: string) {
     return this.moveInfo.findMany({

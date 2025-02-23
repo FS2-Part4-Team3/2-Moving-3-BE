@@ -166,4 +166,11 @@ export class DriverRepository implements IDriverRepository {
       select: { id: true },
     });
   }
+
+  async updateApplyCount(driverIds: string[]) {
+    return this.driver.updateMany({
+      where: { id: { in: driverIds } },
+      data: { applyCount: { increment: 1 } },
+    });
+  }
 }
