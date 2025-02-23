@@ -18,6 +18,7 @@ import {
   ReviewableGetQueries,
 } from '#types/queries.type.js';
 import {
+  ConfirmedEstimationDTO,
   DriverEstimationDetailDTO,
   DriverEstimationsListDTO,
   EstimationInputDTO,
@@ -367,12 +368,12 @@ export class EstimationService implements IEstimationService {
     return { estimations: estimationData, totalCount };
   }
 
-  async getConfirmedEstimation(estimationId: string): Promise<any> {
+  async getConfirmedEstimation(estimationId: string): Promise<ConfirmedEstimationDTO> {
     const { reviews, ...estimation } = await this.estimationRepository.findById(estimationId);
 
     const driver = await this.driversService.findDriver(estimation.driverId);
     const isLiked = await this.driversService.isLikedDriver(estimation.driverId);
-    const designatedRequest = await this.estimationRepository.findDesignatedStatus(estimation.moveInfoId, estimation.driverId);
+    const designatedRequest = await this.requestRepository.findDesignatedStatus(estimation.moveInfoId, estimation.driverId);
 
     const ConfirmedEstimationInfo = {
       estimationInfo: {

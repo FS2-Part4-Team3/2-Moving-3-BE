@@ -334,7 +334,7 @@ export class RejectedEstimationsListDTO {
 
 class ConfirmedEstimation {
   @ApiProperty({ description: '견적 ID', type: String })
-  id: string;
+  estimationId: string;
 
   @IsString()
   @ApiProperty({ description: '견적 코멘트', type: String })

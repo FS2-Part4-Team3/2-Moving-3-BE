@@ -15,6 +15,7 @@ import {
 import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards, ValidationPipe } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
+  ConfirmedEstimationDTO,
   DriverEstimationDetailDTO,
   DriverEstimationsList,
   EstimationInputDTO,
@@ -107,6 +108,7 @@ export class EstimationController implements IEstimationController {
   async getRejectedRequests(@Query() query: DriverRejectedEstimations) {
     const { page = 1, pageSize = 10 } = query;
     const options = { page, pageSize };
+
     const estimations = await this.estimationService.getRejectedEstimations(options);
     return estimations;
   }
@@ -132,8 +134,9 @@ export class EstimationController implements IEstimationController {
   @ApiParam({ name: 'estimationId', description: '견적 ID', type: 'string' })
   @ApiResponse({
     status: HttpStatus.OK,
+    type: ConfirmedEstimationDTO,
   })
-  async getConfirmedEstimation(@Param('estimationId') estimationId: string): Promise<any> {
+  async getConfirmedEstimation(@Param('estimationId') estimationId: string): Promise<ConfirmedEstimationDTO> {
     const estimation = await this.estimationService.getConfirmedEstimation(estimationId);
     return estimation;
   }
