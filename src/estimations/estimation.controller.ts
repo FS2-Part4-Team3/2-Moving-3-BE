@@ -125,6 +125,19 @@ export class EstimationController implements IEstimationController {
     return estimation;
   }
 
+  @Get('confirmed/:estimationId')
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth('accessToken')
+  @ApiOperation({ summary: '확정된 견적 상세 조회' })
+  @ApiParam({ name: 'estimationId', description: '견적 ID', type: 'string' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+  })
+  async getConfirmedEstimation(@Param('estimationId') estimationId: string): Promise<any> {
+    const estimation = await this.estimationService.getConfirmedEstimation(estimationId);
+    return estimation;
+  }
+
   @Post(':moveInfoId')
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth('accessToken')

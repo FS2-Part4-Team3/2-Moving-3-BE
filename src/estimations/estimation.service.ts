@@ -367,4 +367,31 @@ export class EstimationService implements IEstimationService {
 
     return { estimations: estimationData, totalCount };
   }
+
+  async getConfirmedEstimation(estimationId: string): Promise<any> {
+    const { reviews, ...estimation } = await this.estimationRepository.findById(estimationId);
+
+    const driver = await this.driversService.findDriver(estimation.driverId);
+    const isLiked = await this.driversService.isLikedDriver(estimation.driverId);
+
+    const ConfirmedEstimationInfo = {
+      estimationInfo: {
+        estimationId: estimation.id,
+        comment: estimation.comment,
+        price: estimation.price,
+      },
+      driverInfo: {
+        image: driver.image,
+        name: driver.name,
+        rating: driver.rating,
+        reviewCount: driver.reviewCount,
+        career: driver.career,
+        applyCount: driver.applyCount,
+        likedUsers: isLiked,
+        likeCount: driver.likeCount,
+        serviceType: driver.serviceType,
+      },
+    };
+    return ConfirmedEstimationInfo;
+  }
 }
