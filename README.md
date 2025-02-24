@@ -1,7 +1,5 @@
-# FS2 PART4 TEAM3 MOVING BE
-
-![로고](https://www.moving.wiki/_next/static/media/logo-icon-text.a208f1f3.svg)
-
+![로고](https://www.moving.wiki/_next/static/media/logo-icon-text.a208f1f3.svg)</br>
+**[FS2 PART4 TEAM3 MOVING BE**</br>
 📅 2025.01.06 ~ 2025.02.25 </br>
 🚀 **코드잇 스프린트 풀스택 2기 고급 프로젝트 3팀 (Backend)** 🖥️
 </br>
@@ -19,7 +17,6 @@
 
 </br>
 
-- [FS2 PART4 TEAM3 MOVING BE](#fs2-part4-team3-moving-be)
 - [🛠️ 기술 스택](#️-기술-스택)
 - [👥 팀원 구성](#-팀원-구성)
 - [📝 팀원별 구현 기능 상세](#-팀원별-구현-기능-상세)
