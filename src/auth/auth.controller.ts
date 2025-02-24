@@ -333,6 +333,21 @@ export class AuthController implements IAuthController {
   })
   async kakaoAuth() {}
 
+  @Get('kakao/:userType/verify/:userId')
+  @UseGuards(AuthGuard('kakaoVerify'))
+  @ApiOperation({ summary: '카카오 로그인 유저 인증' })
+  @ApiParam({ name: 'userType', enum: UserType })
+  @ApiResponse({
+    status: HttpStatus.FOUND,
+    headers: {
+      Location: {
+        description: '카카오 콜백 페이지에 액세스 토큰과 함께 리다이렉션',
+        schema: { type: 'string', example: 'https://www.moving.wiki/callback/kakao/verify?accessToken=TokenValue' },
+      },
+    },
+  })
+  async kakaoAuthVerify() {}
+
   @Get('oauth2/redirect/kakao')
   @ApiExcludeEndpoint()
   @UseGuards(AuthGuard('kakao'))
@@ -344,6 +359,19 @@ export class AuthController implements IAuthController {
     this.setRefreshToken(response, refreshToken);
 
     response.redirect(`${oauthRedirect}/callback/kakao?accessToken=${accessToken}`);
+  }
+
+  @Get('oauth2/redirect/kakao/verify')
+  @ApiExcludeEndpoint()
+  @UseGuards(AuthGuard('kakaoVerify'))
+  async kakaoAuthVerifyRedirect(@Req() req, @Res({ passthrough: true }) response: Response) {
+    const redirectResult: SocialAuthType = req.user;
+
+    const { person, accessToken, refreshToken } = await this.authService.socialAuthVerify(redirectResult);
+    this.setAccessToken(response, accessToken);
+    this.setRefreshToken(response, refreshToken);
+
+    response.redirect(`${oauthRedirect}/callback/kakao/verify?accessToken=${accessToken}`);
   }
 
   @Get('naver/:userType')
@@ -361,6 +389,21 @@ export class AuthController implements IAuthController {
   })
   async naverAuth() {}
 
+  @Get('naver/:userType/verify/:userId')
+  @UseGuards(AuthGuard('naverVerify'))
+  @ApiOperation({ summary: '네이버 로그인 유저 인증' })
+  @ApiParam({ name: 'userType', enum: UserType })
+  @ApiResponse({
+    status: HttpStatus.FOUND,
+    headers: {
+      Location: {
+        description: '네이버 콜백 페이지에 액세스 토큰과 함께 리다이렉션',
+        schema: { type: 'string', example: 'https://www.moving.wiki/callback/naver/verify?accessToken=TokenValue' },
+      },
+    },
+  })
+  async naverAuthVerify() {}
+
   @Get('oauth2/redirect/naver')
   @ApiExcludeEndpoint()
   @UseGuards(AuthGuard('naver'))
@@ -372,5 +415,18 @@ export class AuthController implements IAuthController {
     this.setRefreshToken(response, refreshToken);
 
     response.redirect(`${oauthRedirect}/callback/naver?accessToken=${accessToken}`);
+  }
+
+  @Get('oauth2/redirect/naver/verify')
+  @ApiExcludeEndpoint()
+  @UseGuards(AuthGuard('naverVerify'))
+  async naverAuthVerifyRedirect(@Req() req, @Res({ passthrough: true }) response: Response) {
+    const redirectResult: SocialAuthType = req.user;
+
+    const { person, accessToken, refreshToken } = await this.authService.socialAuthVerify(redirectResult);
+    this.setAccessToken(response, accessToken);
+    this.setRefreshToken(response, refreshToken);
+
+    response.redirect(`${oauthRedirect}/callback/naver/verify?accessToken=${accessToken}`);
   }
 }
