@@ -1,5 +1,5 @@
 ![로고](https://www.moving.wiki/_next/static/media/logo-icon-text.a208f1f3.svg)</br>
-**[FS2 PART4 TEAM3 MOVING BE**</br>
+**FS2 PART4 TEAM3 MOVING BE**</br>
 📅 2025.01.06 ~ 2025.02.25 </br>
 🚀 **코드잇 스프린트 풀스택 2기 고급 프로젝트 3팀 (Backend)** 🖥️
 </br>
