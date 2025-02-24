@@ -381,6 +381,7 @@ export class EstimationService implements IEstimationService {
       price: estimation.price,
 
       driver: {
+        driverId: driver.id,
         image: driver.image,
         name: driver.name,
         rating: driver.rating,

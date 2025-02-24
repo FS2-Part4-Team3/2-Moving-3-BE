@@ -333,6 +333,9 @@ export class RejectedEstimationsListDTO {
 }
 
 class ConfirmedDriverInfoDTO {
+  @ApiProperty({ description: '드라이버 ID', type: String })
+  driverId: string;
+
   @ApiProperty({ description: '드라이버 프로필 이미지', type: String, nullable: true })
   @IsOptional()
   image?: string;
