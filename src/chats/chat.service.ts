@@ -60,7 +60,6 @@ export class ChatService implements IChatService {
       await generateS3DownloadUrlForChat(type === UserType.User ? userId : driverId, chat);
       newList.push(chat);
     }
-    // await Promise.all(list.map(async chat => await generateS3DownloadUrlForChat(chat.ownerId, chat)));
 
     return { totalCount, list: newList };
   }
