@@ -36,6 +36,9 @@ export class EstimationRepository implements IEstimationRepository {
     return this.estimation.count({
       where: {
         confirmedForId: { in: moveInfoIds },
+        moveInfo: {
+          progress: 'COMPLETE',
+        },
       },
     });
   }
@@ -45,6 +48,9 @@ export class EstimationRepository implements IEstimationRepository {
     const estimations = await this.estimation.findMany({
       where: {
         confirmedForId: { in: moveInfoIds },
+        moveInfo: {
+          progress: 'COMPLETE',
+        },
       },
       include: {
         driver: true,
@@ -254,7 +260,7 @@ export class EstimationRepository implements IEstimationRepository {
       where: {
         moveInfo: {
           ownerId: userId,
-          progress: ProgressEnum.OPEN,
+          progress: 'OPEN',
           confirmedEstimationId: null,
         },
         price: { not: null },
