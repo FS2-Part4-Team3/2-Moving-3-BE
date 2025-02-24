@@ -137,6 +137,7 @@ export class EstimationRepository implements IEstimationRepository {
       where: {
         driverId,
         moveInfo: { progress: { in: ['OPEN', 'CONFIRMED'] } },
+        price: { not: null },
       },
       include: { moveInfo: { include: { owner: true } } },
       orderBy: { createdAt: 'desc' }, // 최신순 정렬
@@ -147,6 +148,7 @@ export class EstimationRepository implements IEstimationRepository {
       where: {
         driverId,
         moveInfo: { progress: { in: ['COMPLETE', 'EXPIRED', 'CANCELED'] } },
+        price: { not: null },
       },
       include: { moveInfo: { include: { owner: true } } },
       orderBy: { createdAt: 'desc' }, // 최신순 정렬
@@ -167,6 +169,7 @@ export class EstimationRepository implements IEstimationRepository {
       where: {
         driverId,
         moveInfo: { progress: { in: ['OPEN', 'CONFIRMED', 'COMPLETE', 'EXPIRED', 'CANCELED'] } },
+        price: { not: null },
       },
     });
   }
