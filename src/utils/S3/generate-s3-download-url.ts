@@ -27,6 +27,8 @@ export async function generateS3DownloadUrlForChat(ownerId: string, chat: IChat)
 
   const downloadUrl = await generatePresignedDownloadUrl(s3Key);
   chat.image = downloadUrl;
+  console.log('🚀 ~ generateS3DownloadUrlForChat ~ chat.id:', chat.id);
+  console.log('🚀 ~ generateS3DownloadUrlForChat ~ downloadUrl:', downloadUrl);
 
   return downloadUrl;
 }
