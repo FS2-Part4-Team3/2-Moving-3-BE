@@ -1,13 +1,19 @@
 # FS2 PART4 TEAM3 MOVING BE
 
-📅 2025.01.06 ~ 2025.02.25 </br>
-👥 코드잇 스프린트 풀스택 2기 고급 프로젝트 3팀 (Backend)
+![로고](https://www.moving.wiki/_next/static/media/logo-icon-text.a208f1f3.svg)
 
+📅 2025.01.06 ~ 2025.02.25 </br>
+🚀 **코드잇 스프린트 풀스택 2기 고급 프로젝트 3팀 (Backend)** 🖥️
+</br>
+
+✨ **원하는 이사 서비스를 요청하고** ✨  
+🚚 **견적을 받아보세요** 💰
 </br>
 
 🔗 **관련 링크**
 
 - **무빙 홈페이지**: [moving.wiki](https://www.moving.wiki/)
+- **무빙 FE Github**: [moving FE Github](https://github.com/FS2-Part4-Team3/2-Moving-3-FE)
 - **무빙 노션**: [Moving Notion](https://www.notion.so/168070c8d1ed80f780a9f4417cf0ec74?v=f40161463b244eab97b47b04b98f7f1a)
 - **API 명세서**: [API Docs](https://backend.moving.wiki/api-docs)
 
@@ -16,7 +22,7 @@
 - [FS2 PART4 TEAM3 MOVING BE](#fs2-part4-team3-moving-be)
 - [🛠️ 기술 스택](#️-기술-스택)
 - [👥 팀원 구성](#-팀원-구성)
-- [📝 팀원별 구현 기능 상세](#--팀원별-구현-기능-상세)
+- [📝 팀원별 구현 기능 상세](#-팀원별-구현-기능-상세)
 
 </br>
 
@@ -28,10 +34,10 @@
 ![Swagger](https://img.shields.io/badge/Swagger-85EA2D?style=flat&logo=swagger&logoColor=black)
 ![Passport](https://img.shields.io/badge/Passport-34E27A?style=flat&logo=passport&logoColor=white)
 ![Jest](https://img.shields.io/badge/Jest-C21325?style=flat&logo=jest&logoColor=white)
-![PM2](https://img.shields.io/badge/PM2-2B037A?style=flat&logo=pm2&logoColor=white)
 ![Winston](https://img.shields.io/badge/Winston-000000?style=flat)
 ![JWT](https://img.shields.io/badge/JWT-000000?style=flat&logo=jsonwebtokens&logoColor=white)
 ![Socket.io](https://img.shields.io/badge/Socket.io-010101?style=flat&logo=socket.io&logoColor=white)
+![Google Gemini](https://img.shields.io/badge/Google%20Gemini-AI-8E75B2?style=flat&logo=googleGemini&logoColor=white)
 
 **Database** <br>
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-336791?style=flat&logo=postgresql&logoColor=white)
@@ -40,6 +46,7 @@
 **DevOps & Others** <br>
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white)
 ![Node-cron](https://img.shields.io/badge/Node--cron-777BB4?style=flat&logo=node-schedule&logoColor=white)
+![Scheduler](https://img.shields.io/badge/Scheduler-8A2BE2?style=flat&logo=scheduler&logoColor=white)
 
 **Tools** <br>
 ![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white)
@@ -53,7 +60,7 @@
 
 |                   김태영                   |                   강명곤                    |                     김윤서                     |
 | :----------------------------------------: | :-----------------------------------------: | :--------------------------------------------: |
-| [태영's Github](https://github.com/csbizz) | [명곤's Github](https://github.com/GGON123) | [윤서's 깃허브](https://github.com/hello-yoon) |
+| [태영's Github](https://github.com/csbizz) | [명곤's Github](https://github.com/GGON123) | [윤서's Github](https://github.com/hello-yoon) |
 
 </br>
 
