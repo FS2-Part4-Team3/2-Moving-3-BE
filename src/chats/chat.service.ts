@@ -55,9 +55,14 @@ export class ChatService implements IChatService {
         ? await this.chatRepository.findChats(userId, targetId, options)
         : await this.chatRepository.findChats(targetId, driverId, options);
 
-    await Promise.all(list.map(async chat => await generateS3DownloadUrlForChat(chat.ownerId, chat)));
+    let newList = [];
+    for (const chat of list) {
+      await generateS3DownloadUrlForChat(type === UserType.User ? userId : driverId, chat);
+      newList.push(chat);
+    }
+    // await Promise.all(list.map(async chat => await generateS3DownloadUrlForChat(chat.ownerId, chat)));
 
-    return { totalCount, list };
+    return { totalCount, list: newList };
   }
 
   async createChat({ userId, driverId, direction, message, image }: ChatCreateDTO) {
