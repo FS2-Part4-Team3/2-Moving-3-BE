@@ -23,14 +23,18 @@ const prisma = new PrismaClient({ datasourceUrl: process.env.DATABASE_URL });
 
 async function main() {
   await prisma.$transaction([
+    prisma.chat.deleteMany(),
     prisma.notification.deleteMany(),
+    prisma.reviewKeywords.deleteMany(),
+    prisma.reviewSummary.deleteMany(),
     prisma.review.deleteMany(),
     prisma.question.deleteMany(),
     prisma.estimation.deleteMany(),
     prisma.request.deleteMany(),
     prisma.moveInfo.deleteMany(),
-    prisma.driver.deleteMany(),
+    prisma.loggedInUsers.deleteMany(),
     prisma.user.deleteMany(),
+    prisma.driver.deleteMany(),
   ]);
 
   // Generate mock data for User
