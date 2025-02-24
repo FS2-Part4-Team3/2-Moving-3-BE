@@ -37,7 +37,7 @@ export class EstimationRepository implements IEstimationRepository {
       where: {
         confirmedForId: { in: moveInfoIds },
         moveInfo: {
-          progress: 'COMPLETE',
+          progress: ProgressEnum.COMPLETE,
         },
       },
     });
@@ -49,7 +49,7 @@ export class EstimationRepository implements IEstimationRepository {
       where: {
         confirmedForId: { in: moveInfoIds },
         moveInfo: {
-          progress: 'COMPLETE',
+          progress: ProgressEnum.COMPLETE,
         },
       },
       include: {
@@ -260,7 +260,7 @@ export class EstimationRepository implements IEstimationRepository {
       where: {
         moveInfo: {
           ownerId: userId,
-          progress: 'OPEN',
+          progress: ProgressEnum.OPEN,
           confirmedEstimationId: null,
         },
         price: { not: null },
