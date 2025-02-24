@@ -1,0 +1,327 @@
+//// ------------------------------------------------------
+//// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+//// ------------------------------------------------------
+
+Table User {
+  id String [pk]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  deletedAt DateTime
+  email String [unique, not null]
+  name String [not null]
+  phoneNumber String
+  image String
+  password String
+  salt String
+  refreshToken String
+  serviceType ServiceType[] [not null]
+  areas Area[] [not null]
+  provider String
+  providerId String
+  reviews Review [not null]
+  moveInfos MoveInfo [not null]
+  likeDrivers Driver [not null]
+  questions Question [not null]
+  notifications Notification [not null]
+  Chat Chat [not null]
+}
+
+Table Driver {
+  id String [pk]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  deletedAt DateTime
+  email String [unique, not null]
+  name String [not null]
+  nickname String
+  image String
+  password String
+  salt String
+  refreshToken String
+  phoneNumber String
+  introduce String
+  description String
+  serviceType ServiceType[] [not null]
+  availableAreas Area[] [not null]
+  startAt DateTime [default: `now()`, not null]
+  applyCount Int [not null, default: 0]
+  likeCount Int [not null, default: 0]
+  rating Float [not null, default: 0]
+  provider String
+  providerId String
+  reviews Review [not null]
+  requests Request [not null]
+  estimations Estimation [not null]
+  likedUsers User [not null]
+  questions Question [not null]
+  notifications Notification [not null]
+  Chat Chat [not null]
+  reviewSummary ReviewSummary
+  reviewKeywords ReviewKeywords [not null]
+}
+
+Table MoveInfo {
+  id String [pk]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  deletedAt DateTime
+  serviceType ServiceType [not null]
+  date DateTime [not null]
+  fromAddress String [not null]
+  toAddress String [not null]
+  progress Progress [not null]
+  confirmedEstimation Estimation
+  confirmedEstimationId String [unique]
+  owner User [not null]
+  ownerId String [not null]
+  estimations Estimation [not null]
+  requests Request [not null]
+  notifications Notification [not null]
+}
+
+Table Request {
+  id String [pk]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  deletedAt DateTime
+  moveInfo MoveInfo [not null]
+  moveInfoId String [not null]
+  status Status [not null]
+  driver Driver [not null]
+  driverId String [not null]
+  notifications Notification [not null]
+}
+
+Table Estimation {
+  id String [pk]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  deletedAt DateTime
+  price Int
+  comment String [not null]
+  moveInfo MoveInfo [not null]
+  moveInfoId String [not null]
+  driver Driver [not null]
+  driverId String [not null]
+  confirmedFor MoveInfo
+  confirmedForId String [unique]
+  questions Question [not null]
+  reviews Review [not null]
+  notifications Notification [not null]
+}
+
+Table Question {
+  id String [pk]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  deletedAt DateTime
+  content String [not null]
+  estimation Estimation [not null]
+  estimationId String [not null]
+  user User
+  userId String
+  driver Driver
+  driverId String
+  notifications Notification [not null]
+}
+
+Table Review {
+  id String [pk]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  deletedAt DateTime
+  comment String [not null]
+  score Int [not null]
+  driver Driver [not null]
+  driverId String [not null]
+  owner User [not null]
+  ownerId String [not null]
+  estimation Estimation [not null]
+  estimationId String [not null]
+}
+
+Table Notification {
+  id String [pk]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  deletedAt DateTime
+  type NotificationType [not null]
+  message String [not null]
+  isRead Boolean [not null, default: false]
+  user User
+  userId String
+  driver Driver
+  driverId String
+  moveInfo MoveInfo
+  moveInfoId String
+  request Request
+  requestId String
+  estimation Estimation
+  estimationId String
+  question Question
+  questionId String
+}
+
+Table Chat {
+  id String [pk]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  deletedAt DateTime
+  user User [not null]
+  userId String [not null]
+  driver Driver [not null]
+  driverId String [not null]
+  direction ChatDirection [not null]
+  message String
+  image String
+  isRead Boolean [not null, default: false]
+}
+
+Table ReviewSummary {
+  id String [pk]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  deletedAt DateTime
+  summary String [not null]
+  driver Driver [not null]
+  driverId String [unique, not null]
+}
+
+Table loggedInUsers {
+  id String [pk]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  deletedAt DateTime
+  loginId String [unique, not null]
+  refreshToken String [not null]
+}
+
+Table ReviewKeywords {
+  id String [pk]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  deletedAt DateTime
+  keyword String [not null]
+  type KeywordType [not null]
+  count Int [not null, default: 1]
+  driver Driver [not null]
+  driverId String [not null]
+
+  indexes {
+    (driverId, keyword) [unique]
+  }
+}
+
+Table DriverToUser {
+  likedriversId String [ref: > Driver.id]
+  likedusersId String [ref: > User.id]
+}
+
+Enum ServiceType {
+  SMALL
+  HOME
+  OFFICE
+}
+
+Enum Area {
+  SEOUL
+  GYEONGGI
+  INCHEON
+  GANGWON
+  CHUNGBUK
+  CHUNGNAM
+  SEJONG
+  DAEJEON
+  JEONBUK
+  JEONNAM
+  GWANGJU
+  GYEONGBUK
+  GYEONGNAM
+  DAEGU
+  ULSAN
+  BUSAN
+  JEJU
+}
+
+Enum Status {
+  PENDING
+  EXPIRED
+  APPLY
+  REJECTED
+  CANCELED
+}
+
+Enum Progress {
+  PENDING
+  OPEN
+  EXPIRED
+  CONFIRMED
+  CANCELED
+  COMPLETE
+}
+
+Enum NotificationType {
+  MOVE_INFO_EXPIRED
+  NEW_REQUEST
+  NEW_ESTIMATION
+  REQUEST_REJECTED
+  ESTIMATION_CONFIRMED
+  NEW_QUESTION
+  D_7
+  D_1
+  D_DAY
+}
+
+Enum ChatDirection {
+  USER_TO_DRIVER
+  DRIVER_TO_USER
+}
+
+Enum KeywordType {
+  POSITIVE
+  NEGATIVE
+}
+
+Ref: MoveInfo.confirmedEstimationId - Estimation.id
+
+Ref: MoveInfo.ownerId > User.id
+
+Ref: Request.moveInfoId > MoveInfo.id
+
+Ref: Request.driverId > Driver.id
+
+Ref: Estimation.moveInfoId - MoveInfo.id
+
+Ref: Estimation.driverId > Driver.id
+
+Ref: Question.estimationId > Estimation.id
+
+Ref: Question.userId > User.id
+
+Ref: Question.driverId > Driver.id
+
+Ref: Review.driverId > Driver.id
+
+Ref: Review.ownerId > User.id
+
+Ref: Review.estimationId > Estimation.id
+
+Ref: Notification.userId > User.id
+
+Ref: Notification.driverId > Driver.id
+
+Ref: Notification.moveInfoId > MoveInfo.id
+
+Ref: Notification.requestId > Request.id
+
+Ref: Notification.estimationId > Estimation.id
+
+Ref: Notification.questionId > Question.id
+
+Ref: Chat.userId > User.id
+
+Ref: Chat.driverId > Driver.id
+
+Ref: ReviewSummary.driverId - Driver.id
+
+Ref: ReviewKeywords.driverId > Driver.id
